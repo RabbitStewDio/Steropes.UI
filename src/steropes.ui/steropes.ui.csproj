@@ -1,0 +1,389 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <CodePage>65001</CodePage>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{2A63593C-03D4-4B6A-BFA6-B9C0AAF12FAD}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Steropes.UI</RootNamespace>
+    <AssemblyName>steropes.ui</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <LangVersion>6</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="MonoGame.Framework, Version=3.6.0.1625, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MonoGame.Framework.Portable.3.6.0.1625\lib\portable-net45+win8+wpa81\MonoGame.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Animation\AnimatedValue.cs" />
+    <Compile Include="Animation\BounceValue.cs" />
+    <Compile Include="Animation\LerpValue.cs" />
+    <Compile Include="Animation\SmoothValue.cs" />
+    <Compile Include="Animation\StepValue.cs" />
+    <Compile Include="Animation\Timeline.cs" />
+    <Compile Include="Annotations\Annotations.cs" />
+    <Compile Include="Components\Window\FrameRateCalculator.cs" />
+    <Compile Include="Components\Window\IMouseCursorService.cs" />
+    <Compile Include="Components\Window\IRootPane.cs" />
+    <Compile Include="I18N\Common.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Common.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Input\BasicGameComponent.cs" />
+    <Compile Include="Input\EventFilterBase.cs" />
+    <Compile Include="Input\EventQueue.cs" />
+    <Compile Include="Input\EventQueueExtensions.cs" />
+    <Compile Include="Input\EventType.cs" />
+    <Compile Include="Input\GamePadInput\GamePadComponent.cs" />
+    <Compile Include="Input\GamePadInput\GamePadEventArgs.cs" />
+    <Compile Include="Input\GamePadInput\GamePadEventType.cs" />
+    <Compile Include="Input\GamePadInput\GamePadVibrationComponent.cs" />
+    <Compile Include="Input\IEventSink.cs" />
+    <Compile Include="Input\IEventSource.cs" />
+    <Compile Include="Input\InputEventArgs.cs" />
+    <Compile Include="Input\InputFlags.cs" />
+    <Compile Include="Input\InputManager.cs" />
+    <Compile Include="Input\KeyboardInput\IVirtualKeyLocaliser.cs" />
+    <Compile Include="Input\KeyboardInput\KeyboardComponent.cs" />
+    <Compile Include="Input\KeyboardInput\KeyEventArgs.cs" />
+    <Compile Include="Input\KeyboardInput\KeyEventType.cs" />
+    <Compile Include="Input\KeyboardInput\KeyStroke.cs" />
+    <Compile Include="Input\MouseInput\MouseButton.cs" />
+    <Compile Include="Input\MouseInput\MouseEventArgs.cs" />
+    <Compile Include="Input\MouseInput\MouseEventType.cs" />
+    <Compile Include="Input\MouseInput\MouseInputHandler.cs" />
+    <Compile Include="Input\TouchInput\TouchEventArgs.cs" />
+    <Compile Include="Input\TouchInput\TouchEventData.cs" />
+    <Compile Include="Input\TouchInput\TouchEventType.cs" />
+    <Compile Include="Input\TouchInput\TouchInputHandler.cs" />
+    <Compile Include="MouseCursor.cs" />
+    <Compile Include="Platform\BatchedDrawingService.cs" />
+    <Compile Include="Platform\BatchedDrawingServiceExtensions.cs" />
+    <Compile Include="Platform\IBoxTexture.cs" />
+    <Compile Include="Platform\Insets.cs" />
+    <Compile Include="Platform\IUIFont.cs" />
+    <Compile Include="Platform\IUITexture.cs" />
+    <Compile Include="Platform\OSPlatform.cs" />
+    <Compile Include="Platform\Resolution.cs" />
+    <Compile Include="Platform\ScreenMode.cs" />
+    <Compile Include="Properties\StaticAssemblyInfo.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StatefulUIManager.cs" />
+    <Compile Include="State\DictionaryNamedLookup.cs" />
+    <Compile Include="State\GameState.cs" />
+    <Compile Include="State\GameStateFadeTransition.cs" />
+    <Compile Include="State\GameStateManager.cs" />
+    <Compile Include="State\IGameState.cs" />
+    <Compile Include="State\INamedReadOnlyLookup.cs" />
+    <Compile Include="UIManagerComponent.cs" />
+    <Compile Include="Util\FlexibleList.cs" />
+    <Compile Include="Styles\Io\IStyleSerializerConfiguration.cs" />
+    <Compile Include="Styles\Io\Parser\IStyleParser.cs" />
+    <Compile Include="Styles\Io\Writer\StyleWriterExtensions.cs" />
+    <Compile Include="Styles\IStyle.cs" />
+    <Compile Include="Styles\IStyleDefinition.cs" />
+    <Compile Include="Styles\StyleSystem.cs" />
+    <Compile Include="Styles\StyleSystemExtensions.cs" />
+    <Compile Include="Styles\SubStyleSystem.cs" />
+    <Compile Include="Util\PropertyChangedEventSupport.cs" />
+    <Compile Include="Widgets\Container\OptionPaneActionArgs.cs" />
+    <Compile Include="Styles\Conditions\AndCondition.cs" />
+    <Compile Include="Styles\Conditions\AttributeCondition.cs" />
+    <Compile Include="Styles\Conditions\ClassCondition.cs" />
+    <Compile Include="Styles\Conditions\ICondition.cs" />
+    <Compile Include="Styles\Conditions\IdCondition.cs" />
+    <Compile Include="Styles\Conditions\NotCondition.cs" />
+    <Compile Include="Styles\Conditions\OrCondition.cs" />
+    <Compile Include="Styles\Conditions\PseudoClassCondition.cs" />
+    <Compile Include="Styles\IContentLoader.cs" />
+    <Compile Include="Styles\IFontFactory.cs" />
+    <Compile Include="Styles\Io\Parser\StyleParseException.cs" />
+    <Compile Include="Styles\Io\Parser\StyleParser.cs" />
+    <Compile Include="Styles\Io\Parser\StyleParserExtensions.cs" />
+    <Compile Include="Styles\Io\Values\BoolValueStylePropertySerializer.cs" />
+    <Compile Include="Styles\Io\Values\BoxTextureStylePropertySerializer.cs" />
+    <Compile Include="Styles\Io\Values\ColorValueStylePropertySerializer.cs" />
+    <Compile Include="Styles\Io\Values\EnumStylePropertySerializer.cs" />
+    <Compile Include="Styles\Io\Values\FloatValueStylePropertySerializer.cs" />
+    <Compile Include="Styles\Io\Values\InsetsStylePropertySerializer.cs" />
+    <Compile Include="Styles\Io\Values\IntValueStylePropertySerializer.cs" />
+    <Compile Include="Styles\Io\Values\IStylePropertySerializer.cs" />
+    <Compile Include="Styles\Io\Values\StringValueStylePropertySerializer.cs" />
+    <Compile Include="Styles\Io\Values\UIFontStylePropertySerializer.cs" />
+    <Compile Include="Styles\Io\Values\UITextureStylePropertySerializer.cs" />
+    <Compile Include="Styles\Io\Writer\AndConditionWriter.cs" />
+    <Compile Include="Styles\Io\Writer\AttributeConditionWriter.cs" />
+    <Compile Include="Styles\Io\Writer\ClassConditionWriter.cs" />
+    <Compile Include="Styles\Io\Writer\ConditionWriter.cs" />
+    <Compile Include="Styles\Io\Writer\IConditionWriter.cs" />
+    <Compile Include="Styles\Io\Writer\IdConditionWriter.cs" />
+    <Compile Include="Styles\Io\Writer\NotConditionWriter.cs" />
+    <Compile Include="Styles\Io\Writer\OrConditionWriter.cs" />
+    <Compile Include="Styles\Io\Writer\PseudoClassConditionWriter.cs" />
+    <Compile Include="Styles\Io\Writer\StyleWriter.cs" />
+    <Compile Include="Styles\Io\Writer\StyleWriterException.cs" />
+    <Compile Include="Styles\IPredefinedStyle.cs" />
+    <Compile Include="Styles\IPresentationStyle.cs" />
+    <Compile Include="Styles\IResolvedStyle.cs" />
+    <Compile Include="Styles\IStyleClassSet.cs" />
+    <Compile Include="Styles\IStyledObject.cs" />
+    <Compile Include="Styles\IStyleKey.cs" />
+    <Compile Include="Styles\IStyleRule.cs" />
+    <Compile Include="Styles\IStyleSystem.cs" />
+    <Compile Include="Styles\Selector\ConditionalSelector.cs" />
+    <Compile Include="Styles\Selector\DescendantSelector.cs" />
+    <Compile Include="Styles\Selector\ElementSelector.cs" />
+    <Compile Include="Styles\Selector\ISimpleSelector.cs" />
+    <Compile Include="Styles\Selector\IStyleSelector.cs" />
+    <Compile Include="Styles\StyleExtensions.cs" />
+    <Compile Include="Styles\StyleBuilder.cs" />
+    <Compile Include="Styles\StyleEventArgs.cs" />
+    <Compile Include="Styles\StyleResolver.cs" />
+    <Compile Include="Styles\Watcher\IWatchRule.cs" />
+    <Compile Include="Styles\Watcher\IWatchRuleFactory.cs" />
+    <Compile Include="Styles\Watcher\PropertyWatchRule.cs" />
+    <Compile Include="Styles\Watcher\PseudoClassWatchRule.cs" />
+    <Compile Include="Styles\Watcher\StyleClassWatchRule.cs" />
+    <Compile Include="Styles\Watcher\WatchRule.cs" />
+    <Compile Include="UIManager.cs" />
+    <Compile Include="Components\Alignment.cs" />
+    <Compile Include="Components\AnchoredRect.cs" />
+    <Compile Include="Widgets\Container\BoxGroup.cs" />
+    <Compile Include="Widgets\Container\DockPanel.cs" />
+    <Compile Include="Widgets\Container\Grid.cs" />
+    <Compile Include="Widgets\Container\Group.cs" />
+    <Compile Include="Widgets\Container\ILayeredWidget.cs" />
+    <Compile Include="Widgets\Container\LengthConstraint.cs" />
+    <Compile Include="Widgets\Container\PopUp.cs" />
+    <Compile Include="Widgets\Container\Splitter.cs" />
+    <Compile Include="Widgets\Container\SplitterBar.cs" />
+    <Compile Include="Widgets\Container\WidgetContainer.cs" />
+    <Compile Include="Widgets\Container\WidgetContainerBase.cs" />
+    <Compile Include="Components\Direction.cs" />
+    <Compile Include="Components\Helper\ArrangerHorizontal.cs" />
+    <Compile Include="Components\Helper\ArrangerVertical.cs" />
+    <Compile Include="Components\Helper\KeyboardActionMap.cs" />
+    <Compile Include="Components\IVisualContent.cs" />
+    <Compile Include="Widgets\Container\OptionPane.cs" />
+    <Compile Include="Components\Orientation.cs" />
+    <Compile Include="Components\Size.cs" />
+    <Compile Include="Widgets\Container\Window.cs" />
+    <Compile Include="Widgets\IToolTip.cs" />
+    <Compile Include="Widgets\ScrollbarMode.cs" />
+    <Compile Include="Widgets\SliderTrack.cs" />
+    <Compile Include="Widgets\Styles\BoxStyleDefinition.cs" />
+    <Compile Include="Widgets\Styles\ButtonStyleDefinition.cs" />
+    <Compile Include="Widgets\Styles\ImageStyleDefinition.cs" />
+    <Compile Include="Widgets\Styles\NotebookStyleDefinition.cs" />
+    <Compile Include="Widgets\Styles\ScrollbarStyleDefinition.cs" />
+    <Compile Include="Widgets\Styles\TextStyleDefinition.cs" />
+    <Compile Include="Components\UIStyle.cs" />
+    <Compile Include="Components\Styles\WidgetStyleDefinition.cs" />
+    <Compile Include="Widgets\TextWidgets\CaretExtensions.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\AbstractDocument.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\Bias.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\Edits\CompoundUndoableEdit.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\Edits\IUndoableEdit.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\Edits\UndoableEditBase.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\Helper\BreakIterator.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\Helper\ITextProcessingRules.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\Helper\LineBreakType.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\Helper\PositionCollection.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\Helper\WordBreakType.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\IDocumentContent.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\IDocumentEditInfo.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\IDocumentEditor.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\IElementEdit.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\ImmutableBranchNode.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\ImmutableLeafTextNode.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\ITextDocument.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\ITextDocumentFilter.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\ITextDocumentFilterChain.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\ITextNode.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\ITextNodeViewFactory.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\ITextPosition.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\ITreePath.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\PlainText\PasswordDocumentEditor.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\PlainText\PasswordViewFactory.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\PlainText\PlainTextDocument.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\PlainText\PlainTextDocumentEditor.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\PlainText\PlainTextViewFactory.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\RelativeTextPosition.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\Views\BlockTextView.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\Views\BranchTextView.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\Views\DocumentView.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\Views\IHighlight.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\Views\IHighlighter.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\Views\ITextChunkView.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\Views\ITextView.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\Views\JustifiedTextChunkView.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\Views\NavigationResult.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\Views\ParagraphTextView.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\Views\PasswordChunkView.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\Views\RebuildDocumentEditInfo.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\Views\RebuildElementEditInfo.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\Views\TextChunkView.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\Views\TextProcessing.cs" />
+    <Compile Include="Widgets\TextWidgets\Documents\Views\TextView.cs" />
+    <Compile Include="Widgets\TextWidgets\ICaret.cs" />
+    <Compile Include="Widgets\TextWidgets\LineNumberWidget.cs" />
+    <Compile Include="Widgets\TextWidgets\PasswordBox.cs" />
+    <Compile Include="Widgets\TextWidgets\TextArea.cs" />
+    <Compile Include="Widgets\TextWidgets\TextEditorWidgetBase.cs" />
+    <Compile Include="Widgets\TextWidgets\TextField.cs" />
+    <Compile Include="Widgets\TextWidgets\TextModificationEventArgs.cs" />
+    <Compile Include="Widgets\TextWidgets\TextStyle.cs" />
+    <Compile Include="Widgets\TextWidgets\TextWidgetBase.cs" />
+    <Compile Include="Components\Widget.cs" />
+    <Compile Include="Components\WidgetExtensions.cs" />
+    <Compile Include="Widgets\Button.cs" />
+    <Compile Include="Widgets\ButtonBase.cs" />
+    <Compile Include="Widgets\CheckBox.cs" />
+    <Compile Include="Widgets\ContentWidget.cs" />
+    <Compile Include="Widgets\CustomViewport.cs" />
+    <Compile Include="Widgets\DropDownBox.cs" />
+    <Compile Include="Widgets\DropDownItem.cs" />
+    <Compile Include="Widgets\IconLabel.cs" />
+    <Compile Include="Widgets\Image.cs" />
+    <Compile Include="Widgets\IRadioButtonSetContent.cs" />
+    <Compile Include="Widgets\IScrollable.cs" />
+    <Compile Include="Widgets\IScrollControl.cs" />
+    <Compile Include="Widgets\KeyBox.cs" />
+    <Compile Include="Widgets\Label.cs" />
+    <Compile Include="Widgets\ListDataItemRenderer.cs" />
+    <Compile Include="Widgets\ListSelectionEventArgs.cs" />
+    <Compile Include="Widgets\ListView.cs" />
+    <Compile Include="Widgets\Notebook.cs" />
+    <Compile Include="Widgets\NotebookTab.cs" />
+    <Compile Include="Widgets\NotebookTabList.cs" />
+    <Compile Include="Widgets\ScrollPanel.cs" />
+    <Compile Include="Widgets\ProgressBar.cs" />
+    <Compile Include="Widgets\RadioButtonSet.cs" />
+    <Compile Include="Widgets\Scrollbar.cs" />
+    <Compile Include="Widgets\SelectionEventArgs.cs" />
+    <Compile Include="Widgets\Slider.cs" />
+    <Compile Include="Widgets\SpinningWheel.cs" />
+    <Compile Include="Widgets\TextWidgets\WrapText.cs" />
+    <Compile Include="Widgets\Tooltip.cs" />
+    <Compile Include="Components\Window\Clipboard.cs" />
+    <Compile Include="Components\Window\Events\FocusedComponentMapper.cs" />
+    <Compile Include="Components\Window\Events\LocaliseKeysEventFilter.cs" />
+    <Compile Include="Components\Window\Events\MouseClickDetector.cs" />
+    <Compile Include="Components\Window\Events\MouseToComponentMapper.cs" />
+    <Compile Include="Components\Window\Events\PopupClosingEventProcessor.cs" />
+    <Compile Include="Components\Window\Events\PopUpEventFilter.cs" />
+    <Compile Include="Components\Window\Events\RepeatKeysEventFilter.cs" />
+    <Compile Include="Components\Window\Events\ScreenEventHandling.cs" />
+    <Compile Include="Components\Window\Events\SwallowEventsWhenInactiveFilter.cs" />
+    <Compile Include="Components\Window\Events\TouchToComponentMapper.cs" />
+    <Compile Include="Components\Window\GlassPane.cs" />
+    <Compile Include="Components\Window\IClipboardService.cs" />
+    <Compile Include="Components\Window\IFocusManager.cs" />
+    <Compile Include="Components\Window\IGameWindowService.cs" />
+    <Compile Include="Components\Window\IMouseHoverManager.cs" />
+    <Compile Include="Components\Window\IPopUp.cs" />
+    <Compile Include="Components\Window\IPopupManager.cs" />
+    <Compile Include="Components\Window\IScreenService.cs" />
+    <Compile Include="Components\Window\IWindow.cs" />
+    <Compile Include="Components\Window\IWindowBase.cs" />
+    <Compile Include="Components\Window\RootPane.cs" />
+    <Compile Include="Components\Window\Screen.cs" />
+    <Compile Include="Util\CollectionDictionary.cs" />
+    <Compile Include="Util\EnumMap.cs" />
+    <Compile Include="Util\EventSupport.cs" />
+    <Compile Include="Util\ExpressionCache.cs" />
+    <Compile Include="Util\IdentityComparator.cs" />
+    <Compile Include="Util\LRUCache.cs" />
+    <Compile Include="Util\PushBackEnumerator.cs" />
+    <Compile Include="Util\Utils.cs" />
+    <Compile Include="Util\XnaExtensions.cs" />
+    <Compile Include="Widgets\TooltipPositionMode.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="..\steropes-ui.licenseheader">
+      <Link>steropes-ui.licenseheader</Link>
+    </None>
+    <None Include="style.xsd">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="I18N\Common.fr.resx" />
+    <EmbeddedResource Include="I18N\Common.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Common.Designer.cs</LastGenOutput>
+      <!--      <LogicalName>NuclearWinter.i18n.Common.resources</LogicalName> -->
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\StyleCop.MSBuild.4.7.55.0\build\StyleCop.MSBuild.Targets" Condition="Exists('..\packages\StyleCop.MSBuild.4.7.55.0\build\StyleCop.MSBuild.Targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\StyleCop.MSBuild.4.7.55.0\build\StyleCop.MSBuild.Targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\StyleCop.MSBuild.4.7.55.0\build\StyleCop.MSBuild.Targets'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
