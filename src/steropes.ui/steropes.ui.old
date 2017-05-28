@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>steropes.ui</id>
+    <version>$version$</version>
+    <title>steropes.ui</title>
+    <authors>Thomas Morgner</authors>
+    <owners>Rabbit-Stew-Dio Ltd.</owners>
+    <licenseUrl>https://www.steropes-ui.com/LICENSE</licenseUrl>
+    <projectUrl>https://www.steropes-ui.com</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Steropes-UI is a lightweight UI framework for Monogame. It gives you flexible declarative styling on top of a simple and testable UI framework.</description>
+    <copyright>Copyright 2017</copyright>
+    <tags>Monogame UI</tags>
+    <developmentDependency>true</developmentDependency>
+  </metadata>
+  <files></files>
+</package>

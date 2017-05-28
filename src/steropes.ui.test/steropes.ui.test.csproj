@@ -1,0 +1,179 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <CodePage>65001</CodePage>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{CAB2DAD0-C159-4260-B0F6-AE299BA79D79}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Steropes.UI.Test</RootNamespace>
+    <AssemblyName>steropes.ui.test</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <LangVersion>6</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="FluentAssertions, Version=4.18.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
+      <HintPath>..\packages\FluentAssertions.4.18.0\lib\net45\FluentAssertions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FluentAssertions.Core, Version=4.18.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
+      <HintPath>..\packages\FluentAssertions.4.18.0\lib\net45\FluentAssertions.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="MonoGame.Framework, Version=3.6.0.1625, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MonoGame.Framework.WindowsDX.3.6.0.1625\lib\net40\MonoGame.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="MonoGame.Framework.Content.Pipeline">
+      <HintPath>$(MSBuildExtensionsPath)\MonoGame\v3.0\Tools\MonoGame.Framework.Content.Pipeline.dll</HintPath>
+    </Reference>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.4.0\lib\net45\NLog.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NSubstitute, Version=1.10.0.0, Culture=neutral, PublicKeyToken=92dd2e9066daa5ca, processorArchitecture=MSIL">
+      <HintPath>..\packages\NSubstitute.1.10.0.0\lib\net45\NSubstitute.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="nunit.framework, Version=3.5.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.3.5.0\lib\net45\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Animation\AnimatedValueTest.cs" />
+    <Compile Include="AssertionHelper.cs" />
+    <Compile Include="ExpressionCache.cs" />
+    <Compile Include="FunctionRecorder.cs" />
+    <Compile Include="LayoutTestStyle.cs" />
+    <Compile Include="LayoutTestWidget.cs" />
+    <Compile Include="LinqTest.cs" />
+    <Compile Include="LocalisationTest.cs" />
+    <Compile Include="Properties\StaticAssemblyInfo.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StyleLoader.cs" />
+    <Compile Include="Styles\ColorParserTest.cs" />
+    <Compile Include="Styles\StyleBuilderTest.cs" />
+    <Compile Include="Styles\StyleWriterTest.cs" />
+    <Compile Include="Styles\TestTest.cs" />
+    <Compile Include="UI\AnchoredRectTest.cs" />
+    <Compile Include="UI\Inputs\MouseClickDetectorTest.cs" />
+    <Compile Include="UI\Inputs\MouseToComponentMapperTest.cs" />
+    <Compile Include="UI\TextWidgets\Documents\HighlighterTest.cs" />
+    <Compile Include="UI\TextWidgets\Documents\PlainText\BlockTextViewTest.cs" />
+    <Compile Include="UI\TextWidgets\Documents\PlainText\BranchTextViewTest.cs" />
+    <Compile Include="UI\TextWidgets\Documents\PlainText\DocumentViewTest.cs" />
+    <Compile Include="UI\TextWidgets\Documents\PlainText\DocumentView_ChangeNotification_Test.cs" />
+    <Compile Include="UI\TextWidgets\Documents\PlainText\ExposingTestChunk.cs" />
+    <Compile Include="UI\TextWidgets\Documents\PlainText\NodeTestExtensions.cs" />
+    <Compile Include="UI\TextWidgets\Documents\PlainText\ParagraphTextViewTest.cs" />
+    <Compile Include="UI\TextWidgets\Documents\PlainText\PlainTextDocumentTest.cs" />
+    <Compile Include="UI\TextWidgets\Documents\PlainText\TextAlignmentTest.cs" />
+    <Compile Include="UI\TextWidgets\Documents\PlainText\TextChunkTest.cs" />
+    <Compile Include="UI\TextWidgets\Documents\PositionCollectionTest.cs" />
+    <Compile Include="UI\TextWidgets\Documents\PushBackEnumeratorTest.cs" />
+    <Compile Include="UI\TextWidgets\Documents\StringDocumentContentTest.cs" />
+    <Compile Include="UI\TextWidgets\Documents\TextProcessingRulesTest.cs" />
+    <Compile Include="UI\TextWidgets\TextAreaTest.cs" />
+    <Compile Include="UI\TextWidgets\TextFieldTest.cs" />
+    <Compile Include="UI\TooltipTest.cs" />
+    <Compile Include="UI\Widgets\BoxGroupTests.cs" />
+    <Compile Include="UI\Widgets\ButtonTest.cs" />
+    <Compile Include="UI\Widgets\CheckBoxTest.cs" />
+    <Compile Include="UI\Widgets\DockPanelTest.cs" />
+    <Compile Include="UI\Widgets\GridTest.cs" />
+    <Compile Include="UI\Widgets\GroupTests.cs" />
+    <Compile Include="UI\Widgets\IconLabelTest.cs" />
+    <Compile Include="UI\Widgets\KeyBoxTest.cs" />
+    <Compile Include="UI\Widgets\LabelTest.cs" />
+    <Compile Include="UI\Widgets\NotebookTabTest.cs" />
+    <Compile Include="UI\Widgets\NotebookTest.cs" />
+    <Compile Include="UI\Widgets\ScrollPanelTest.cs" />
+    <Compile Include="UI\Widgets\PopUpTest.cs" />
+    <Compile Include="UI\Widgets\RootPanelTest.cs" />
+    <Compile Include="UI\Widgets\ScrollbarTest.cs" />
+    <Compile Include="UI\Widgets\SliderTest.cs" />
+    <Compile Include="UI\Widgets\SplitterTest.cs" />
+    <Compile Include="UI\Widgets\TooltipTest.cs" />
+    <Compile Include="UI\Widgets\WidgetContainerTest.cs" />
+    <Compile Include="UI\Widgets\WidgetTest.cs" />
+    <Compile Include="UI\WidgetTest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\steropes.ui\steropes.ui.csproj">
+      <Project>{2a63593c-03d4-4b6a-bfa6-b9c0aaf12fad}</Project>
+      <Name>steropes.ui</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="..\steropes-ui.licenseheader">
+      <Link>steropes-ui.licenseheader</Link>
+    </None>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\MSBuildTasks.1.5.0.214\build\MSBuildTasks.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MSBuildTasks.1.5.0.214\build\MSBuildTasks.targets'))" />
+    <Error Condition="!Exists('..\packages\StyleCop.MSBuild.4.7.55.0\build\StyleCop.MSBuild.Targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\StyleCop.MSBuild.4.7.55.0\build\StyleCop.MSBuild.Targets'))" />
+  </Target>
+  <Import Project="..\packages\MSBuildTasks.1.5.0.214\build\MSBuildTasks.targets" Condition="Exists('..\packages\MSBuildTasks.1.5.0.214\build\MSBuildTasks.targets')" />
+  <Import Project="..\packages\StyleCop.MSBuild.4.7.55.0\build\StyleCop.MSBuild.Targets" Condition="Exists('..\packages\StyleCop.MSBuild.4.7.55.0\build\StyleCop.MSBuild.Targets')" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,223 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Common.props')" />
+  <PropertyGroup>
+    <CodePage>65001</CodePage>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{7DA2B4CB-9896-49FF-8914-0D473F5A608B}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Steropes.UI.Demo</RootNamespace>
+    <AssemblyName>steropes.ui.demo</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <MonoGamePlatform>DesktopGL</MonoGamePlatform>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+    <LangVersion>6</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\$(MonoGamePlatform)\$(Platform)\$(Configuration)\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;LINUX</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\$(MonoGamePlatform)\$(Platform)\$(Configuration)\</OutputPath>
+    <DefineConstants>TRACE;LINUX</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;LINUX</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;LINUX</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Demos\BasicDemoPane.cs" />
+    <Compile Include="Demos\CustomViewportPane.cs" />
+    <Compile Include="Demos\NotebookPane.cs" />
+    <Compile Include="Demos\TextAreaPane.cs" />
+    <Compile Include="Demos\WidgetDemo.cs" />
+    <Compile Include="GameStates\GameStateIntro.cs" />
+    <Compile Include="GameStates\GameStateMainMenu.cs" />
+    <Compile Include="NuclearSampleGame.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\StaticAssemblyInfo.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SimpleGame.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="MonoGame.Framework, Version=3.6.0.1625, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MonoGame.Framework.WindowsDX.3.6.0.1625\lib\net40\MonoGame.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.4.0\lib\net45\NLog.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.XML" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Icon.ico" />
+    <Content Include="Content\Sprites\Mushroom.png" />
+    <Content Include="Content\Sprites\NuclearWinterLogo.png" />
+    <Content Include="Content\Sprites\NuclearWinterTitle.png" />
+    <Content Include="Content\Sprites\SparklinLabs.png" />
+    <Content Include="Content\Sprites\UI\IndicatorFrame.png" />
+    <Content Include="Content\Sprites\UI\ListRowInsertMarker.png" />
+    <Content Include="Content\Sprites\UI\Panel01.png" />
+    <Content Include="Content\Sprites\UI\Panel02.png" />
+    <Content Include="Content\Sprites\UI\Panel03.png" />
+    <Content Include="Content\Sprites\UI\Panel04.png" />
+    <Content Include="Content\Sprites\UI\TreeViewBranch.png" />
+    <Content Include="Content\Sprites\UI\TreeViewBranchClosed.png" />
+    <Content Include="Content\Sprites\UI\TreeViewBranchLast.png" />
+    <Content Include="Content\Sprites\UI\TreeViewBranchOpen.png" />
+    <Content Include="Content\Sprites\UI\TreeViewBranchOpenEmpty.png" />
+    <Content Include="Content\Sprites\UI\TreeViewCheckBoxFrame.png" />
+    <Content Include="Content\Sprites\UI\TreeViewContainerFrameSelected.png" />
+    <Content Include="Content\Sprites\UI\TreeViewLine.png" />
+    <Content Include="Content\Sprites\UI\UnreadTabMarker.png" />
+    <Content Include="Content\Sprites\WhitePixel.png" />
+    <Content Include="Content\UI\Metro\CheckBoxSelectedOverlay.png" />
+    <Content Include="Content\UI\Metro\DropdownArrow.png" />
+    <Content Include="Content\UI\Metro\Frame.png" />
+    <Content Include="Content\UI\Metro\FrameBottomBorder.png" />
+    <Content Include="Content\UI\Metro\FrameSelected.png" />
+    <Content Include="Content\UI\Metro\FrameTopBorder.png" />
+    <Content Include="Content\UI\Metro\ProgressBarFill.png" />
+    <Content Include="Content\UI\Metro\SmallSpinningWheel.png" />
+    <Content Include="Content\UI\Metro\SpinningWheel.png" />
+    <Content Include="Content\UI\Metro\SplitterCollapseArrow.png" />
+    <Content Include="Content\UI\Metro\SplitterDragHandle.png" />
+    <Content Include="Content\UI\Metro\style.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\UI\Metro\WhitePixel.png" />
+    <Content Include="Content\UI\NuclearWinter\Button\ButtonFocus.png" />
+    <Content Include="Content\UI\NuclearWinter\Button\ButtonFrame.png" />
+    <Content Include="Content\UI\NuclearWinter\Button\ButtonFrameDown.png" />
+    <Content Include="Content\UI\NuclearWinter\Button\ButtonHover.png" />
+    <Content Include="Content\UI\NuclearWinter\Button\ButtonPress.png" />
+    <Content Include="Content\UI\NuclearWinter\CheckBox\CheckBoxFrame.png" />
+    <Content Include="Content\UI\NuclearWinter\CheckBox\CheckBoxFrameFocus.png" />
+    <Content Include="Content\UI\NuclearWinter\CheckBox\CheckBoxFrameHover.png" />
+    <Content Include="Content\UI\NuclearWinter\CheckBox\Checked.png" />
+    <Content Include="Content\UI\NuclearWinter\CheckBox\Indeterminate.png" />
+    <Content Include="Content\UI\NuclearWinter\CheckBox\Unchecked.png" />
+    <Content Include="Content\UI\NuclearWinter\DropDown\DropDownArrow.png" />
+    <Content Include="Content\UI\NuclearWinter\ListView\ListFrame.png" />
+    <Content Include="Content\UI\NuclearWinter\ListView\ListRowFrame.png" />
+    <Content Include="Content\UI\NuclearWinter\ListView\ListRowFrameFocused.png" />
+    <Content Include="Content\UI\NuclearWinter\ListView\ListRowFrameHover.png" />
+    <Content Include="Content\UI\NuclearWinter\ListView\ListRowFrameSelected.png" />
+    <Content Include="Content\UI\NuclearWinter\Notebook\ActiveTab.png" />
+    <Content Include="Content\UI\NuclearWinter\Notebook\ActiveTabFocused.png" />
+    <Content Include="Content\UI\NuclearWinter\Notebook\NotebookFrame.png" />
+    <Content Include="Content\UI\NuclearWinter\Notebook\Tab.png" />
+    <Content Include="Content\UI\NuclearWinter\Notebook\TabClose.png" />
+    <Content Include="Content\UI\NuclearWinter\Notebook\TabCloseDown.png" />
+    <Content Include="Content\UI\NuclearWinter\Notebook\TabCloseHover.png" />
+    <Content Include="Content\UI\NuclearWinter\Notebook\TabFocus.png" />
+    <Content Include="Content\UI\NuclearWinter\Notebook\TabHover.png" />
+    <Content Include="Content\UI\NuclearWinter\OptionPane\PopupFrame.png" />
+    <Content Include="Content\UI\NuclearWinter\ProgressBar\ProgressBar.png" />
+    <Content Include="Content\UI\NuclearWinter\ProgressBar\ProgressBarFrame.png" />
+    <Content Include="Content\UI\NuclearWinter\RadioButtonSet\ButtonFrameLeft.png" />
+    <Content Include="Content\UI\NuclearWinter\RadioButtonSet\ButtonFrameLeftDown.png" />
+    <Content Include="Content\UI\NuclearWinter\RadioButtonSet\ButtonFrameMiddle.png" />
+    <Content Include="Content\UI\NuclearWinter\RadioButtonSet\ButtonFrameMiddleDown.png" />
+    <Content Include="Content\UI\NuclearWinter\RadioButtonSet\ButtonFrameRight.png" />
+    <Content Include="Content\UI\NuclearWinter\RadioButtonSet\ButtonFrameRightDown.png" />
+    <Content Include="Content\UI\NuclearWinter\Scrollbar\VerticalScrollbar.png" />
+    <Content Include="Content\UI\NuclearWinter\Slider\SliderFrame.png" />
+    <Content Include="Content\UI\NuclearWinter\SpinningWheel\SmallSpinningWheel.png" />
+    <Content Include="Content\UI\NuclearWinter\SpinningWheel\SpinningWheel.png" />
+    <Content Include="Content\UI\NuclearWinter\Splitter\SplitterCollapseArrow.png" />
+    <Content Include="Content\UI\NuclearWinter\Splitter\SplitterDragHandle.png" />
+    <Content Include="Content\UI\NuclearWinter\Splitter\SplitterFrame.png" />
+    <Content Include="Content\UI\NuclearWinter\style.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\UI\NuclearWinter\TextArea\TextAreaFrame.png" />
+    <Content Include="Content\UI\NuclearWinter\TextArea\TextAreaGutterFrame.png" />
+    <Content Include="Content\UI\NuclearWinter\TextField\TextFieldFrame.png" />
+    <Content Include="Content\UI\NuclearWinter\Tooltip\TooltipFrame.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <MonoGameContentReference Include="Content\Content.mgcb" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\steropes.ui.windows\steropes.ui.windows.csproj">
+      <Project>{ae04a3dc-aa26-4059-bae2-91da242e8c17}</Project>
+      <Name>steropes.ui.windows</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\steropes.ui\steropes.ui.csproj">
+      <Project>{2a63593c-03d4-4b6a-bfa6-b9c0aaf12fad}</Project>
+      <Name>steropes.ui</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\steropes-ui.licenseheader">
+      <Link>steropes-ui.licenseheader</Link>
+    </None>
+    <None Include="app.config" />
+    <None Include="Content\Fonts\LargeFont.spritefont" />
+    <None Include="Content\Fonts\MediumFont.spritefont" />
+    <None Include="Content\Fonts\MediumMonoFont.spritefont" />
+    <None Include="Content\Fonts\SmallFont.spritefont" />
+    <None Include="Content\UI\Metro\Fonts\Dialog.spritefont" />
+    <None Include="Content\UI\Metro\Fonts\DialogBold.spritefont" />
+    <None Include="Content\UI\Metro\Fonts\DialogLight.spritefont" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\MonoGame\v3.0\MonoGame.Content.Builder.targets" />
+  <Import Project="..\packages\StyleCop.MSBuild.4.7.55.0\build\StyleCop.MSBuild.Targets" Condition="Exists('..\packages\StyleCop.MSBuild.4.7.55.0\build\StyleCop.MSBuild.Targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\StyleCop.MSBuild.4.7.55.0\build\StyleCop.MSBuild.Targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\StyleCop.MSBuild.4.7.55.0\build\StyleCop.MSBuild.Targets'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
