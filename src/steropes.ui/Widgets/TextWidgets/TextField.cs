@@ -54,6 +54,11 @@ namespace Steropes.UI.Widgets.TextWidgets
 
     public int MaxLength { get; set; }
 
+    protected override bool IsIgnored(char ch)
+    {
+      return base.IsIgnored(ch) || ch == '\t';
+    }
+
     protected override Rectangle ArrangeOverride(Rectangle layoutSize)
     {
       if (!EnableScrolling || Content == null)

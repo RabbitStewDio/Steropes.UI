@@ -16,11 +16,9 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 using System;
-using System.Diagnostics;
-
 using Microsoft.Xna.Framework;
-
 using Steropes.UI.Components;
 using Steropes.UI.Platform;
 using Steropes.UI.Styles;
@@ -66,6 +64,8 @@ namespace Steropes.UI.Widgets.TextWidgets.Documents.Views
       Style.ValueChanged += OnStyleValueChanged;
       StyleInvalidated += (s, a) => ResetDocumentView();
 
+      TextStyles = Style.StyleSystem.StylesFor<TextStyleDefinition>();
+
       Highlighter = new Highligher<TDocument>(this);
 
       ViewFactory = editor.CreateViewFactory();
@@ -74,16 +74,15 @@ namespace Steropes.UI.Widgets.TextWidgets.Documents.Views
       Enabled = false;
     }
 
+    TextStyleDefinition TextStyles { get; }
+
     public event EventHandler<TextModificationEventArgs> DocumentModified;
 
     public event EventHandler<UndoableEditEventArgs> UndoableEditCreated;
 
     public TDocument Document
     {
-      get
-      {
-        return document;
-      }
+      get { return document; }
       set
       {
         if (document != null)
@@ -109,10 +108,7 @@ namespace Steropes.UI.Widgets.TextWidgets.Documents.Views
 
     public ITextNodeViewFactory<TDocument> ViewFactory
     {
-      get
-      {
-        return viewFactory;
-      }
+      get { return viewFactory; }
       set
       {
         viewFactory = value;
@@ -148,49 +144,49 @@ namespace Steropes.UI.Widgets.TextWidgets.Documents.Views
         switch (RootView.Navigate(currentOffset, direction, out offset))
         {
           case NavigationResult.Valid:
+          {
+            return offset;
+          }
+          case NavigationResult.Invalid:
+          {
+            if (currentOffset < Offset)
             {
+              // correct the invalid offset to the nearest valid offset within the document.
+              RootView.Navigate(RootView.Offset - 1, Direction.Right, out offset);
               return offset;
             }
-          case NavigationResult.Invalid:
+            if (currentOffset > EndOffset)
             {
-              if (currentOffset < Offset)
+              // correct the invalid offset to the nearest valid offset within the document.
+              RootView.Navigate(RootView.EndOffset + 1, Direction.Left, out offset);
+              return offset;
+            }
+
+            // Nothing we can do, make it a no-op.
+            return currentOffset;
+          }
+          case NavigationResult.BoundaryChanged:
+          {
+            switch (direction)
+            {
+              case Direction.Right:
+              case Direction.Down:
               {
-                // correct the invalid offset to the nearest valid offset within the document.
-                RootView.Navigate(RootView.Offset - 1, Direction.Right, out offset);
-                return offset;
-              }
-              if (currentOffset > EndOffset)
-              {
-                // correct the invalid offset to the nearest valid offset within the document.
                 RootView.Navigate(RootView.EndOffset + 1, Direction.Left, out offset);
                 return offset;
               }
-
-              // Nothing we can do, make it a no-op.
-              return currentOffset;
-            }
-          case NavigationResult.BoundaryChanged:
-            {
-              switch (direction)
+              case Direction.Left:
+              case Direction.Up:
               {
-                case Direction.Right:
-                case Direction.Down:
-                  {
-                    RootView.Navigate(RootView.EndOffset + 1, Direction.Left, out offset);
-                    return offset;
-                  }
-                case Direction.Left:
-                case Direction.Up:
-                  {
-                    RootView.Navigate(RootView.Offset - 1, Direction.Right, out offset);
-                    return offset;
-                  }
-                default:
-                  {
-                    throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
-                  }
+                RootView.Navigate(RootView.Offset - 1, Direction.Right, out offset);
+                return offset;
+              }
+              default:
+              {
+                throw new ArgumentOutOfRangeException(nameof(direction), direction, null);
               }
             }
+          }
           default:
             throw new ArgumentOutOfRangeException();
         }
@@ -255,7 +251,8 @@ namespace Steropes.UI.Widgets.TextWidgets.Documents.Views
     {
       if (RootView == null)
       {
-        return new Size();
+        var font = Style.GetValue(TextStyles.Font);
+        return new Size(0, font?.LineSpacing ?? 0);
       }
 
       RootView.Measure(availableSize);
