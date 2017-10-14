@@ -16,15 +16,23 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
+using System;
 using FluentAssertions;
 
 using Microsoft.Xna.Framework;
-
+using Microsoft.Xna.Framework.Input;
 using NUnit.Framework;
 
 using Steropes.UI.Components;
+using Steropes.UI.Input;
+using Steropes.UI.Input.KeyboardInput;
 using Steropes.UI.Platform;
+using Steropes.UI.Test.UI.TextWidgets.Documents.PlainText;
 using Steropes.UI.Widgets;
+using Steropes.UI.Widgets.Container;
+using Steropes.UI.Widgets.TextWidgets;
+using Steropes.UI.Widgets.TextWidgets.Documents.PlainText;
 
 namespace Steropes.UI.Test.UI.Widgets
 {
@@ -81,6 +89,24 @@ namespace Steropes.UI.Test.UI.Widgets
       b.Content.Label.Text = "Test";
       b.Measure(Size.Auto);
       b.Content.Label.Alignment.Should().Be(Alignment.Center);
+    }
+
+    [Test]
+    public void Consumed_Widget_Events_Dont_Pass_To_Parent_Widgets()
+    {
+      var style = LayoutTestStyle.Create();
+      var textField = new TextField(style, new TestDocumentViewEditor<PlainTextDocument>(new PlainTextDocumentEditor(style)));
+
+      bool keyPressedReceived = false;
+      var group = new Group(style);
+      group.Focusable = true;
+      group.Add(textField);
+      group.KeyPressed += (s, e) => keyPressedReceived = true;
+
+      var eventData = new KeyEventArgs(this, new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Left));
+      textField.DispatchEvent(eventData);
+
+      keyPressedReceived.Should().Be(false);
     }
   }
 }

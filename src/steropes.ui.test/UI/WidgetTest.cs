@@ -16,16 +16,12 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 using System;
-
 using FluentAssertions;
-
 using Microsoft.Xna.Framework;
-
 using NSubstitute;
-
 using NUnit.Framework;
-
 using Steropes.UI.Components;
 using Steropes.UI.Platform;
 
@@ -37,29 +33,29 @@ namespace Steropes.UI.Test.UI
     public class ArrangeChildExtension
     {
       static readonly TestCaseData[] ValidateFixedSizeData =
-        {
-          new TestCaseData(AnchoredRect.Full).Returns(new Rectangle(10, 20, 200, 100)),
-          new TestCaseData(AnchoredRect.CreateCentered()).Returns(new Rectangle(85, 50, 50, 40)),
-          new TestCaseData(AnchoredRect.CreateCentered(60, 50)).Returns(new Rectangle(80, 45, 60, 50)),
-          new TestCaseData(AnchoredRect.CreateFixed(60, 50, 90, 80)).Returns(new Rectangle(70, 70, 90, 80)),
-          new TestCaseData(AnchoredRect.CreateFull(10, 20, 30, 45)).Returns(new Rectangle(20, 40, 160, 35)),
-          new TestCaseData(AnchoredRect.CreateTopLeftAnchored(10, 20)).Returns(new Rectangle(20, 40, 50, 40)),
-          new TestCaseData(AnchoredRect.CreateTopLeftAnchored(10, 20, 30, 45)).Returns(new Rectangle(20, 40, 30, 45))
-        };
+      {
+        new TestCaseData(AnchoredRect.Full).Returns(new Rectangle(10, 20, 200, 100)),
+        new TestCaseData(AnchoredRect.CreateCentered()).Returns(new Rectangle(85, 50, 50, 40)),
+        new TestCaseData(AnchoredRect.CreateCentered(60, 50)).Returns(new Rectangle(80, 45, 60, 50)),
+        new TestCaseData(AnchoredRect.CreateFixed(60, 50, 90, 80)).Returns(new Rectangle(70, 70, 90, 80)),
+        new TestCaseData(AnchoredRect.CreateFull(10, 20, 30, 45)).Returns(new Rectangle(20, 40, 160, 35)),
+        new TestCaseData(AnchoredRect.CreateTopLeftAnchored(10, 20)).Returns(new Rectangle(20, 40, 50, 40)),
+        new TestCaseData(AnchoredRect.CreateTopLeftAnchored(10, 20, 30, 45)).Returns(new Rectangle(20, 40, 30, 45))
+      };
 
       static readonly TestCaseData[] ValidateFixedSizeDataSmall =
-        {
-          // new TestCaseData(AnchoredRect.Full).Returns(new Rectangle(10, 20, 0, 0)).SetName("Full - {m}{a}"),
-          // new TestCaseData(AnchoredRect.CreateCentered()).Returns(new Rectangle(-15, 0, 50, 40)).SetName("Centred, auto-size - {m}{a}"),
-          // new TestCaseData(AnchoredRect.CreateCentered(60, 50)).Returns(new Rectangle(-20, -5, 60, 50)).SetName("Centred, defined size - {m}{a}"),
-          // new TestCaseData(AnchoredRect.CreateFixed(60, 50, 90, 80)).Returns(new Rectangle(70, 70, 90, 80)).SetName("Fixed, defined size - {m}{a}"),
-          new TestCaseData(AnchoredRect.CreateFull(10, 20, 30, 40)).Returns(new Rectangle(20, 40, 0, 0))
-            .SetName("Full, padded - {m}{a}"),
-          new TestCaseData(AnchoredRect.CreateTopLeftAnchored(10, 20)).Returns(new Rectangle(20, 40, 50, 40))
-            .SetName("TopLeft, auto-size - {m}{a}"),
-          new TestCaseData(AnchoredRect.CreateTopLeftAnchored(10, 20, 30, 45)).Returns(new Rectangle(20, 40, 30, 45))
-            .SetName("TopLeft, defined size - {m}{a}")
-        };
+      {
+        // new TestCaseData(AnchoredRect.Full).Returns(new Rectangle(10, 20, 0, 0)).SetName("Full - {m}{a}"),
+        // new TestCaseData(AnchoredRect.CreateCentered()).Returns(new Rectangle(-15, 0, 50, 40)).SetName("Centred, auto-size - {m}{a}"),
+        // new TestCaseData(AnchoredRect.CreateCentered(60, 50)).Returns(new Rectangle(-20, -5, 60, 50)).SetName("Centred, defined size - {m}{a}"),
+        // new TestCaseData(AnchoredRect.CreateFixed(60, 50, 90, 80)).Returns(new Rectangle(70, 70, 90, 80)).SetName("Fixed, defined size - {m}{a}"),
+        new TestCaseData(AnchoredRect.CreateFull(10, 20, 30, 40)).Returns(new Rectangle(20, 40, 0, 0))
+          .SetName("Full, padded - {m}{a}"),
+        new TestCaseData(AnchoredRect.CreateTopLeftAnchored(10, 20)).Returns(new Rectangle(20, 40, 50, 40))
+          .SetName("TopLeft, auto-size - {m}{a}"),
+        new TestCaseData(AnchoredRect.CreateTopLeftAnchored(10, 20, 30, 45)).Returns(new Rectangle(20, 40, 30, 45))
+          .SetName("TopLeft, defined size - {m}{a}")
+      };
 
       [Test]
       [TestCaseSource(nameof(ValidateFixedSizeData))]
@@ -127,13 +123,18 @@ namespace Steropes.UI.Test.UI
         widget.LayoutRect.Should().Be(new Rectangle(10, 20, 200, 100));
       }
 
+
       [SetUp]
       public void EstablishContext()
       {
         measureCalled = new FunctionRecorder<Size, Size>();
         arrangeCalled = new FunctionRecorder<Rectangle, Rectangle>();
 
-        widget = new LayoutTestWidget { ArrangeOverrideFunc = arrangeCalled.Decorate(rect => rect), MeasureOverrideFunc = measureCalled.Decorate(size => size) };
+        widget = new LayoutTestWidget
+        {
+          ArrangeOverrideFunc = arrangeCalled.Decorate(rect => rect),
+          MeasureOverrideFunc = measureCalled.Decorate(size => size)
+        };
       }
     }
   }
