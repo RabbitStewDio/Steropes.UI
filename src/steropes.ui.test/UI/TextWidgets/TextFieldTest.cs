@@ -272,7 +272,7 @@ namespace Steropes.UI.Test.UI.TextWidgets
       var textField = new TextField(style);
       style.StyleResolver.AddRoot(textField);
       textField.Measure(Size.Auto);
-      textField.DesiredSize.Should().Be(new Size(30, 30));
+      textField.DesiredSize.Should().Be(new Size(30, 30 + 16));
     }
 
     [Test]

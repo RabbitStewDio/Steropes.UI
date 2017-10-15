@@ -86,11 +86,16 @@ namespace Steropes.UI.Widgets.TextWidgets.Documents.Views
         contentWidth = Math.Max(contentWidth, size.WidthInt);
       }
 
-      if (Count > 1)
+      if (Count == 0)
+      {
+        contentHeight = GetFontHeight();
+      }
+      else if (Count > 1)
       {
         contentHeight += Spacing * (Count - 1);
       }
       return new Size(contentWidth, contentHeight);
     }
+
   }
 }

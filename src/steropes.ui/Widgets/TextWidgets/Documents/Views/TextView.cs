@@ -75,6 +75,25 @@ namespace Steropes.UI.Widgets.TextWidgets.Documents.Views
 
     protected IUIFont Font => Style.GetValue(TextStyles.Font);
 
+    int? fontHeight;
+
+    protected int GetFontHeight()
+    {
+      if (fontHeight == null)
+      {
+        var f = Font;
+        if (f != null)
+        {
+          fontHeight = (int) Math.Ceiling(f.MeasureString(" ").Y);
+        }
+        else
+        {
+          fontHeight = 0;
+        }
+      }
+      return fontHeight.Value;
+    }
+
     public virtual ITextView<TDocument> this[int index]
     {
       get
@@ -118,6 +137,7 @@ namespace Steropes.UI.Widgets.TextWidgets.Documents.Views
     protected override void OnLayoutInvalidated()
     {
       base.OnLayoutInvalidated();
+      fontHeight = null;
       Parent?.InvalidateLayout();
     }
   }

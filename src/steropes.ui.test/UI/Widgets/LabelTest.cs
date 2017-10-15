@@ -92,7 +92,7 @@ namespace Steropes.UI.Test.UI.Widgets
       l.Padding = new Insets();
       l.Font = LayoutTestStyle.CreateFont();
       l.Measure(Size.Auto);
-      l.DesiredSize.Should().Be(new Size(0, 0));
+      l.DesiredSize.Should().Be(new Size(0, 12));
     }
 
     [Test]
