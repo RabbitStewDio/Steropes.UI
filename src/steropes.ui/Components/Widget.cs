@@ -1343,7 +1343,7 @@ namespace Steropes.UI.Components
       }
     }
 
-    public IWidget PerformHitTest(Point mouseHitPoint)
+    public virtual IWidget PerformHitTest(Point mouseHitPoint)
     {
       return WidgetExtensions.PerformHitTest(this, mouseHitPoint);
     }
