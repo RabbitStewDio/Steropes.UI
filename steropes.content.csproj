@@ -65,6 +65,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="docs\concepts.md" />
+    <Content Include="docs\notes.md" />
     <None Include="docs\quickstart.md" />
     <None Include="docs\README.md" />
     <None Include="docs\style.md" />

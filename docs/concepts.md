@@ -277,16 +277,28 @@ MonoGame:
 * Key events
 * GamePad/Joystick events
 
+## Positional Input Events
+
 Mouse and touch events are delivered to whatever widget is most 
 visible at the given coordinate. To select the correct widget 
 for a given mouse or touch event, the Screen class examines the 
-Widget's visibility and layout position. Widgets that are invisible 
-cannot receive events.
+Widget's visibility and layout position. The algorithm assumes
+that a Widget's child elements are fully contained in the layout
+area of their parent.
+
+Widgets that are invisible cannot receive mouse or touch events.
 
 If a widget receives a mouse-down event and is capable of 
 receiving the keyboard focus, then this widget will also 
 automatically receive the keyboard focus during the processing 
 of this event.
+
+If the current widget does not consume positional events, the
+events will be redelivered to the parent widget until the event
+has been consumed or the widget is the root element in the
+widget tree.
+
+## Focused Input Events
 
 Key and GamePad events are delivered to whatever widget has the 
 keyboard focus. The focus can be changed via the Tab-Key or via 
@@ -295,13 +307,42 @@ receive the keyboard focus. The widget having the focus must be
 visible and must be directly or indirectly attached to the root 
 panel. 
 
-An Widget can control whether it wants to receive the keyboard 
-focus or how the focus should be passed on to the next component. 
+A widget can control whether it wants to receive the keyboard 
+focus (see ``IWidget#Focusable`` property) or how the focus 
+should be passed on to the next component. 
 
 Events are sent to the most specific Widget in the tree. When an 
 event is not handled by the widget, the event will be passed on
 to the parent widget until either the event is marked as processed
 or there is no parent left.
+
+If a keyboard key has been pressed for a longer time (default: 500ms),
+the system will generate RepeatKey events. These repeat events
+follow the same semantics as the keyPressed event and allow you
+to easily handle automated actions based on the current key.
+
+## KeyPressed Keycodes and KeyTyped Events
+
+KeyPressed and KeyReleased events are directly generated from
+the ``Microsoft.Xna.Framework.Input.Keys`` state. These events
+are generated during the ``Update()`` phase. However The KeyTyped
+event is sourced via MonoGame's extension to GameWindow (
+``Microsoft.Xna.Framework.GameWindow.TextInput`` event).
+This is normally routed to the native text input events and thus
+generates input that has been localized.
+
+Key events indicate the key pressed as Keyboard scan-code. 
+Scancodes are technical identifiers of the raw keys pressed
+on a keyboard and rouchly match the US keyboard layout. This
+is pretty useless for international games, therefore Steropes-UI 
+has an interface to localise these events. Localisation uses
+native functions of the underlying operation system to work,
+both to determine the current keyboard layout and then to translate
+the raw input into localised inputs.
+
+The ``Steropes.UI.Windows`` library contains a KeyLocaliser 
+that uses the Win32 API to perform that translation for games
+running in Windows. 
 
 Event pre-processing is defined in the ``ScreenEventHandling`` 
 class.

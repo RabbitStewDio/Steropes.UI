@@ -95,7 +95,7 @@ namespace Steropes.UI.Test.UI.Widgets
     public void Consumed_Widget_Events_Dont_Pass_To_Parent_Widgets()
     {
       var style = LayoutTestStyle.Create();
-      var textField = new TextField(style, new TestDocumentViewEditor<PlainTextDocument>(new PlainTextDocumentEditor(style)));
+      var textField = new Button(style, "Hello");
 
       bool keyPressedReceived = false;
       var group = new Group(style);
@@ -104,6 +104,24 @@ namespace Steropes.UI.Test.UI.Widgets
       group.KeyPressed += (s, e) => keyPressedReceived = true;
 
       var eventData = new KeyEventArgs(this, new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Left));
+      textField.DispatchEvent(eventData);
+
+      keyPressedReceived.Should().Be(false);
+    }
+
+    [Test]
+    public void Repeat_Events_Dont_Pass_To_Parent_Widgets()
+    {
+      var style = LayoutTestStyle.Create();
+      var textField = new Button(style, "Hello");
+
+      bool keyPressedReceived = false;
+      var group = new Group(style);
+      group.Focusable = true;
+      group.Add(textField);
+      group.KeyRepeated += (s, e) => keyPressedReceived = true;
+
+      var eventData = new KeyEventArgs(this, new KeyEventData(KeyEventType.KeyRepeat, TimeSpan.Zero, 0, InputFlags.None, Keys.Left));
       textField.DispatchEvent(eventData);
 
       keyPressedReceived.Should().Be(false);
