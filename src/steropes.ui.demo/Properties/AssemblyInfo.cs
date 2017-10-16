@@ -28,4 +28,4 @@ using System.Reflection;
 // [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.1.1.0")]
-[assembly: AssemblyInformationalVersion("1.1.1-unstable.0+Branch.develop.Sha.4b13ce92f4402adb7f144a53d8e4ddfc3e8e9dde")]
+[assembly: AssemblyInformationalVersion("1.1.1-beta.1+0.Branch.release-1.1.1.Sha.b33f0d63a3f3e7816dd49831e2ff32a235caa118")]
