@@ -13,7 +13,7 @@
     <RootNamespace>Steropes.UI.Demo</RootNamespace>
     <AssemblyName>steropes.ui.demo</AssemblyName>
     <FileAlignment>512</FileAlignment>
-    <MonoGamePlatform>DesktopGL</MonoGamePlatform>
+    <MonoGamePlatform>Windows</MonoGamePlatform>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>

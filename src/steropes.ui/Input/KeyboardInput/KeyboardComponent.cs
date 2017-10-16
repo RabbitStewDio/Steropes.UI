@@ -108,6 +108,7 @@ namespace Steropes.UI.Input.KeyboardInput
         return;
       }
 
+      Debug.WriteLine("Raise typed event for " + (int)args.Character);
       typedCharacters.Enqueue(new KeyEventData(KeyEventType.KeyTyped, currentTime, frame, currentFlags, args.Character));
     }
   }

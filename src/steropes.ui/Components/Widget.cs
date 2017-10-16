@@ -1076,11 +1076,6 @@ namespace Steropes.UI.Components
               throw new ArgumentOutOfRangeException();
             }
         }
-
-        if (!eventData.Consumed)
-        {
-          Parent?.DispatchEvent(eventData);
-        }
       }
       finally
       {
@@ -1263,11 +1258,6 @@ namespace Steropes.UI.Components
               throw new ArgumentOutOfRangeException();
             }
         }
-
-        if (!eventData.Consumed)
-        {
-          Parent?.DispatchEvent(eventData);
-        }
       }
       finally
       {
@@ -1353,7 +1343,7 @@ namespace Steropes.UI.Components
       }
     }
 
-    public IWidget PerformHitTest(Point mouseHitPoint)
+    public virtual IWidget PerformHitTest(Point mouseHitPoint)
     {
       return WidgetExtensions.PerformHitTest(this, mouseHitPoint);
     }

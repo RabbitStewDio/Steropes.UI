@@ -64,7 +64,9 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="ChangeLog.md" />
     <None Include="docs\concepts.md" />
+    <Content Include="docs\notes.md" />
     <None Include="docs\quickstart.md" />
     <None Include="docs\README.md" />
     <None Include="docs\style.md" />

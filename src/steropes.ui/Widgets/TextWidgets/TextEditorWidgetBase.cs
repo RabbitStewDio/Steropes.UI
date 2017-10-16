@@ -228,6 +228,11 @@ namespace Steropes.UI.Widgets.TextWidgets
         return;
       }
 
+      if (IsIgnored(ch))
+      {
+        return;
+      }
+
       if (insertBuffer == null)
       {
         insertBuffer = new StringBuilder(10);
@@ -236,6 +241,30 @@ namespace Steropes.UI.Widgets.TextWidgets
       insertBuffer.Append(ch);
       DoInsertFromBuffer(insertBuffer);
     }
+
+    protected virtual bool IsIgnored(char ch)
+    {
+      if (ch == 0x7f)
+      {
+        // ASCII delete
+        return true;
+      }
+
+      if (ch < 0x20)
+      {
+        if (ch == 0xa || ch == 0xd)
+        {
+          return false;
+        }
+        if (ch == '\t')
+        {
+          return false;
+        }
+        return true;
+      }
+      return false;
+    }
+
 
     protected void SelectAll()
     {
@@ -374,6 +403,11 @@ namespace Steropes.UI.Widgets.TextWidgets
 
     void OnKeyTyped(object source, KeyEventArgs args)
     {
+      if (args.Consumed)
+      {
+        return;
+      }
+
       OnKeyTyped(args.Character);
       args.Consume();
     }

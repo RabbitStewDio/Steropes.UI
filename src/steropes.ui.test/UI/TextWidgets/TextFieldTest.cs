@@ -31,6 +31,7 @@ using Steropes.UI.Input.KeyboardInput;
 using Steropes.UI.Platform;
 using Steropes.UI.Styles;
 using Steropes.UI.Test.UI.TextWidgets.Documents.PlainText;
+using Steropes.UI.Widgets.Container;
 using Steropes.UI.Widgets.Styles;
 using Steropes.UI.Widgets.TextWidgets;
 using Steropes.UI.Widgets.TextWidgets.Documents.PlainText;
@@ -271,7 +272,7 @@ namespace Steropes.UI.Test.UI.TextWidgets
       var textField = new TextField(style);
       style.StyleResolver.AddRoot(textField);
       textField.Measure(Size.Auto);
-      textField.DesiredSize.Should().Be(new Size(30, 30));
+      textField.DesiredSize.Should().Be(new Size(30, 30 + 16));
     }
 
     [Test]
@@ -341,6 +342,73 @@ namespace Steropes.UI.Test.UI.TextWidgets
 
       // the edit should have flushed out the old chunk. Chunks retain the text/strings to match what we give to SpriteBatch.
       chunk.Text.Should().Be("Hello Word");
+    }
+
+    /// <summary>
+    ///  Backspace should be ignored in a Typed event. We handle it as part of the KeyPressed event instead.
+    /// </summary>
+    [Test]
+    public void Typed_Control_Character_Inputs_Are_Discarded()
+    {
+      var style = LayoutTestStyle.Create();
+      var textField = new TextField(style, new TestDocumentViewEditor<PlainTextDocument>(new PlainTextDocumentEditor(style)));
+      textField.Text = "Hello";
+      textField.Caret.MoveTo(1); // after 'H'
+      style.StyleResolver.AddRoot(textField);
+
+      var eventData = new KeyEventArgs(this, new KeyEventData(KeyEventType.KeyTyped, TimeSpan.Zero, 0, InputFlags.None, '\b'));
+      textField.DispatchEvent(eventData);
+      textField.Text.Should().Be("Hello");
+      eventData.Consumed.Should().Be(true);
+    }
+
+    [Test]
+    public void KeyPressed_Control_Character_Inputs_Are_Handled()
+    {
+      var style = LayoutTestStyle.Create();
+      var textField = new TextField(style, new TestDocumentViewEditor<PlainTextDocument>(new PlainTextDocumentEditor(style)));
+      textField.Text = "Hello";
+      textField.Caret.MoveTo(1); // after 'H'
+      style.StyleResolver.AddRoot(textField);
+
+      var eventData = new KeyEventArgs(this, new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Back));
+      textField.DispatchEvent(eventData);
+      textField.Text.Should().Be("ello");
+      eventData.Consumed.Should().Be(true);
+    }
+
+    [Test]
+    public void KeyPressed_Cursor_Keys_Should_Be_Consumed()
+    {
+      var style = LayoutTestStyle.Create();
+      var textField = new TextField(style, new TestDocumentViewEditor<PlainTextDocument>(new PlainTextDocumentEditor(style)));
+      textField.Text = "Hello";
+      textField.Caret.MoveTo(1); // after 'H'
+      style.StyleResolver.AddRoot(textField);
+
+      var eventData = new KeyEventArgs(this, new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Left));
+      textField.DispatchEvent(eventData);
+      textField.Caret.SelectionEndOffset.Should().Be(0);
+      textField.Caret.SelectionStartOffset.Should().Be(0);
+      eventData.Consumed.Should().Be(true);
+    }
+
+    [Test]
+    public void Consumed_Widget_Events_Dont_Pass_To_Parent_Widgets()
+    {
+      var style = LayoutTestStyle.Create();
+      var textField = new TextField(style, new TestDocumentViewEditor<PlainTextDocument>(new PlainTextDocumentEditor(style)));
+
+      bool keyPressedReceived = false;
+      var group = new Group(style);
+      group.Focusable = true;
+      group.Add(textField);
+      group.KeyPressed += (s, e) => keyPressedReceived = true;
+
+      var eventData = new KeyEventArgs(this, new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Left));
+      textField.DispatchEvent(eventData);
+
+      keyPressedReceived.Should().Be(false);
     }
   }
 }
