@@ -187,6 +187,18 @@ namespace Steropes.UI.Components
       return new AnchoredRect(null, null, null, null, width, height);
     }
 
+    /// <summary>
+    ///  An alias to CreateCentred that makes defining constraints for BoxGroup child widgets more
+    ///  natural.
+    /// </summary>
+    /// <param name="width"></param>
+    /// <param name="height"></param>
+    /// <returns></returns>
+    public static AnchoredRect CreateSizeConstraint(int? width = null, int? height = null)
+    {
+      return CreateCentered(width, height);
+    }
+
     static bool IsValidSize(int? width)
     {
       if (width == null)
