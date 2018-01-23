@@ -31,7 +31,7 @@ namespace Steropes.UI.Styles.Io.Values
 
     public string TypeId => "bool";
 
-    public object Parse(IStyleSystem styleSystem, XElement reader)
+    public object Parse(IStyleSystem styleSystem, XElement reader, IStylePropertyContext context)
     {
       return (bool)reader;
     }

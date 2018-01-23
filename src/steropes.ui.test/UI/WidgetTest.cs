@@ -123,7 +123,6 @@ namespace Steropes.UI.Test.UI
         widget.LayoutRect.Should().Be(new Rectangle(10, 20, 200, 100));
       }
 
-
       [SetUp]
       public void EstablishContext()
       {

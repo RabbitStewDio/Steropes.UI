@@ -32,7 +32,8 @@ namespace Steropes.UI.Demo
     {
       Content.RootDirectory = "Content";
 
-      Graphics = new GraphicsDeviceManager(this) { PreferredBackBufferWidth = 1280, PreferredBackBufferHeight = 720 };
+      Graphics = new GraphicsDeviceManager(this) { PreferredBackBufferWidth = 1280, PreferredBackBufferHeight = 720, SynchronizeWithVerticalRetrace = false};
+      IsFixedTimeStep = false;
     }
 
     public GraphicsDeviceManager Graphics { get; }
@@ -40,6 +41,7 @@ namespace Steropes.UI.Demo
     protected override void Initialize()
     {
       base.Initialize();
+
 
       Window.Title = "NuclearWinter Sample";
       Window.AllowUserResizing = true;
@@ -56,10 +58,15 @@ namespace Steropes.UI.Demo
       // This requires Monogame-DirectX. Remove this line when on DesktopGL or Linux etc.. 
       windowService.MouseCursorService = new WinFormsMouseCursorService(this);
       stateManager.States["Main"] = new GameStateMainMenu(this, drawingService, inputManager, stateManager, windowService);
-      stateManager.SwitchState(stateManager.States["Intro"]);
+      stateManager.SwitchState(stateManager.States["Main"]);
 
       Components.Add(inputManager);
       Components.Add(stateManager);
+      Components.Add(new DebugOverlayRenderer(this));
+
+      
     }
+
+
   }
 }

@@ -17,6 +17,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System.Collections.Generic;
+using System.IO;
 using System.Xml.Linq;
 
 using Microsoft.Xna.Framework;
@@ -41,18 +42,24 @@ namespace Steropes.UI.Demo.GameStates
     {
       public string Name { get; }
       public List<IStyleRule> Rules { get; }
+      public IUITexture WhitePixel { get; }
 
-      public StyleDefinition(string name, List<IStyleRule> rules)
+      public StyleDefinition(string name, List<IStyleRule> rules, IUITexture whitePixel)
       {
+        this.WhitePixel = whitePixel;
         Name = name;
         Rules = rules;
       }
+
+
 
       public override string ToString()
       {
         return Name;
       }
     }
+
+    readonly FrameRateCalculator frameRateCalculator;
 
     readonly IInputManager inputManager;
 
@@ -65,6 +72,7 @@ namespace Steropes.UI.Demo.GameStates
     public GameStateMainMenu(Game game, IBatchedDrawingService drawingService, IInputManager inputManager, IGameStateManager stateService, IGameWindowService windowService)
       : base(drawingService)
     {
+      this.frameRateCalculator = new FrameRateCalculator();
       this.inputManager = inputManager;
       this.stateService = stateService;
       this.windowService = windowService;
@@ -79,9 +87,18 @@ namespace Steropes.UI.Demo.GameStates
 
     public override void Draw()
     {
+      frameRateCalculator.BeginTime();
       Game.GraphicsDevice.Clear(Color.Black);
 
       UIManager.Draw();
+      frameRateCalculator.EndTime();
+    }
+
+    StyleDefinition Load(string context, string filename)
+    {
+      var rules = UIManager.UIStyle.StyleSystem.WithContext(context).CreateParser(Game.GraphicsDevice)
+        .Read(XDocument.Load(filename));
+      return new StyleDefinition("Metro", rules, UIManager.UIStyle.StyleSystem.WhitePixel);
     }
 
     public override void Start()
@@ -91,10 +108,8 @@ namespace Steropes.UI.Demo.GameStates
       UIManager.Start();
 
       styles.Clear();
-      styles.Add(new StyleDefinition("Nuclear Winter", 
-        UIManager.UIStyle.StyleSystem.WithContext("UI/NuclearWinter").CreateParser().Read(XDocument.Load("Content/UI/NuclearWinter/style.xml"))));
-      styles.Add(new StyleDefinition("Metro",
-        UIManager.UIStyle.StyleSystem.WithContext("UI/Metro").CreateParser().Read(XDocument.Load("Content/UI/Metro/style.xml"))));
+      styles.Add(Load("UI/Metro", "Content/UI/Metro/style.xml"));
+      styles.Add(Load("UI/NuclearWinter", "Content/UI/NuclearWinter/style.xml"));
 
       UIManager.UIStyle.StyleResolver.StyleRules.Clear();
       UIManager.UIStyle.StyleResolver.StyleRules.AddRange(styles[0].Rules);
@@ -131,6 +146,8 @@ namespace Steropes.UI.Demo.GameStates
           {
             uiStyle.StyleResolver.StyleRules.Clear();
             uiStyle.StyleResolver.StyleRules.AddRange(d.Rules);
+            DrawingService.WhitePixel = d.WhitePixel;
+            UIManager.UIStyle.StyleSystem.WhitePixel = d.WhitePixel;
           }
         };
 
@@ -147,7 +164,12 @@ namespace Steropes.UI.Demo.GameStates
 
     public override void Update(GameTime elapsedTime)
     {
+      frameRateCalculator.BeginTime();
       UIManager.Update(elapsedTime);
+      frameRateCalculator.EndTime();
+      frameRateCalculator.Update(elapsedTime);
+
+      UIManager.ScreenService.WindowService.Title = frameRateCalculator.ToString();
     }
   }
 }

@@ -78,7 +78,8 @@ namespace Steropes.UI.Test
 
     public static IBoxTexture CreateBoxTexture(string name, int width, int height, Insets border, Insets margin)
     {
-      return new TestUITexture(Math.Max(width, border.Horizontal), Math.Max(height, border.Vertical), border, margin, name);
+      var bounds = new Rectangle(0, 0, Math.Max(width, border.Horizontal), Math.Max(height, border.Vertical));
+      return new TestUITexture(bounds, border, margin, name);
     }
 
     public static IUIFont CreateFont(string name = null, int width = 11, int height = 12, int lineSpacing = 15)
@@ -116,7 +117,8 @@ namespace Steropes.UI.Test
 
     public static IUITexture CreateTexture(string name, int width, int height)
     {
-      return new TestUITexture(width, height, Insets.Zero, Insets.Zero, name);
+      var bounds = new Rectangle(0, 0, width, height);
+      return new TestUITexture(bounds, Insets.Zero, Insets.Zero, name);
     }
 
     static Style CreateStyle()
@@ -148,7 +150,10 @@ namespace Steropes.UI.Test
         fonts.Add(style.LargeFont.Name, style.LargeFont);
         fonts.Add(style.MediumFont.Name, style.MediumFont);
         fonts.Add(style.SmallFont.Name, style.SmallFont);
+        WhitePixel = CreateTexture("WhitePixel", 1, 1);
       }
+
+      public IUITexture WhitePixel { get; }
 
       public string ContextPath => "";
 
@@ -287,19 +292,25 @@ namespace Steropes.UI.Test
 
     class TestUITexture : IBoxTexture, IEquatable<TestUITexture>
     {
-      public TestUITexture(int width, int height, Insets cornerArea, Insets margins, string name = null)
+      public TestUITexture(Rectangle bounds, Insets cornerArea, Insets margins, string name = null)
       {
-        Width = width;
-        Height = height;
+        Bounds = bounds;
         CornerArea = cornerArea;
         Margins = margins;
         Name = name;
         Texture = null;
       }
 
+      public Rectangle Bounds { get; }
+
+      public IUITexture Rebase(Texture2D texture, Rectangle bounds, string name)
+      {
+        return new TestUITexture(bounds, CornerArea, Margins, name);
+      }
+
       public Insets CornerArea { get; }
 
-      public int Height { get; }
+      public int Height => Bounds.Height;
 
       public Insets Margins { get; }
 
@@ -307,7 +318,7 @@ namespace Steropes.UI.Test
 
       public Texture2D Texture { get; }
 
-      public int Width { get; }
+      public int Width => Bounds.Width;
 
       public static bool operator ==(TestUITexture left, TestUITexture right)
       {

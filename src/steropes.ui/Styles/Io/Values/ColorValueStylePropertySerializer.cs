@@ -30,11 +30,11 @@ namespace Steropes.UI.Styles.Io.Values
 {
   public class ColorValueStylePropertySerializer : IStylePropertySerializer
   {
-    static readonly Dictionary<string, Color> KnownColors;
+    static readonly Dictionary<string, Color> knownColors;
 
     static ColorValueStylePropertySerializer()
     {
-      KnownColors = new Dictionary<string, Color>();
+      knownColors = new Dictionary<string, Color>();
       RegisterColors();
     }
 
@@ -62,7 +62,7 @@ namespace Steropes.UI.Styles.Io.Values
       return new Color(red, green, blue) * alphaFloat;
     }
 
-    public object Parse(IStyleSystem styleSystem, XElement reader)
+    public object Parse(IStyleSystem styleSystem, XElement reader, IStylePropertyContext context)
     {
       var colorAsText = (string)reader;
       if (string.IsNullOrWhiteSpace(colorAsText))
@@ -71,7 +71,7 @@ namespace Steropes.UI.Styles.Io.Values
       }
 
       Color c;
-      if (KnownColors.TryGetValue(colorAsText, out c))
+      if (knownColors.TryGetValue(colorAsText, out c))
       {
         return c;
       }
@@ -89,7 +89,7 @@ namespace Steropes.UI.Styles.Io.Values
     {
       var c = (Color)value;
 
-      foreach (var knownColor in KnownColors)
+      foreach (var knownColor in knownColors)
       {
         if (knownColor.Value.Equals(c))
         {
@@ -101,12 +101,12 @@ namespace Steropes.UI.Styles.Io.Values
       if (c.A == 255)
       {
         // fully opaque. 
-        propertyElement.Value = $"#{c.R.ToString("X2")}{c.G.ToString("X2")}{c.B.ToString("X2")}";
+        propertyElement.Value = $"#{c.R:X2}{c.G:X2}{c.B:X2}";
       }
       else
       {
         propertyElement.SetAttributeValue("premultiplied", true);
-        propertyElement.Value = $"#{c.A.ToString("X2")}{c.R.ToString("X2")}{c.G.ToString("X2")}{c.B.ToString("X2")}";
+        propertyElement.Value = $"#{c.A:X2}{c.R:X2}{c.G:X2}{c.B:X2}";
       }
     }
 
@@ -140,7 +140,7 @@ namespace Steropes.UI.Styles.Io.Values
         try
         {
           var key = (Color)getter.Invoke(null, new object[0]);
-          KnownColors.Add(property.Name.ToLowerInvariant(), key);
+          knownColors.Add(property.Name.ToLowerInvariant(), key);
         }
         catch (Exception e)
         {

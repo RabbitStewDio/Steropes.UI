@@ -19,15 +19,14 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Xml.Linq;
-using Steropes.UI.Components;
+using Microsoft.Xna.Framework.Graphics;
+using Steropes.UI.Annotations;
+using Steropes.UI.Platform;
 using Steropes.UI.Styles.Conditions;
 using Steropes.UI.Styles.Io.Values;
 using Steropes.UI.Styles.Selector;
-using Steropes.UI.Widgets;
-using Steropes.UI.Widgets.TextWidgets;
 
 namespace Steropes.UI.Styles.Io.Parser
 {
@@ -37,6 +36,7 @@ namespace Steropes.UI.Styles.Io.Parser
   /// </summary>
   public class StyleParser : IStyleParser
   {
+    [CanBeNull] readonly GraphicsDevice graphicsDevice;
     public static readonly XNamespace StyleNamespace = "http://www.steropes-ui.org/namespaces/style/1.0";
 
     readonly Dictionary<Type, IStylePropertySerializer> propertyParsers;
@@ -45,8 +45,9 @@ namespace Steropes.UI.Styles.Io.Parser
 
     readonly Dictionary<string, IStylePropertySerializer> typeParsers;
 
-    public StyleParser(IStyleSystem styleSystem)
+    public StyleParser(IStyleSystem styleSystem, [CanBeNull] GraphicsDevice graphicsDevice = null)
     {
+      this.graphicsDevice = graphicsDevice;
       registeredKeys = new Dictionary<string, IStyleKey>();
       propertyParsers = new Dictionary<Type, IStylePropertySerializer>();
       typeParsers = new Dictionary<string, IStylePropertySerializer>();
@@ -72,12 +73,69 @@ namespace Steropes.UI.Styles.Io.Parser
       ValidateSetup();
 
       var rules = new List<IStyleRule>();
+      var textureMode = (string) document.Root.AttributeLocal("texture-packer") ?? "disabled";
+      var context = Create(textureMode);
+
       var x = from e in document.Root.Elements() where e.Name.LocalName == "style" select e;
       foreach (var node in x)
       {
-        ReadStyleRule(node, rules);
+        ReadStyleRule(node, context, rules);
       }
+
+      StyleSystem.WhitePixel = context.ProcessTexture(StyleSystem.WhitePixel);
+
       return rules;
+    }
+
+    IStylePropertyContext Create(string textureMode)
+    {
+      if (textureMode == "auto" && graphicsDevice != null)
+      {
+        return new AutoPropertyContext(graphicsDevice);
+      }
+      return new PassthroughPropertyContext();
+    }
+
+    class AutoPropertyContext : IStylePropertyContext
+    {
+      readonly MultiTextureAtlasBuilder atlasBuilder;
+      readonly Dictionary<IUITexture, IUITexture> processedTextures;
+
+      public AutoPropertyContext(GraphicsDevice device)
+      {
+        this.atlasBuilder = new MultiTextureAtlasBuilder(device);
+        this.processedTextures = new Dictionary<IUITexture, IUITexture>();
+      }
+
+      public IUITexture ProcessTexture(IUITexture texture)
+      {
+        IUITexture result;
+        if (processedTextures.TryGetValue(texture, out result))
+        {
+          return result;
+        }
+        result = this.atlasBuilder.Insert(texture);
+        processedTextures[texture] = result;
+        return result;
+      }
+
+      public IBoxTexture ProcessTexture(IBoxTexture texture)
+      {
+        return (IBoxTexture) ProcessTexture((IUITexture) texture);
+      }
+    }
+
+    class PassthroughPropertyContext : IStylePropertyContext
+    {
+      public IUITexture ProcessTexture(IUITexture texture)
+      {
+        return texture;
+      }
+
+      public IBoxTexture ProcessTexture(IBoxTexture texture)
+      {
+        return texture;
+      }
     }
 
     public void RegisterPropertyParsers(IStylePropertySerializer serializer)
@@ -87,7 +145,7 @@ namespace Steropes.UI.Styles.Io.Parser
       {
         typeParsers[serializer.TypeId] = serializer;
       }
-      typeParsers[serializer.TargetType.FullName] = serializer;
+      typeParsers[serializer.TargetType.FullName ?? serializer.TargetType.Name] = serializer;
     }
 
     public void RegisterStyles(IStyleDefinition styleDefinitions)
@@ -117,7 +175,11 @@ namespace Steropes.UI.Styles.Io.Parser
       }
     }
 
-    IStyleSelector CreateSelector(XElement style, IStyleSelector parent, bool directChild, string element)
+    IStyleSelector CreateSelector(XElement style,
+                                  IStyleSelector parent,
+                                  bool directChild,
+                                  string element,
+                                  IStylePropertyContext context)
     {
       if (string.IsNullOrWhiteSpace(element) || "*".Equals(element))
       {
@@ -128,7 +190,7 @@ namespace Steropes.UI.Styles.Io.Parser
       var c = style.ElementLocal("conditions");
       if (c != null)
       {
-        var cond = ParseAndCondition(c);
+        var cond = ParseAndCondition(c, context);
         es = new ConditionalSelector(es, cond);
       }
 
@@ -148,7 +210,7 @@ namespace Steropes.UI.Styles.Io.Parser
         return p;
       }
       throw new StyleParseException($"Unable to locate a property serializer for type {propertyType.FullName}",
-        context);
+                                    context);
     }
 
     IStyleKey LookupStyleKey(string name, XObject context)
@@ -163,28 +225,28 @@ namespace Steropes.UI.Styles.Io.Parser
         context);
     }
 
-    ICondition ParseAndCondition(XElement s)
+    ICondition ParseAndCondition(XElement s, IStylePropertyContext context)
     {
       ICondition c = null;
       foreach (var e in s.Elements())
       {
-        var x = ParseCondition(e);
+        var x = ParseCondition(e, context);
         c = c == null ? x : new AndCondition(c, x);
       }
 
       return c;
     }
 
-    ICondition ParseCondition(XElement s)
+    ICondition ParseCondition(XElement s, IStylePropertyContext context)
     {
       var localName = s.Name.LocalName;
       if (localName == "or")
       {
-        return ParseOrCondition(s);
+        return ParseOrCondition(s, context);
       }
       if (localName == "not")
       {
-        return ParseNotCondition(s);
+        return ParseNotCondition(s, context);
       }
       if (localName == "id")
       {
@@ -222,31 +284,31 @@ namespace Steropes.UI.Styles.Io.Parser
         IStylePropertySerializer serializer;
         if (typeParsers.TryGetValue(type, out serializer))
         {
-          return new AttributeCondition(name, serializer.Parse(StyleSystem, value));
+          return new AttributeCondition(name, serializer.Parse(StyleSystem, value, context));
         }
       }
 
       throw new StyleParseException($"Unable to handle condition type {localName}", s);
     }
 
-    NotCondition ParseNotCondition(XElement s)
+    NotCondition ParseNotCondition(XElement s, IStylePropertyContext context)
     {
-      return new NotCondition(ParseAndCondition(s));
+      return new NotCondition(ParseAndCondition(s, context));
     }
 
-    ICondition ParseOrCondition(XElement s)
+    ICondition ParseOrCondition(XElement s, IStylePropertyContext context)
     {
       ICondition c = null;
       foreach (var e in s.Elements())
       {
-        var x = ParseCondition(e);
+        var x = ParseCondition(e, context);
         c = c == null ? x : new OrCondition(c, x);
       }
 
       return c;
     }
 
-    KeyValuePair<IStyleKey, object> ReadProperty(XElement reader)
+    KeyValuePair<IStyleKey, object> ReadProperty(XElement reader, IStylePropertyContext context)
     {
       var name = reader.AttributeLocal("name")?.Value;
       if (string.IsNullOrWhiteSpace(name))
@@ -273,23 +335,25 @@ namespace Steropes.UI.Styles.Io.Parser
           serializer = LookupPropertyParser(key.ValueType, reader);
         }
 
-        result = serializer.Parse(StyleSystem, reader);
+        result = serializer.Parse(StyleSystem, reader, context);
       }
 
       return new KeyValuePair<IStyleKey, object>(key, result);
     }
 
-    void ReadStyleRule(XElement reader, List<IStyleRule> rules, IStyleSelector parent = null, bool directChild = false)
+    void ReadStyleRule(XElement reader, IStylePropertyContext context,
+                       List<IStyleRule> rules, IStyleSelector parent = null, 
+                       bool directChild = false)
     {
       var element = reader.AttributeLocal("element")?.Value;
-      var selector = CreateSelector(reader, parent, directChild, element);
+      var selector = CreateSelector(reader, parent, directChild, element, context);
 
       var style = new PredefinedStyle(StyleSystem);
 
       var hasStyle = false;
       foreach (var propertyNode in reader.Elements().Where(pn => pn.Name.LocalName == "property"))
       {
-        var p = ReadProperty(propertyNode);
+        var p = ReadProperty(propertyNode, context);
         style.SetValue(p.Key, p.Value);
         hasStyle = true;
       }
@@ -303,7 +367,7 @@ namespace Steropes.UI.Styles.Io.Parser
       foreach (var propertyNode in reader.Elements().Where(pn => pn.Name.LocalName == "style"))
       {
         var attr = propertyNode.AttributeLocal("direct-child");
-        ReadStyleRule(propertyNode, rules, selector, attr?.Value == "true");
+        ReadStyleRule(propertyNode, context, rules, selector, attr?.Value == "true");
       }
     }
 

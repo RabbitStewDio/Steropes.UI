@@ -1,6 +1,3 @@
-using System;
-using System.Text;
-using System.Xml;
 using Microsoft.Xna.Framework;
 using NUnit.Framework;
 using Steropes.UI.Styles;
@@ -13,7 +10,7 @@ namespace Steropes.UI.Test.Styles
   [Category("Styles")]
   public class TestTest
   {
-    void defineDocumentationStyleExample()
+    void DefineDocumentationStyleExample()
     {
       var uiStyle = LayoutTestStyle.Create();
       var b = new StyleBuilder(uiStyle.StyleSystem);

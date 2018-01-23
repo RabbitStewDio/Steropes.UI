@@ -34,7 +34,7 @@ namespace Steropes.UI.Styles.Io.Values
 
     public string TypeId => "Font";
 
-    public object Parse(IStyleSystem styleSystem, XElement property)
+    public object Parse(IStyleSystem styleSystem, XElement property, IStylePropertyContext context)
     {
       var reader = property.ElementLocal("font");
       if (reader == null)

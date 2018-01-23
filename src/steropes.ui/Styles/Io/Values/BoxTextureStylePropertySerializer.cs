@@ -16,9 +16,9 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 using System;
 using System.Xml.Linq;
-
 using Steropes.UI.Platform;
 using Steropes.UI.Styles.Io.Parser;
 
@@ -26,15 +26,17 @@ namespace Steropes.UI.Styles.Io.Values
 {
   public class BoxTextureStylePropertySerializer : IStylePropertySerializer
   {
-    public BoxTextureStylePropertySerializer()
+    public Type TargetType
     {
+      get { return typeof(IBoxTexture); }
     }
 
-    public Type TargetType => typeof(IBoxTexture);
+    public string TypeId
+    {
+      get { return "BoxTexture"; }
+    }
 
-    public string TypeId => "BoxTexture";
-
-    public object Parse(IStyleSystem styleSystem, XElement reader)
+    public object Parse(IStyleSystem styleSystem, XElement reader, IStylePropertyContext context)
     {
       var textureElement = reader.ElementLocal("texture");
       var texture = (string) textureElement?.ElementLocal("name");
@@ -43,15 +45,20 @@ namespace Steropes.UI.Styles.Io.Values
         texture = null;
       }
 
-      var insets = (Insets)new InsetsStylePropertySerializer("corners").Parse(styleSystem, textureElement);
-      var margins = (Insets)new InsetsStylePropertySerializer("margins").Parse(styleSystem, textureElement);
+      var insets = (Insets) new InsetsStylePropertySerializer("corners").Parse(styleSystem, textureElement, context);
+      var margins = (Insets) new InsetsStylePropertySerializer("margins").Parse(styleSystem, textureElement, context);
       var contentLoader = styleSystem.ContentLoader;
+      var tp = (string) reader.ElementLocal("texture-packer") ?? "disabled";
+      if (tp == "auto")
+      {
+        return context.ProcessTexture(contentLoader.LoadTexture(texture, insets, margins));
+      }
       return contentLoader.LoadTexture(texture, insets, margins);
     }
 
     public void Write(IStyleSystem styleSystem, XElement propertyElement, object value)
     {
-      var texture = (IBoxTexture)value;
+      var texture = (IBoxTexture) value;
       var element = new XElement(StyleParser.StyleNamespace + "texture");
       element.Add(new XElement(StyleParser.StyleNamespace + "name", texture.Name));
       if (texture.CornerArea != Insets.Zero)

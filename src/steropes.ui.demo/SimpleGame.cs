@@ -56,7 +56,7 @@ namespace Steropes.UI.Demo
       uiManager = UIManagerComponent.CreateAndInit(this, new InputManager(this), "Content");
 
       var styleSystem = uiManager.UIStyle;
-      var styles = styleSystem.LoadStyles("Content/UI/Metro/style.xml", "UI/Metro");
+      var styles = styleSystem.LoadStyles("Content/UI/Metro/style.xml", "UI/Metro", GraphicsDevice);
       styleSystem.StyleResolver.StyleRules.AddRange(styles);
 
       uiManager.Root.Content = WidgetDemo.CreateRootPanel(styleSystem);
