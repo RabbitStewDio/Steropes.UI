@@ -16,14 +16,15 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
-
 using Steropes.UI.Components;
 using Steropes.UI.Styles.Watcher;
+using Steropes.UI.Util;
 using Steropes.UI.Widgets.Container;
 
 namespace Steropes.UI.Styles
@@ -62,6 +63,7 @@ namespace Steropes.UI.Styles
     readonly Comparison<IStyleRule> styleRuleSortOrder = StyleRule.StyleRuleSortOrder;
 
     readonly IStyleSystem styleSystem;
+    readonly TraceSource tracer = TracingUtil.Create<StyleResolver>();
 
     public StyleResolver(IStyleSystem styleSystem)
     {
@@ -88,7 +90,39 @@ namespace Steropes.UI.Styles
     {
       return new ResolvedStyle(styleSystem, widget);
     }
-    
+
+    public void RemoveRoot(IWidget root)
+    {
+      Uninstall(root);
+    }
+
+    public bool Revalidate()
+    {
+      if (Dirty)
+      {
+        var sw = Stopwatch.StartNew();
+        var widgetCount = 0;
+        foreach (var pair in registeredWidgets)
+        {
+          var widget = pair.Key;
+          var value = pair.Value;
+          if (ResolveAsRegisteredWidget(widget, value))
+          {
+            widgetCount += 1;
+          }
+        }
+
+        Dirty = false;
+        sw.Stop();
+
+        tracer.TraceEvent(TraceEventType.Verbose, 0,
+                          "Finished revalidate of {0} widgets in {1} seconds.", widgetCount,
+                          sw.Elapsed.TotalSeconds);
+        return true;
+      }
+      return false;
+    }
+
     public void MarkDirty(IWidget w)
     {
       WidgetChangeTracker tracker;
@@ -98,11 +132,6 @@ namespace Steropes.UI.Styles
         tracker.Dirty = WidgetState.Dirty;
         Dirty = true;
       }
-    }
-
-    public void RemoveRoot(IWidget root)
-    {
-      Uninstall(root);
     }
 
     public void ResolveStyle(IWidget widget)
@@ -137,30 +166,6 @@ namespace Steropes.UI.Styles
         rule.Style.CopyInto(widget.ResolvedStyle);
       }
       widget.ResolvedStyle.InvalidateCaches("After resolve.");
-    }
-
-    public bool Revalidate()
-    {
-      if (Dirty)
-      {
-        var sw = Stopwatch.StartNew();
-        var widgetCount = 0;
-        foreach (var pair in registeredWidgets)
-        {
-          var widget = pair.Key;
-          var value = pair.Value;
-          if (ResolveAsRegisteredWidget(widget, value))
-          {
-            widgetCount += 1;
-          }
-        }
-
-        Dirty = false;
-        sw.Stop();
-        ///Debug.WriteLine($"Finished revalidate of {widgetCount} widgets in {sw.Elapsed.TotalSeconds} seconds.");
-        return true;
-      }
-      return false;
     }
 
     void Install(IWidget widget)
@@ -276,12 +281,12 @@ namespace Steropes.UI.Styles
       Clean,
 
       /// <summary>
-      /// Something in the widget or the widget-composition changed.
+      ///   Something in the widget or the widget-composition changed.
       /// </summary>
       Dirty,
-      
+
       /// <summary>
-      /// The style rules have changed and we have to invalidate all caches.
+      ///   The style rules have changed and we have to invalidate all caches.
       /// </summary>
       Invalidated
     }

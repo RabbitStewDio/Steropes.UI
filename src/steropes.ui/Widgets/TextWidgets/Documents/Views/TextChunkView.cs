@@ -17,7 +17,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System;
-using System.Diagnostics;
 
 using Microsoft.Xna.Framework;
 
@@ -146,8 +145,6 @@ namespace Steropes.UI.Widgets.TextWidgets.Documents.Views
       first = SubChunk(OffsetPosition, Node.Document.CreatePosition(breakPoint, Bias.Backward));
       second = SubChunk(Node.Document.CreatePosition(breakPoint, Bias.Forward), EndOffsetPosition);
     }
-    
-    
 
     public override void Draw(IBatchedDrawingService drawingService)
     {
@@ -359,26 +356,8 @@ namespace Steropes.UI.Widgets.TextWidgets.Documents.Views
 
     protected override void OnLayoutInvalidated()
     {
-      Debug.WriteLine("Layout invalidated");
       maxSize = new Vector2(float.PositiveInfinity, float.PositiveInfinity);
       base.OnLayoutInvalidated();
-    }
-
-    int AlignText(float layoutSize)
-    {
-      var extraSpace = DesiredSize.Width - layoutSize;
-      switch (Alignment)
-      {
-        case Alignment.Center:
-          return (int)(extraSpace / 2f);
-        case Alignment.Start:
-        case Alignment.Fill:
-          return 0;
-        case Alignment.End:
-          return (int)extraSpace;
-        default:
-          throw new ArgumentOutOfRangeException();
-      }
     }
 
     Insets ComputePaddings()

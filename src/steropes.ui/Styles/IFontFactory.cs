@@ -16,14 +16,14 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 using System;
 using System.Diagnostics;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-
 using Steropes.UI.Platform;
+using Steropes.UI.Util;
 
 namespace Steropes.UI.Styles
 {
@@ -39,6 +39,7 @@ namespace Steropes.UI.Styles
   /// </summary>
   public class FontFactory : IFontFactory
   {
+    readonly TraceSource tracer;
     readonly ContentManager contentManager;
 
     readonly GraphicsDevice graphicsDevice;
@@ -47,6 +48,7 @@ namespace Steropes.UI.Styles
     {
       this.contentManager = contentManager;
       this.graphicsDevice = graphicsDevice;
+      this.tracer = TracingUtil.Create<FontFactory>();
     }
 
     public IUIFont LoadFont(string name)
@@ -109,22 +111,26 @@ namespace Steropes.UI.Styles
       }
 
       var size = font.MeasureString(c.ToString());
-      var width = Math.Max(1, (int)Math.Ceiling(size.X));
-      var height = Math.Max(1, (int)Math.Ceiling(size.Y));
+      var width = Math.Max(1, (int) Math.Ceiling(size.X));
+      var height = Math.Max(1, (int) Math.Ceiling(size.Y));
       var colors = Render(font, c, width, height);
       var line = Analyze(colors, width);
       if (line <= 0)
       {
-        Debug.WriteLine($"Unable to find base line for {name}, assuming 75% of font height ({height}) = {font.LineSpacing * 0.75}");
+        tracer.TraceEvent(TraceEventType.Information, 0,
+                          "Unable to find base line for {0}, assuming 75% of font height ({1}) = {2}",
+                          name, height, font.LineSpacing * 0.75);
         return height * 0.75f;
       }
-      Debug.WriteLine($"Found base line for {name}, using font height ({height}) = {line}");
+      tracer.TraceEvent(TraceEventType.Information, 0, 
+                        "Found base line for {0}, using font height ({1}) = {2}", name, height, line);
       return line;
     }
 
     Color[] Render(SpriteFont font, char c, int width, int height)
     {
-      var renderTarget = new RenderTarget2D(graphicsDevice, width, height, false, graphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.None);
+      var renderTarget = new RenderTarget2D(graphicsDevice, width, height, false,
+                                            graphicsDevice.PresentationParameters.BackBufferFormat, DepthFormat.None);
 
       graphicsDevice.SetRenderTarget(renderTarget);
       graphicsDevice.Clear(Color.White);

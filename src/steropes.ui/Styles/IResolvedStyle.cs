@@ -67,8 +67,6 @@ namespace Steropes.UI.Styles
 
     public bool GetValue<T>(IStyleKey key, out T value)
     {
-      Resolve();
-
       if (elementStyle.GetValue(key, out value))
       {
         return true;
@@ -202,22 +200,6 @@ namespace Steropes.UI.Styles
       ValueChanged?.Invoke(this, args);
     }
 
-    void Resolve()
-    {
-      /*
-      //// Invalid means that either the widget or the widget's parents have had changes in their style properties.
-      //// Style properties can be inherited, so we have to at least clear the caches for them.
-      if (invalid)
-      {
-        cachedValues.Clear();
-        if (styleResolver.Revalidate())
-        {
-          Debug.WriteLine("WARNING: StyleResolver detected invalid styles.");
-        }
-      }
-      invalid = false;
-      */
-    }
 
     void Store(IStyleKey key, object value)
     {

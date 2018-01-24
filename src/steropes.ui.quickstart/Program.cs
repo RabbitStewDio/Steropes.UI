@@ -43,7 +43,7 @@ namespace Steropes.UI.Quickstart
 
       IsMouseVisible = true;
 
-      var uiManager = UIManagerComponent.CreateAndInit(this, new InputManager(this), "Content");
+      var uiManager = UIManagerComponent.CreateAndInit(this, new InputManager(this), "Content").Manager;
 
       var styleSystem = uiManager.UIStyle;
       var styles = styleSystem.LoadStyles("Content/UI/Metro/style.xml", "UI/Metro", GraphicsDevice);

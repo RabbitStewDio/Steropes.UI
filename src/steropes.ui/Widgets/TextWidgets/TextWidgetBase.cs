@@ -125,8 +125,12 @@ namespace Steropes.UI.Widgets.TextWidgets
 
       set
       {
-        Content.Document.SetText(value);
-        InvalidateLayout();
+        var oldText = Content.Document.GetText();
+        if (oldText != value)
+        {
+          Content.Document.SetText(value);
+          InvalidateLayout();
+        }
       }
     }
 

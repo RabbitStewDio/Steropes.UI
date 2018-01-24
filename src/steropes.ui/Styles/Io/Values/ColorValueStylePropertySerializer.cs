@@ -25,6 +25,7 @@ using System.Xml.Linq;
 using Microsoft.Xna.Framework;
 
 using Steropes.UI.Styles.Io.Parser;
+using Steropes.UI.Util;
 
 namespace Steropes.UI.Styles.Io.Values
 {
@@ -112,6 +113,8 @@ namespace Steropes.UI.Styles.Io.Values
 
     static void RegisterColors()
     {
+      var tracer = TracingUtil.Create<ColorValueStylePropertySerializer>();
+
       var properties = typeof(Color).GetProperties();
       for (var i = 0; i < properties.Length; i++)
       {
@@ -144,7 +147,7 @@ namespace Steropes.UI.Styles.Io.Values
         }
         catch (Exception e)
         {
-          Debug.WriteLine("Failed to read color for {0} [{1}]", property.Name, e);
+          tracer.TraceEvent(TraceEventType.Verbose, 0, "Failed to read color for {0} [{1}]", property.Name, e);
         }
       }
     }

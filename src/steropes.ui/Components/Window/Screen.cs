@@ -81,6 +81,10 @@ namespace Steropes.UI.Components.Window
 
     public void Draw()
     {
+      // re-layout. This is a no-op if there had been no changes since the last
+      // arrange call, but it avoids subtle bugs when UI components get updated
+      // during an earlier operation in another component's Draw call.
+      ArrangeRoot();
       DrawingService.StartDrawing();
       try
       {
@@ -134,6 +138,10 @@ namespace Steropes.UI.Components.Window
     void ArrangeRoot()
     {
       StyleResolver.Revalidate();
+      if (StyleResolver.StyleRules.Count == 0)
+      {
+        throw new InvalidOperationException("The style system contains no style-rules. This will result in errors. Aborting!");
+      }
 
       var screenSpace = Bounds;
       if (lastLayoutSize != screenSpace || Root.LayoutInvalid)
