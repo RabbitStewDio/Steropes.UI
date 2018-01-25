@@ -98,10 +98,15 @@ user input.
 * Window - A window.
 
 ### Layout Container
-* Group - Arranges child content based on their "AnchorRect" property. Similar to WPF's Canvas control.
-* Grid - Arranges content into rows and columns. Similar to WPF's grid control, but without row-/col-span support.
-* DockPanel - Docks content to the side of the panel. Same as the WPF class with the same name.
-* BoxGroup - Arrange child content horizontally or vertically. Same as the StackPanel in WPF.
+* Group - Arranges child content based on their "AnchorRect" property. Similar to 
+  WPF's Canvas control.
+* LayeredPane - Like Group, but with explicit rendering/z-order for all widgets.
+* Grid - Arranges content into rows and columns. Similar to WPF's grid control, but 
+  without row-/col-span support.
+* DockPanel - Docks content to the side of the panel. Same as the WPF class with the 
+  same name.
+* BoxGroup - Arrange child content horizontally or vertically. Same as the StackPanel 
+  in WPF.
 
 ## Downloads
 
@@ -137,43 +142,17 @@ You can find all documentation in the [documentation folder](docs/README.md).
 
 ## Roadmap
 
-I created Steropes-UI to solve my reoccuring pains of writing testable UIs for
-my Monogame related projects. I also suffer from ongoing laziness when styling UIs (especially
-prototypes). Therefore the current state of the library solves these two pain points with 
-the testable architecture and the styling system.
-
 There are a few areas I think that need additional work at a later stage:
 
-### Performance
-
-* At the moment, the rendering relies on having separate textures and the box-textures must be
- rendered with a texturemode of stretch. This prevents frames from having repeating patterns.
- To fix that, we need a custom shader that properly implements the repeated rendering.
-
-* Having separate textures means we end up with a large number of draw calls. That is generally
-  a bad thing. GUI textures are small, so we should be able to put all of them into a texture
-  atlas and render subsets of the same texture instead. 
-
-  There are two complementary ways to implement that:
-
-  1) Support texture coordinates in the style descriptions. A variant of that: Support 
-     a parsed texture atlas and resolve textures against that. This should make the affair
-     more usable, as the texture atlas contains readable names for each contained sprite.
-
-  2) Pack textures at runtime. This should be relatively cheap given the small sizes and
-     fairly regular structures involved. This would mean that images can be kept as separate
-     files and wont need a recompile to see changes.
-
-  Bonus points for mapping the referenced spritefonts onto the same sprite-sheet. Under ideal
-  conditions that could bring down the draw call count to 1.
-
-* Add tree and table widgets for data centric UIs. Hardcore strategy games would benefit from that.
+* Add tree and table widgets for data centric UIs. Hardcore strategy games would benefit 
+  from that.
 
 * Add a rich-text widget that is suitable for dispaying help texts. 
 
-* Add basic charts (pie, bar, line). Those would also be useful for strategy games. These could be
-  implemented right now using the CustomViewport widget, but having something out of the box would be
-  much nicer.
+* Add basic charts (pie, bar, line). Those would also be useful for strategy games. 
+  These could be implemented right now using the CustomViewport widget, but having 
+  something out of the box would be much nicer.
 
-* Add basic data binding. Thats here because I am way to lazy to manually and repeatedly write mostly
-  similar listener code over and over again just to get data in and out of the UI. 
+* Add basic data binding. Thats here because I am way to lazy to manually and 
+  repeatedly write mostly similar listener code over and over again just to get data 
+  in and out of the UI. 
