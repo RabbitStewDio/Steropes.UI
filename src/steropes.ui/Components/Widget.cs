@@ -1022,6 +1022,14 @@ namespace Steropes.UI.Components
       Parent = parent;
     }
 
+    /// <summary>
+    ///  A DSL helper to allow a more fluent assembly of GUIs similar to the ScalaFX DSL.
+    /// </summary>
+    public Action<Widget> WithInitializer
+    {
+      set { value?.Invoke(this); }
+    }
+
     public void AddPseudoStyleClass(string styleClass)
     {
       pseudoStyleClasses.Add(styleClass);
@@ -1375,15 +1383,13 @@ namespace Steropes.UI.Components
     public void ShowTooltip(string text)
     {
       var t = Tooltip;
-      if (t is Tooltip<Label>)
+      if (t is Tooltip<Label> tooltipLabel)
       {
-        var label = (Tooltip<Label>)t;
-        label.Content.Text = text;
+        tooltipLabel.Content.Text = text;
       }
-      else if (t is Tooltip<IconLabel>)
+      else if (t is Tooltip<IconLabel> tooltipIconLabel)
       {
-        var label = (Tooltip<IconLabel>)t;
-        label.Content.Text = text;
+        tooltipIconLabel.Content.Text = text;
       }
       else
       {

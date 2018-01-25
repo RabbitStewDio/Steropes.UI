@@ -63,10 +63,6 @@ namespace Steropes.UI.Demo
       Components.Add(inputManager);
       Components.Add(stateManager);
       Components.Add(new DebugOverlayRenderer(this));
-
-      
     }
-
-
   }
 }

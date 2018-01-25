@@ -16,12 +16,10 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System.Collections.Generic;
-using System.Globalization;
 
+using System.Globalization;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-
 using Steropes.UI.Components;
 using Steropes.UI.Components.Window;
 using Steropes.UI.Input;
@@ -36,65 +34,63 @@ namespace Steropes.UI.Demo.Demos
   {
     public BasicDemoPane(IUIStyle style) : base(style)
     {
-      var gridGroup = new Grid(UIStyle);
-      gridGroup.ColumnConstraints.Add(LengthConstraint.Auto);
-      gridGroup.ColumnConstraints.Add(LengthConstraint.Relative(1));
-      gridGroup.ColumnConstraints.Add(LengthConstraint.Relative(1));
-
-      var rowIndex = 0;
-
-      gridGroup.AddChildAt(new Label(UIStyle, "PasswordBox"), 0, rowIndex);
-      gridGroup.AddChildAt(CreatePasswordBox(), 1, rowIndex);
-
-      rowIndex++;
-      gridGroup.AddChildAt(new Label(UIStyle, "Text-Box"), 0, rowIndex);
-      gridGroup.AddChildAt(CreateTextBox(), 1, rowIndex);
-
-      rowIndex++;
-      gridGroup.AddChildAt(new Label(UIStyle, "DropDownBox"), 0, rowIndex);
-      gridGroup.AddChildAt(CreateDropBox(), 1, rowIndex);
-
-      rowIndex++;
-
-      gridGroup.AddChildAt(new Label(UIStyle, "RadioButtonSet"), 0, rowIndex);
-      gridGroup.AddChildAt(CreateRadioButtonSet(), 1, rowIndex);
-
-      rowIndex++;
-
-      gridGroup.AddChildAt(new Label(UIStyle, "Slider"), 0, rowIndex);
-      gridGroup.AddChildAt(CreateSlider(), 1, rowIndex);
-
-      rowIndex++;
-
-      gridGroup.AddChildAt(new Label(UIStyle, "Button"), 0, rowIndex);
-      gridGroup.AddChildAt(CreateButton(), 1, rowIndex);
-
-      rowIndex++;
-
-      gridGroup.AddChildAt(new Label(UIStyle, "CheckBox"), 0, rowIndex);
-      gridGroup.AddChildAt(CreateCheckBox(), 1, rowIndex);
-
-      rowIndex++;
-
-      gridGroup.AddChildAt(new Label(UIStyle, "KeyBox"), 0, rowIndex);
-      gridGroup.AddChildAt(CreateKeyBox(), 1, rowIndex);
-
-      rowIndex++;
-
-      gridGroup.AddChildAt(new Label(UIStyle, "Spinner"), 0, rowIndex);
-      gridGroup.AddChildAt(CreateSpinner(), 1, rowIndex);
-
-      rowIndex++;
-
-      gridGroup.AddChildAt(new Label(UIStyle, "ProgressBar"), 0, rowIndex);
-      gridGroup.AddChildAt(CreateProgressBar(), 1, rowIndex);
-
-      rowIndex++;
-
-      gridGroup.AddChildAt(new Label(UIStyle, "ListBox"), 0, rowIndex);
-      gridGroup.AddChildAt(CreateListView(), 1, rowIndex);
-
-      Content = gridGroup;
+      Content = new Grid(UIStyle)
+      {
+        Spacing = 5,
+        Columns = new []
+        {
+          LengthConstraint.Auto, 
+          LengthConstraint.Relative(1), 
+          LengthConstraint.Relative(1), 
+        },
+        Children = new []
+        {
+          new [] {
+            new Label(UIStyle, "PasswordBox"),
+            CreatePasswordBox()
+          },
+          new [] {
+            new Label(UIStyle, "Text-Box"),
+            CreateTextBox()
+          },
+          new [] {
+            new Label(UIStyle, "DropDown-Box"),
+            CreateDropBox()
+          },
+          new [] {
+            new Label(UIStyle, "RadioButtonSet"),
+            CreateRadioButtonSet()
+          },
+          new [] {
+            new Label(UIStyle, "Slider"),
+            CreateSlider()
+          },
+          new [] {
+            new Label(UIStyle, "Button"),
+            CreateButton()
+          },
+          new [] {
+            new Label(UIStyle, "Checkbox"),
+            CreateCheckBox()
+          },
+          new [] {
+            new Label(UIStyle, "Keybox"),
+            CreateKeyBox()
+          },
+          new [] {
+            new Label(UIStyle, "Spinner"),
+            CreateSpinner()
+          },
+          new [] {
+            new Label(UIStyle, "Progressbar"),
+            CreateProgressBar()
+          },
+          new [] {
+            new Label(UIStyle, "ListBox"),
+            CreateListView()
+          },
+        }
+      };
     }
 
     enum Flavor
@@ -108,13 +104,16 @@ namespace Steropes.UI.Demo.Demos
 
     IWidget CreateButton()
     {
-      var button = new Button(UIStyle, "Get Ice Cream!");
       IPopUp popup = null;
-      button.ActionPerformed += (sender, args) =>
+      var button = new Button(UIStyle, "Get Ice Cream!")
+      {
+        OnActionPerformed = (s, a) =>
         {
           popup?.Close();
-          popup = Screen?.PopUpManager?.ShowConfirmDialog(new Point(600, 250), UIStyle, "Oh noes!", "It melted already. Sorry.");
-        };
+          popup = Screen?.PopUpManager?.ShowConfirmDialog(new Point(600, 250), UIStyle, "Oh noes!",
+                                                          "It melted already. Sorry.");
+        }
+      };
       return button;
     }
 
@@ -125,23 +124,25 @@ namespace Steropes.UI.Demo.Demos
 
     IWidget CreateDropBox()
     {
-      var items = new List<DropDownItem<Flavor>>();
-      items.Add(new DropDownItem<Flavor>("Chocolate", Flavor.Chocolate));
-      items.Add(new DropDownItem<Flavor>("Vanilla", Flavor.Vanilla));
-      items.Add(new DropDownItem<Flavor>("Cheese", Flavor.Cheese));
-      items.Add(new DropDownItem<Flavor>("Cheese 1", Flavor.Cheese));
-      items.Add(new DropDownItem<Flavor>("Cheese 2", Flavor.Cheese));
-      items.Add(new DropDownItem<Flavor>("Cheese 3", Flavor.Cheese));
-      items.Add(new DropDownItem<Flavor>("Cheese 4", Flavor.Cheese));
-      items.Add(new DropDownItem<Flavor>("Cheese 5", Flavor.Cheese));
-      items.Add(new DropDownItem<Flavor>("Cheese 6", Flavor.Cheese));
-      items.Add(new DropDownItem<Flavor>("Cheese 7", Flavor.Cheese));
-      items.Add(new DropDownItem<Flavor>("Cheese 8", Flavor.Cheese));
-      items.Add(new DropDownItem<Flavor>("Cheese 9", Flavor.Cheese));
-
-      var dropDownBox = new DropDownBox<DropDownItem<Flavor>>(UIStyle, items);
-      dropDownBox.SelectedIndex = 0;
-      return dropDownBox;
+      return new DropDownBox<DropDownItem<Flavor>>(UIStyle)
+      {
+        SelectedIndex = 0,
+        Data = new[]
+        {
+          new DropDownItem<Flavor>("Chocolate", Flavor.Chocolate),
+          new DropDownItem<Flavor>("Vanilla", Flavor.Vanilla),
+          new DropDownItem<Flavor>("Cheese", Flavor.Cheese),
+          new DropDownItem<Flavor>("Cheese 1", Flavor.Cheese),
+          new DropDownItem<Flavor>("Cheese 2", Flavor.Cheese),
+          new DropDownItem<Flavor>("Cheese 3", Flavor.Cheese),
+          new DropDownItem<Flavor>("Cheese 4", Flavor.Cheese),
+          new DropDownItem<Flavor>("Cheese 5", Flavor.Cheese),
+          new DropDownItem<Flavor>("Cheese 6", Flavor.Cheese),
+          new DropDownItem<Flavor>("Cheese 7", Flavor.Cheese),
+          new DropDownItem<Flavor>("Cheese 8", Flavor.Cheese),
+          new DropDownItem<Flavor>("Cheese 9", Flavor.Cheese)
+        }
+      };
     }
 
     IWidget CreateKeyBox()
@@ -151,15 +152,19 @@ namespace Steropes.UI.Demo.Demos
 
     IWidget CreateListView()
     {
-      var list = new ListView<string>(UIStyle);
-      list.DataItems.Add("One");
-      list.DataItems.Add("Two");
-      list.DataItems.Add("Three");
-      list.DataItems.Add("Four");
-      list.DataItems.Add("Five");
-      list.DataItems.Add("Five A");
-      list.DataItems.Add("Five B");
-      return list;
+      return new ListView<string>(UIStyle)
+      {
+        Data = new[]
+        {
+          "One",
+          "Two",
+          "Three",
+          "Four",
+          "Five",
+          "Six",
+          "Seven",
+        }
+      };
     }
 
     IWidget CreatePasswordBox()
@@ -169,27 +174,27 @@ namespace Steropes.UI.Demo.Demos
 
     IWidget CreateProgressBar()
     {
-      var progressBar = new ProgressBar(UIStyle) { Min = 0, Max = 400, Value = 200 };
-      return progressBar;
+      return new ProgressBar(UIStyle) { Min = 0, Max = 400, Value = 200 };
     }
 
     IWidget CreateRadioButtonSet()
     {
-      var items = new List<DropDownItem<Flavor>>();
-      items.Add(new DropDownItem<Flavor>("Chocolate", Flavor.Chocolate));
-      items.Add(new DropDownItem<Flavor>("Vanilla", Flavor.Vanilla));
-      items.Add(new DropDownItem<Flavor>("Cheese", Flavor.Cheese));
-
-      var dropDownBox = new RadioButtonSet<DropDownItem<Flavor>>(UIStyle);
-      dropDownBox.AddAll(items);
-      dropDownBox.SelectedIndex = 0;
-      return dropDownBox;
+      return new RadioButtonSet<DropDownItem<Flavor>>(UIStyle)
+      {
+        Data = new[]
+        {
+          new DropDownItem<Flavor>("Chocolate", Flavor.Chocolate),
+          new DropDownItem<Flavor>("Vanilla", Flavor.Vanilla),
+          new DropDownItem<Flavor>("Cheese", Flavor.Cheese)
+        },
+        SelectedIndex = 0
+      };
     }
 
     IWidget CreateSlider()
     {
       var slider = new Slider(UIStyle, 1, 5, 1, 1);
-      slider.ValueChanged += (sender, args) => slider.ShowTooltip(slider.Value.ToString(CultureInfo.CurrentCulture));
+      slider.OnValueChanged = (sender, args) => slider.ShowTooltip(slider.Value.ToString(CultureInfo.CurrentCulture));
       return slider;
     }
 

@@ -23,6 +23,7 @@ using Microsoft.Xna.Framework.Input;
 using Steropes.UI.Components;
 using Steropes.UI.Input.KeyboardInput;
 using Steropes.UI.Input.MouseInput;
+using Steropes.UI.Util;
 using Steropes.UI.Widgets.Container;
 
 namespace Steropes.UI.Widgets
@@ -44,20 +45,21 @@ namespace Steropes.UI.Widgets
   {
     public static readonly string CloseButtonStyleClass = "NotebookTabCloseButton";
 
+    readonly EventSupport<EventArgs> activationRequestedSupport;
+    readonly EventSupport<EventArgs> closeRequestedSupport;
     readonly Button closeButton;
-
     readonly IWidget emptyContent;
 
     IWidget content;
-
     IWidget headerContent;
-
     bool pinned;
-
     bool isActive;
 
     public NotebookTab(IUIStyle style, IWidget headerContent, IWidget content) : base(style)
     {
+      activationRequestedSupport = new EventSupport<EventArgs>();
+      closeRequestedSupport = new EventSupport<EventArgs>();
+
       emptyContent = new Label(UIStyle) { Anchor = AnchoredRect.CreateHorizontallyStretched() };
       
       closeButton = new Button(UIStyle);
@@ -79,10 +81,30 @@ namespace Steropes.UI.Widgets
       Content = content;
     }
 
-    public event EventHandler<EventArgs> ActivationRequested;
+    public event EventHandler<EventArgs> ActivationRequested
+    {
+      add { activationRequestedSupport.Event += value; }
+      remove { activationRequestedSupport.Event -= value; }
+    }
+    
+    public EventHandler<EventArgs> OnActivationRequested
+    {
+      get { return activationRequestedSupport.Handler; }
+      set { activationRequestedSupport.Handler = value; }
+    }
 
-    public event EventHandler<EventArgs> CloseRequested;
-
+    public event EventHandler<EventArgs> CloseRequested
+    {
+      add { closeRequestedSupport.Event += value; }
+      remove { closeRequestedSupport.Event -= value; }
+    }
+    
+    public EventHandler<EventArgs> OnCloseRequested
+    {
+      get { return closeRequestedSupport.Handler; }
+      set { closeRequestedSupport.Handler = value; }
+    }
+    
     public IWidget Content
     {
       get
@@ -170,13 +192,13 @@ namespace Steropes.UI.Widgets
     {
       if (IsClosable)
       {
-        CloseRequested?.Invoke(this, EventArgs.Empty);
+        closeRequestedSupport.Raise(this, EventArgs.Empty);
       }
     }
 
     void ActivateTab()
     {
-      ActivationRequested?.Invoke(this, EventArgs.Empty);
+      activationRequestedSupport.Raise(this, EventArgs.Empty);
     }
 
     void OnCloseButtonOnClicked(object sender, EventArgs e)

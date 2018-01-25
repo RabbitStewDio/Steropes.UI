@@ -24,6 +24,7 @@ using Steropes.UI.Components;
 using Steropes.UI.Input.MouseInput;
 using Steropes.UI.Platform;
 using Steropes.UI.Styles;
+using Steropes.UI.Util;
 using Steropes.UI.Widgets.Container;
 using Steropes.UI.Widgets.Styles;
 
@@ -32,6 +33,7 @@ namespace Steropes.UI.Widgets
   public class NotebookTabList : WidgetContainerBase<bool>
   {
     readonly NotebookStyleDefinition notebookStyle;
+    readonly EventSupport<EventArgs> activeTabChangedSupport;
 
     INotebookTab activeTab;
 
@@ -39,12 +41,23 @@ namespace Steropes.UI.Widgets
 
     public NotebookTabList(IUIStyle style) : base(style)
     {
+      activeTabChangedSupport = new EventSupport<EventArgs>();
       allowDragReorder = true;
       notebookStyle = StyleSystem.StylesFor<NotebookStyleDefinition>();
       DragState = new DragNDropState(this);
     }
 
-    public event EventHandler<EventArgs> ActiveTabChanged;
+    public event EventHandler<EventArgs> ActiveTabChanged
+    {
+      add { activeTabChangedSupport.Event += value; }
+      remove { activeTabChangedSupport.Event -= value; }
+    }
+    
+    public EventHandler<EventArgs> OnActiveTabChanged
+    {
+      get { return activeTabChangedSupport.Handler; }
+      set { activeTabChangedSupport.Handler = value; }
+    }
 
     public INotebookTab ActiveTab
     {
@@ -68,7 +81,7 @@ namespace Steropes.UI.Widgets
           activeTab.IsActive = true;
         }
         OnPropertyChanged();
-        ActiveTabChanged?.Invoke(this, EventArgs.Empty);
+        activeTabChangedSupport.Raise(this, EventArgs.Empty);
       }
     }
     

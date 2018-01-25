@@ -23,31 +23,58 @@
 using System;
 using Steropes.UI.Components;
 using Steropes.UI.Components.Window;
+using Steropes.UI.Util;
 
 namespace Steropes.UI.Widgets.Container
 {
   public class Window<TContent> : ContentWidget<TContent>, IWindow<TContent>
     where TContent : class, IWidget
   {
+    readonly EventSupport<EventArgs> closedSupport;
+    readonly EventSupport<ClosingEventArgs> closingSupport;
+
     public Window(IUIStyle style) : base(style)
     {
+      closedSupport = new EventSupport<EventArgs>();
+      closingSupport = new EventSupport<ClosingEventArgs>();
     }
 
-    public event EventHandler<EventArgs> Closed;
-    public event EventHandler<ClosingEventArgs> Closing;
+    public event EventHandler<EventArgs> Closed
+    {
+      add { closedSupport.Event += value; }
+      remove { closedSupport.Event -= value; }
+    }
+    
+    public EventHandler<EventArgs> OnClosed
+    {
+      get { return closedSupport.Handler; }
+      set { closedSupport.Handler = value; }
+    }
+
+    public event EventHandler<ClosingEventArgs> Closing
+    {
+      add { closingSupport.Event += value; }
+      remove { closingSupport.Event -= value; }
+    }
+    
+    public EventHandler<ClosingEventArgs> OnClosing
+    {
+      get { return closingSupport.Handler; }
+      set { closingSupport.Handler = value; }
+    }
 
     public void Close()
     {
       if (Parent != null)
       {
         var closingEvent = new ClosingEventArgs();
-        Closing?.Invoke(this, closingEvent);
+        closingSupport.Raise(this, closingEvent);
         if (closingEvent.Rejected)
         {
           return;
         }
 
-        Closed?.Invoke(this, EventArgs.Empty);
+        closedSupport.Raise(this, EventArgs.Empty);
         if (Parent != null)
         {
           throw new InvalidOperationException("Not closed!");

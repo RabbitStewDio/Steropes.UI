@@ -17,7 +17,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System.Collections.Generic;
-using System.IO;
 using System.Xml.Linq;
 
 using Microsoft.Xna.Framework;
@@ -51,8 +50,6 @@ namespace Steropes.UI.Demo.GameStates
         Rules = rules;
       }
 
-
-
       public override string ToString()
       {
         return Name;
@@ -69,7 +66,11 @@ namespace Steropes.UI.Demo.GameStates
 
     readonly List<StyleDefinition> styles;
 
-    public GameStateMainMenu(Game game, IBatchedDrawingService drawingService, IInputManager inputManager, IGameStateManager stateService, IGameWindowService windowService)
+    public GameStateMainMenu(Game game, 
+                             IBatchedDrawingService drawingService, 
+                             IInputManager inputManager, 
+                             IGameStateManager stateService, 
+                             IGameWindowService windowService)
       : base(drawingService)
     {
       this.frameRateCalculator = new FrameRateCalculator();
@@ -96,8 +97,11 @@ namespace Steropes.UI.Demo.GameStates
 
     StyleDefinition Load(string context, string filename)
     {
-      var rules = UIManager.UIStyle.StyleSystem.WithContext(context).CreateParser(Game.GraphicsDevice)
+      var rules = UIManager.UIStyle.StyleSystem
+        .WithContext(context)
+        .CreateParser(Game.GraphicsDevice)
         .Read(XDocument.Load(filename));
+
       return new StyleDefinition("Metro", rules, UIManager.UIStyle.StyleSystem.WhitePixel);
     }
 
@@ -111,6 +115,8 @@ namespace Steropes.UI.Demo.GameStates
       styles.Add(Load("UI/Metro", "Content/UI/Metro/style.xml"));
       styles.Add(Load("UI/NuclearWinter", "Content/UI/NuclearWinter/style.xml"));
 
+      Select(styles[0]);
+
       UIManager.UIStyle.StyleResolver.StyleRules.Clear();
       UIManager.UIStyle.StyleResolver.StyleRules.AddRange(styles[0].Rules);
 
@@ -122,7 +128,7 @@ namespace Steropes.UI.Demo.GameStates
 
     Widget CreateContentPane(IUIStyle style)
     {
-      Grid g = new Grid(style);
+      var g = new Grid(style);
       g.ColumnConstraints.Add(LengthConstraint.Percentage(100));
       g.RowConstraints.Add(LengthConstraint.Auto);
       g.RowConstraints.Add(LengthConstraint.Relative(1));
@@ -143,14 +149,19 @@ namespace Steropes.UI.Demo.GameStates
         {
           if (radioButtons.LookUpSelectedItem(out var d))
           {
-            uiStyle.StyleResolver.StyleRules.Clear();
-            uiStyle.StyleResolver.StyleRules.AddRange(d.Rules);
-            DrawingService.WhitePixel = d.WhitePixel;
-            UIManager.UIStyle.StyleSystem.WhitePixel = d.WhitePixel;
+            Select(d);
           }
         };
 
       return new BoxGroup(uiStyle, Orientation.Vertical, 0) { radioButtons };
+    }
+
+    void Select(StyleDefinition d)
+    {
+      UIManager.UIStyle.StyleResolver.StyleRules.Clear();
+      UIManager.UIStyle.StyleResolver.StyleRules.AddRange(d.Rules);
+      UIManager.UIStyle.StyleSystem.WhitePixel = d.WhitePixel;
+      DrawingService.WhitePixel = d.WhitePixel;
     }
 
     public override void Stop()

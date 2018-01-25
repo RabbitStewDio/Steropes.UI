@@ -32,8 +32,11 @@ namespace Steropes.UI.Demo.Demos
     {
       var basicDemoPane = new BasicDemoPane(uiStyle);
 
-      // var tx = content.Load<Texture2D>("Sprites/UI/Panel04");
-      var demoPanel = new ScrollPanel(uiStyle) { VerticalScrollbarMode = ScrollbarMode.None, Content = basicDemoPane };
+      var demoPanel = new ScrollPanel(uiStyle)
+      {
+        VerticalScrollbarMode = ScrollbarMode.None, 
+        Content = basicDemoPane
+      };
       demoPanel.AddStyleClass("DemoPanel");
 
       var demosBoxGroup = new BoxGroup(uiStyle, Orientation.Vertical, 0)

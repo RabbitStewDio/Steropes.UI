@@ -16,50 +16,60 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 using System;
-
 using Microsoft.Xna.Framework.Input;
-
 using Steropes.UI.Components;
 using Steropes.UI.Input;
 using Steropes.UI.Input.KeyboardInput;
 using Steropes.UI.Input.MouseInput;
+using Steropes.UI.Util;
 
 namespace Steropes.UI.Widgets
 {
   public class ListDataItemRenderer : ContentWidget<IWidget>, IListDataItemRenderer
   {
+    readonly EventSupport<ListSelectionEventArgs> selectionChangedSupport;
     bool selected;
 
     public ListDataItemRenderer(IUIStyle style) : base(style)
     {
+      selectionChangedSupport = new EventSupport<ListSelectionEventArgs>();
       Anchor = AnchoredRect.CreateHorizontallyStretched();
       FocusedChanged += (s, e) =>
+      {
+        if (Focused)
         {
-          if (Focused)
-          {
-            OnSelection?.Invoke(this, ListSelectionEventArgs.Adjusted);
-          }
-        };
+          selectionChangedSupport.Raise(this, ListSelectionEventArgs.Adjusted);
+        }
+      };
 
       MouseClicked += OnMouseClick;
       KeyPressed += OnKeyPressed;
     }
 
-    public event EventHandler<ListSelectionEventArgs> OnSelection;
+    public event EventHandler<ListSelectionEventArgs> SelectionChanged
+    {
+      add { selectionChangedSupport.Event += value; }
+      remove { selectionChangedSupport.Event -= value; }
+    }
+
+    public EventHandler<ListSelectionEventArgs> OnSelectionChanged
+    {
+      get { return selectionChangedSupport.Handler; }
+      set { selectionChangedSupport.Handler = value; }
+    }
 
     public bool Selected
     {
-      get
-      {
-        return selected;
-      }
+      get { return selected; }
       set
       {
         if (value == selected)
         {
           return;
         }
+
         selected = value;
         OnPropertyChanged();
       }
@@ -75,13 +85,13 @@ namespace Steropes.UI.Widgets
       args.Consumed = true;
       if (args.Key == Keys.Space || args.Key == Keys.Enter)
       {
-        OnSelection?.Invoke(this, ListSelectionEventArgs.Confirmed);
+        selectionChangedSupport.Raise(this, ListSelectionEventArgs.Confirmed);
       }
     }
 
     void OnMouseClick(object source, MouseEventArgs args)
     {
-      OnSelection?.Invoke(this, ListSelectionEventArgs.Confirmed);
+      selectionChangedSupport.Raise(this, ListSelectionEventArgs.Confirmed);
       args.Consume();
     }
   }

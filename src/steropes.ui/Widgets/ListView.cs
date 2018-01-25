@@ -24,19 +24,22 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-
+using System.Linq;
 using Microsoft.Xna.Framework;
 
 using Steropes.UI.Components;
 using Steropes.UI.Platform;
 using Steropes.UI.Styles;
+using Steropes.UI.Util;
 using Steropes.UI.Widgets.Container;
 
 namespace Steropes.UI.Widgets
 {
   public interface IListDataItemRenderer : IWidget
   {
-    event EventHandler<ListSelectionEventArgs> OnSelection;
+    event EventHandler<ListSelectionEventArgs> SelectionChanged;
+    
+    EventHandler<ListSelectionEventArgs> OnSelectionChanged { get; set; }
 
     bool Selected { get; set; }
   }
@@ -78,9 +81,11 @@ namespace Steropes.UI.Widgets
     int minimumWidth;
 
     int selectedIndex;
+    readonly EventSupport<ListSelectionEventArgs> selectionChangedSupport;
 
     public ListView(IUIStyle style) : base(style)
     {
+      selectionChangedSupport = new EventSupport<ListSelectionEventArgs>();
       listViewStyle = StyleSystem.StylesFor<ListViewStyleDefinition>();
 
       selectedIndex = -1;
@@ -100,7 +105,17 @@ namespace Steropes.UI.Widgets
       MaxHeight = int.MaxValue;
     }
 
-    public event EventHandler<ListSelectionEventArgs> SelectionChanged;
+    public event EventHandler<ListSelectionEventArgs> SelectionChanged
+    {
+      add { selectionChangedSupport.Event += value; }
+      remove { selectionChangedSupport.Event -= value; }
+    }
+
+    public EventHandler<ListSelectionEventArgs> OnSelectionChanged
+    {
+      get { return selectionChangedSupport.Handler; }
+      set { selectionChangedSupport.Handler = value; }
+    }
 
     public Func<IUIStyle, T, IListDataItemRenderer> CreateRenderer
     {
@@ -116,6 +131,16 @@ namespace Steropes.UI.Widgets
     }
 
     public ObservableCollection<T> DataItems { get; }
+
+    public IReadOnlyCollection<T> Data
+    {
+      get { return DataItems.ToArray(); }
+      set
+      {
+        DataItems.Clear();
+        DataItems.AddRange(value);
+      }
+    }
 
     public int MaxHeight
     {
@@ -185,8 +210,7 @@ namespace Steropes.UI.Widgets
           var oldItem = SelectedItem;
           for (var widgetItem = 0; widgetItem < InternalContent.Content.Count; widgetItem += 1)
           {
-            var r = InternalContent.Content[widgetItem] as IListDataItemRenderer;
-            if (r != null)
+            if (InternalContent.Content[widgetItem] is IListDataItemRenderer r)
             {
               r.Selected = widgetItem == value;
             }
@@ -263,7 +287,7 @@ namespace Steropes.UI.Widgets
 
     protected void RaiseSelectionChanged(ListSelectionEventArgs args)
     {
-      SelectionChanged?.Invoke(this, args);
+      selectionChangedSupport.Raise(this, args);
     }
 
     void RebuildDataRenderers()
@@ -284,7 +308,7 @@ namespace Steropes.UI.Widgets
         renderer.MouseDragged += (s, e) => InternalContent.DispatchEvent(e.Derive());
         renderer.MouseWheel += (s, e) => InternalContent.DispatchEvent(e.Derive());
 
-        renderer.OnSelection += (s, a) =>
+        renderer.SelectionChanged += (s, a) =>
           {
             SelectedIndex = closureIndex;
             if (a.Adjusting == false)

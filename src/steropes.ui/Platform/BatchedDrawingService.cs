@@ -318,7 +318,7 @@ namespace Steropes.UI.Platform
           GraphicsDevice.ScissorRectangle = rect;
         }
 
-        StartSpriteBatch();
+        StartSpriteBatch(ScissorRasterizerState);
       }
       else
       {
@@ -337,9 +337,9 @@ namespace Steropes.UI.Platform
       StartSpriteBatch();
     }
 
-    protected virtual void StartSpriteBatch()
+    protected virtual void StartSpriteBatch(RasterizerState rs = null)
     {
-      SpriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointWrap, null, ScissorRasterizerState, null, SpriteMatrix);
+      SpriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointWrap, null, rs, null, SpriteMatrix);
     }
 
     public SpriteBatch SuspendBatch()

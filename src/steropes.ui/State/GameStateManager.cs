@@ -143,12 +143,7 @@ namespace Steropes.UI.State
     /// <param name="newState"></param>
     public void SwitchState(IGameState newState)
     {
-      if (newState == null)
-      {
-        throw new ArgumentNullException(nameof(newState));
-      }
-
-      NextState = newState;
+      NextState = newState ?? throw new ArgumentNullException(nameof(newState));
 
       if (CurrentState == null)
       {
