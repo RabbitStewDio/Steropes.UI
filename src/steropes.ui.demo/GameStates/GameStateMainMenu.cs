@@ -85,7 +85,7 @@ namespace Steropes.UI.Demo.GameStates
 
     IUIManager UIManager { get; set; }
 
-    public override void Draw()
+    public override void Draw(GameTime time)
     {
       frameRateCalculator.BeginTime();
       Game.GraphicsDevice.Clear(Color.Black);
@@ -141,8 +141,7 @@ namespace Steropes.UI.Demo.GameStates
       }
       radioButtons.SelectionChanged += (sender, args) =>
         {
-          StyleDefinition d;
-          if (radioButtons.LookUpSelectedItem(out d))
+          if (radioButtons.LookUpSelectedItem(out var d))
           {
             uiStyle.StyleResolver.StyleRules.Clear();
             uiStyle.StyleResolver.StyleRules.AddRange(d.Rules);

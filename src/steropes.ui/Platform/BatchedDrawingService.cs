@@ -103,9 +103,13 @@ namespace Steropes.UI.Platform
 
     IUITexture whitePixel;
 
-    public BatchedDrawingService(Game game)
+    public BatchedDrawingService(Game game): this(game.GraphicsDevice)
     {
-      Game = game;
+    }
+
+    public BatchedDrawingService(GraphicsDevice graphicsDevice)
+    {
+      GraphicsDevice = graphicsDevice ?? throw new ArgumentNullException(nameof(graphicsDevice));
 
       whitePixelTex = new UITexture(new Texture2D(GraphicsDevice, 1, 1, false, SurfaceFormat.Color));
       whitePixelTex.Texture.SetData(new[] { Color.White });
@@ -117,20 +121,16 @@ namespace Steropes.UI.Platform
       SpriteMatrix = Matrix.Identity;
     }
 
-    public bool DebugDrawing { get; set; }
-
     public Rectangle ScissorRectangle
     {
       get { return scissorRects.Count > 0 ? scissorRects.Peek() : GraphicsDevice.Viewport.Bounds; }
     }
 
-    public Matrix SpriteMatrix { get; protected set; }
+    public Matrix SpriteMatrix { get; }
 
     bool DrawingInProgress { get; set; }
 
-    Game Game { get; }
-
-    RasterizerState ScissorRasterizerState { get; }
+    protected RasterizerState ScissorRasterizerState { get; }
 
     SpriteBatch SpriteBatch { get; }
 
@@ -145,10 +145,7 @@ namespace Steropes.UI.Platform
       get { return GraphicsDevice.Viewport.Bounds; }
     }
 
-    public GraphicsDevice GraphicsDevice
-    {
-      get { return Game.GraphicsDevice; }
-    }
+    public GraphicsDevice GraphicsDevice { get; }
 
     public void Draw(IUITexture texture,
                      Rectangle destinationRectangle,
@@ -272,6 +269,12 @@ namespace Steropes.UI.Platform
       SpriteBatch.End();
       DrawingInProgress = false;
       ValidateBalancedScissorOperations();
+      EndDrawingOverride();
+    }
+
+    public virtual void EndDrawingOverride()
+    {
+
     }
 
     public void FillRect(Rectangle bounds, Color color)
@@ -306,7 +309,6 @@ namespace Steropes.UI.Platform
 
     public void ResumeBatch()
     {
-      GraphicsDevice.RasterizerState = ScissorRasterizerState;
 
       if (scissorRects.Count > 0)
       {
@@ -316,12 +318,11 @@ namespace Steropes.UI.Platform
           GraphicsDevice.ScissorRectangle = rect;
         }
 
-        SpriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointWrap, null, ScissorRasterizerState, null,
-                          SpriteMatrix);
+        StartSpriteBatch();
       }
       else
       {
-        SpriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointWrap, null, null, null, SpriteMatrix);
+        StartSpriteBatch();
       }
     }
 
@@ -333,7 +334,12 @@ namespace Steropes.UI.Platform
       }
 
       DrawingInProgress = true;
-      SpriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointWrap, null, null, null, SpriteMatrix);
+      StartSpriteBatch();
+    }
+
+    protected virtual void StartSpriteBatch()
+    {
+      SpriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointWrap, null, ScissorRasterizerState, null, SpriteMatrix);
     }
 
     public SpriteBatch SuspendBatch()

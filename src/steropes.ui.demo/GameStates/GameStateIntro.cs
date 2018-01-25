@@ -60,15 +60,14 @@ namespace Steropes.UI.Demo.GameStates
       this.stateService = stateService;
       this.nextState = nextState;
 
-      Content = new ContentManager(game.Services);
-      Content.RootDirectory = "Content";
+      Content = new ContentManager(game.Services) { RootDirectory = "Content" };
     }
 
     public ContentManager Content { get; set; }
 
     public NuclearSampleGame Game { get; }
 
-    public override void Draw()
+    public override void Draw(GameTime time)
     {
       Game.GraphicsDevice.Clear(new Color(45, 51, 49));
       var spriteBatch = new SpriteBatch(Game.GraphicsDevice);

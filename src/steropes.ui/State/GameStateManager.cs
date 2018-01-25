@@ -113,22 +113,22 @@ namespace Steropes.UI.State
     {
       if (isExiting)
       {
-        CurrentState?.DrawFadeOut();
+        CurrentState?.DrawFadeOut(time);
       }
       else if (NextState != null)
       {
         if (CurrentState != null)
         {
-          CurrentState.DrawFadeOut();
+          CurrentState.DrawFadeOut(time);
         }
         else
         {
-          NextState.DrawFadeIn();
+          NextState.DrawFadeIn(time);
         }
       }
       else
       {
-        CurrentState?.Draw();
+        CurrentState?.Draw(time);
       }
     }
 

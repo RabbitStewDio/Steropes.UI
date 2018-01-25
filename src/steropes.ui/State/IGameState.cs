@@ -32,11 +32,11 @@ namespace Steropes.UI.State
   /// </summary>
   public interface IGameState
   {
-    void Draw();
+    void Draw(GameTime elapsedTime);
 
-    void DrawFadeIn();
+    void DrawFadeIn(GameTime elapsedTime);
 
-    void DrawFadeOut();
+    void DrawFadeOut(GameTime elapsedTime);
 
     void Start();
 

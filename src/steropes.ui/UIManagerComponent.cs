@@ -33,12 +33,7 @@ namespace Steropes.UI
     public UIManagerComponent(Game game,
                               IUIManager manager) : base(game)
     {
-      if (manager == null)
-      {
-        throw new ArgumentNullException(nameof(manager));
-      }
-
-      Manager = manager;
+      Manager = manager ?? throw new ArgumentNullException(nameof(manager));
     }
 
     public override void Update(GameTime gameTime)
@@ -66,8 +61,7 @@ namespace Steropes.UI
     public static UIManagerComponent CreateAndInit(Game game, IInputManager inputManager, string rootDirectory = null)
     {
       var uiManagerComponent = Create(game, inputManager, rootDirectory);
-      var inputManagerAsComponent = inputManager as IGameComponent;
-      if (inputManagerAsComponent != null)
+      if (inputManager is IGameComponent inputManagerAsComponent)
       {
         game.Components.Add(inputManagerAsComponent);
       }

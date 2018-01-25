@@ -41,13 +41,17 @@ namespace Steropes.UI.Components.Window
     int ignoreClickFrames;
 
     Rectangle lastLayoutSize;
+    IBatchedDrawingService drawingService;
 
-    public Screen(IInputManager rawInputs, IUIStyle style, IBatchedDrawingService drawingService, IGameWindowService windowService)
+    public Screen(IInputManager rawInputs, 
+                  IUIStyle style, 
+                  IBatchedDrawingService drawingService, 
+                  IGameWindowService windowService)
     {
       actions = new Queue<Action>();
 
-      DrawingService = drawingService;
-      WindowService = windowService;
+      DrawingService = drawingService ?? throw new ArgumentNullException(nameof(drawingService));
+      WindowService = windowService ?? throw new ArgumentNullException(nameof(windowService));
       FocusManager = new ScreenFocusManager(this);
       MouseHoverManager = new MouseHoverManager();
       Root = new RootPane(this, style);
@@ -77,7 +81,14 @@ namespace Steropes.UI.Components.Window
 
     Rectangle Bounds => DrawingService.GraphicsDevice.Viewport.TitleSafeArea;
 
-    IBatchedDrawingService DrawingService { get; }
+    public IBatchedDrawingService DrawingService
+    {
+      get { return drawingService; }
+      set
+      {
+        drawingService = value ?? throw new ArgumentNullException(nameof(value));
+      }
+    }
 
     public void Draw()
     {
@@ -177,8 +188,7 @@ namespace Steropes.UI.Components.Window
 
       void HandlePopUpClosed(object sender, EventArgs e)
       {
-        var popUp = sender as IPopUp;
-        if (popUp != null)
+        if (sender is IPopUp popUp)
         {
           rootPane.Remove(popUp);
         }
