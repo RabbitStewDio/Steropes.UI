@@ -22,9 +22,10 @@ namespace Steropes.UI.Animation
 {
   public class BounceValue : AnimatedValue
   {
-    public BounceValue(float start, float end, float duration, int bounceCount, float delay, AnimationLoop loop)
+    public BounceValue(float start, float end, float duration, int bounceCount, float delay = 0f, AnimationLoop loop = AnimationLoop.NoLoop)
     {
       Start = start;
+      BounceRestitution = 0.5f;
       End = end;
       Duration = duration;
       BounceCount = bounceCount;
@@ -37,23 +38,20 @@ namespace Steropes.UI.Animation
     {
     }
 
-    public BounceValue(float start, float end, float duration, int bounceCount, float delay) : this(start, end, duration, bounceCount, delay, AnimationLoop.NoLoop)
-    {
-    }
+    public int BounceCount { get; set; }
 
-    public BounceValue(float start, float end, float duration, int bounceCount) : this(start, end, duration, bounceCount, 0f, AnimationLoop.NoLoop)
-    {
-    }
-
-    public int BounceCount { get; }
-
-    public float BounceRestitution { get; } = 0.5f;
+    public float BounceRestitution { get; set; }
 
     public override float CurrentValue
     {
       get
       {
         if (Time <= Delay)
+        {
+          return Start;
+        }
+
+        if (Math.Abs(Duration) < 0.0005 || BounceCount == 0)
         {
           return Start;
         }
@@ -79,8 +77,8 @@ namespace Steropes.UI.Animation
       }
     }
 
-    public float End { get; }
+    public float End { get; set; }
 
-    public float Start { get; }
+    public float Start { get; set; }
   }
 }

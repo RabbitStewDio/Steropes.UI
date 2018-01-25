@@ -1,14 +1,18 @@
 ﻿// MIT License
+//
 // Copyright (c) 2011-2016 Elisée Maurer, Sparklin Labs, Creative Patterns
-// Copyright (c) 2016 Thomas Morgner, Rabbit-StewDio Ltd.
+// Copyright (c) 2016-2018 Thomas Morgner, Rabbit-StewDio Ltd.
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
+//
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -16,27 +20,12 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 using Microsoft.Xna.Framework;
 
 namespace Steropes.UI.Animation
 {
-  public enum AnimationDirection
-  {
-    Forward,
-
-    Backward,
-  }
-
-  public enum AnimationLoop
-  {
-    NoLoop,
-
-    Loop,
-
-    LoopBackAndForth
-  }
-
-  public abstract class AnimatedValue
+  public abstract class AnimatedValue: IAnimatedValue
   {
     double time;
 
@@ -78,10 +67,7 @@ namespace Steropes.UI.Animation
 
     public double Time
     {
-      get
-      {
-        return time;
-      }
+      get { return time; }
       set
       {
         time = value;
@@ -89,38 +75,14 @@ namespace Steropes.UI.Animation
       }
     }
 
-    public void FinishAnimation()
-    {
-      if (Direction == AnimationDirection.Backward)
-      {
-        Time = 0;
-      }
-      else
-      {
-        Time = Delay + Duration;
-      }
-    }
-
-    public void StartAnimation()
-    {
-      if (Direction == AnimationDirection.Backward)
-      {
-        Time = Delay + Duration;
-      }
-      else
-      {
-        Time = 0;
-      }
-    }
-
-    public void Update(GameTime time)
+    public void Update(GameTime gameTime)
     {
       if (Stopped)
       {
         return;
       }
 
-      var timeInSeconds = time.ElapsedGameTime.TotalSeconds;
+      var timeInSeconds = gameTime.ElapsedGameTime.TotalSeconds;
       Time += Direction == AnimationDirection.Forward ? timeInSeconds : -timeInSeconds;
     }
 
@@ -139,7 +101,9 @@ namespace Steropes.UI.Animation
             break;
           case AnimationLoop.LoopBackAndForth:
             time = animTotalTime - (Time - animTotalTime);
-            Direction = Direction == AnimationDirection.Forward ? AnimationDirection.Backward : AnimationDirection.Forward;
+            Direction = Direction == AnimationDirection.Forward
+              ? AnimationDirection.Backward
+              : AnimationDirection.Forward;
             break;
         }
       }
@@ -155,7 +119,9 @@ namespace Steropes.UI.Animation
             break;
           case AnimationLoop.LoopBackAndForth:
             time = -Time;
-            Direction = Direction == AnimationDirection.Forward ? AnimationDirection.Backward : AnimationDirection.Forward;
+            Direction = Direction == AnimationDirection.Forward
+              ? AnimationDirection.Backward
+              : AnimationDirection.Forward;
             break;
         }
       }

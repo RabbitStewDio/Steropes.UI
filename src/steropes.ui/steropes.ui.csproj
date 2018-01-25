@@ -72,7 +72,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Animation\AnimatedValue.cs" />
+    <Compile Include="Animation\AnimatedValueExtensions.cs" />
+    <Compile Include="Animation\AnimationDirection.cs" />
+    <Compile Include="Animation\AnimationLoop.cs" />
     <Compile Include="Animation\BounceValue.cs" />
+    <Compile Include="Animation\IAnimatedValue.cs" />
     <Compile Include="Animation\LerpValue.cs" />
     <Compile Include="Animation\SmoothValue.cs" />
     <Compile Include="Animation\StepValue.cs" />
