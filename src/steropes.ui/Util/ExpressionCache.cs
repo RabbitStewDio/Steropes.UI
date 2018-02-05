@@ -16,6 +16,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 using System;
 using System.Linq.Expressions;
 
@@ -61,7 +62,13 @@ namespace Steropes.UI.Util
       // object param;
       // pp = (object) ((T) param).Property;
       var cast = t.IsValueType ? Expression.TypeAs(param, t) : Expression.Convert(param, t);
-      var getter = Expression.Property(cast, t.GetProperty(name));
+      var propertyInfo = t.GetProperty(name);
+      if (propertyInfo == null)
+      {
+        throw new ArgumentException($"No such property {name} in type {t}");
+      }
+
+      var getter = Expression.Property(cast, propertyInfo);
       var result = Expression.Convert(getter, typeof(object));
       var expression = Expression.Lambda<Func<object, object>>(result, param);
       return expression.Compile();

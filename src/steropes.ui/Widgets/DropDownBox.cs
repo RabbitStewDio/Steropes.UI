@@ -46,7 +46,7 @@ namespace Steropes.UI.Widgets
   /// </summary>
   /// <typeparam name="T"></typeparam>
   public class DropDownBox<T> : InternalContentWidget<IWidget>
-    where T : class
+    //where T : class
   {
     readonly ContentWidget<IWidget> dropDownButtonContent;
 
@@ -77,6 +77,8 @@ namespace Steropes.UI.Widgets
       dropDownContainer.SelectionChanged += (s, e) =>
       {
         UpdateLabelText();
+        OnPropertyChanged(nameof(SelectedIndex));
+        OnPropertyChanged(nameof(SelectedItem));
         selectionChangedSupport.Raise(this, new SelectionEventArgs<T>(SelectedIndex, SelectedItem));
         if (!e.Adjusting)
         {

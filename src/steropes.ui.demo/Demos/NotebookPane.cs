@@ -16,38 +16,47 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
+using System;
 using Steropes.UI.Components;
 using Steropes.UI.Widgets;
 
 namespace Steropes.UI.Demo.Demos
 {
-  class NotebookPane : ScrollPanel
+  class NotebookPane : ScrollPanel<Notebook>
   {
+    int tabCounter;
+
     public NotebookPane(IUIStyle style) : base(style)
     {
-      var notebook = new Notebook(UIStyle);
-      notebook.Tabs.Add(CreateHomeTab(notebook));
-      Content = notebook;
+      Content = new Notebook(UIStyle).DoWith(n => n.Tabs.Add(CreateHomeTab()));
     }
 
-    public NotebookTab CreateHomeTab(Notebook notebook)
+    NotebookTab CreateHomeTab()
     {
-      var tabCounter = 0;
-
-      var createTabButton = new Button(UIStyle, "CreatePopup tab");
-      createTabButton.Anchor = AnchoredRect.CreateFull(10);
-      createTabButton.ActionPerformed += (sender, args) =>
+      void CreateNewTab(object sender, EventArgs args)
+      {
+        tabCounter += 1;
+        var tab = new NotebookTab(UIStyle)
         {
-          tabCounter += 1;
-          var tab = new NotebookTab(UIStyle, new Label(UIStyle, $"Tab {tabCounter}"), new Label(UIStyle, "Tab Content for " + tabCounter));
-          tab.Tag = "Tab Content for " + tabCounter;
-          notebook.Tabs.Add(tab);
+          Tag = "Tab Content for " + tabCounter,
+          HeaderContent = new Label(UIStyle, $"Tab {tabCounter}"),
+          Content = new Label(UIStyle, "Tab Content for " + tabCounter)
         };
+        Content.Tabs.Add(tab);
+      }
 
-      var homeTab = new NotebookTab(UIStyle, new Label(UIStyle, "Home"), createTabButton);
-      homeTab.IsPinned = true;
-      homeTab.Tag = "Home";
-      return homeTab;
+      return new NotebookTab(UIStyle)
+      {
+        Content = new Button(UIStyle, "CreatePopup tab")
+        {
+          Anchor = AnchoredRect.CreateFull(10),
+          OnActionPerformed = CreateNewTab
+        },
+        HeaderContent = new Label(UIStyle, "Home"),
+        IsPinned = true,
+        Tag = "Home"
+      };
     }
   }
 }

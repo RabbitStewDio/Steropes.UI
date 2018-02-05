@@ -170,6 +170,14 @@ namespace Steropes.UI.Components
     void RemoveNotify(IWidget parent);
 
     void ValidateStyle();
+
+    /// <summary>
+    ///  Style resolver helper method. Iterate the structural tree of this widget and visit all nodes 
+    ///  that have this widget as direct parent. Include both standard children and tooltips and other
+    ///  nodes that may participate in style resolving, measurements or arrange operations.
+    /// </summary>
+    /// <param name="action"></param>
+    void VisitStructuralChildren(Action<IWidget> action);
   }
 
   public static class WidgetPseudoClasses
@@ -1411,6 +1419,10 @@ namespace Steropes.UI.Components
 
     public sealed override void ValidateStyle()
     {
+      if (!RegisteredInStyleSystem)
+      {
+        throw new InvalidOperationException("A widget cannot be arranged if it is not registered in the style system.");
+      }
       UIStyle.StyleResolver.Revalidate();
     }
 
@@ -1731,6 +1743,25 @@ namespace Steropes.UI.Components
           return current;
         }
       }
+    }
+
+    public virtual void VisitStructuralChildren(Action<IWidget> action)
+    {
+      for (var i = 0; i < this.Count; i++)
+      {
+        var widget = this[i];
+        action(widget);
+      }
+
+      if (Tooltip != null)
+      {
+        action(Tooltip);
+      }
+    }
+
+    public bool RegisteredInStyleSystem
+    {
+      get { return UIStyle.StyleResolver.IsRegistered(this); }
     }
   }
 }

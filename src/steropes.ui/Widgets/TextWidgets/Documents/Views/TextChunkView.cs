@@ -413,6 +413,10 @@ namespace Steropes.UI.Widgets.TextWidgets.Documents.Views
 
     float WidthFor(int offset, int positionWithinDocument)
     {
+      if (Font == null)
+      {
+        throw new InvalidOperationException("No font for text-view. The style system is not initialized correctly.");
+      }
       return Font.MeasureString(TextFor(offset, positionWithinDocument)).X;
     }
   }

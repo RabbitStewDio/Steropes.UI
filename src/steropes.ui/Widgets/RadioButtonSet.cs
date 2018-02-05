@@ -62,7 +62,7 @@ namespace Steropes.UI.Widgets
 
     public ObservableCollection<T> DataItems { get; }
 
-    public IReadOnlyCollection<T> Data
+    public IReadOnlyList<T> Data
     {
       get { return DataItems.ToArray(); }
       set
@@ -81,6 +81,7 @@ namespace Steropes.UI.Widgets
       set
       {
         InternalContent.Orientation = value;
+        OnPropertyChanged();
       }
     }
 
@@ -93,6 +94,7 @@ namespace Steropes.UI.Widgets
       set
       {
         InternalContent.Spacing = value;
+        OnPropertyChanged();
       }
     }
 
@@ -111,10 +113,40 @@ namespace Steropes.UI.Widgets
         {
           return;
         }
-        GetButtonAt(selectedButtonIndex).Selected = SelectionState.Unselected;
+        var oldBt = GetButtonAt(selectedButtonIndex);
+        if (oldBt != null)
+        {
+          oldBt.Selected = SelectionState.Unselected;
+        }
+
         selectedButtonIndex = value;
-        GetButtonAt(selectedButtonIndex).Selected = SelectionState.Selected;
+        var newBt = GetButtonAt(selectedButtonIndex);
+        if (newBt != null)
+        {
+          newBt.Selected = SelectionState.Selected;
+        }
+
         selectionChangedSupport.Raise(this, new ListSelectionEventArgs(false));
+        OnPropertyChanged(nameof(SelectedIndex));
+        OnPropertyChanged(nameof(SelectedItem));
+      }
+    }
+
+    public T SelectedItem
+    {
+      get
+      {
+        var selection = SelectedIndex;
+        if (selection < 0 || selection >= Data.Count)
+        {
+          return default(T);
+        }
+
+        return Data[selection];
+      }
+      set
+      {
+        SelectedIndex = Data.IndexOf(value);
       }
     }
 

@@ -41,6 +41,8 @@ namespace Steropes.UI.Styles
     void RemoveRoot(IWidget root);
 
     bool Revalidate();
+
+    bool IsRegistered(IWidget widget);
   }
 
   /// <summary>
@@ -123,6 +125,11 @@ namespace Steropes.UI.Styles
       return false;
     }
 
+    public bool IsRegistered(IWidget widget)
+    {
+      return registeredWidgets.ContainsKey(widget);
+    }
+
     public void MarkDirty(IWidget w)
     {
       WidgetChangeTracker tracker;
@@ -178,10 +185,7 @@ namespace Steropes.UI.Styles
       registeredWidgets.Add(widget, new WidgetChangeTracker(this, widget));
       Dirty = true;
       widget.ChildrenChanged += onChildrenChangedHandler;
-      for (var i = 0; i < widget.Count; i++)
-      {
-        Install(widget[i]);
-      }
+      widget.VisitStructuralChildren(Install);
     }
 
     void OnChildrenChanged(object sender, ContainerEventArgs e)
@@ -269,10 +273,7 @@ namespace Steropes.UI.Styles
         registeredWidgets.Remove(widget);
         tracker.ClearMonitors();
         widget.ChildrenChanged -= onChildrenChangedHandler;
-        for (var i = 0; i < widget.Count; i++)
-        {
-          Uninstall(widget[i]);
-        }
+        widget.VisitStructuralChildren(Uninstall);
       }
     }
 

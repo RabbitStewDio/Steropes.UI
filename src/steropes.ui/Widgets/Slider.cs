@@ -41,7 +41,7 @@ namespace Steropes.UI.Widgets
     float minValue;
     float step;
 
-    public Slider(IUIStyle style, float min, float max, float initialValue, float step) : base(style)
+    public Slider(IUIStyle style) : base(style)
     {
       valueChangedSupport = new EventSupport<EventArgs>();
 
@@ -63,6 +63,14 @@ namespace Steropes.UI.Widgets
       InternalContent = elements;
       Focusable = true;
 
+      MinValue = 0;
+      MaxValue = 10;
+      Step = 1;
+      Value = 0;
+    }
+
+    public Slider(IUIStyle style, float min, float max, float initialValue, float step) : this(style)
+    {
       MinValue = Math.Min(min, max);
       MaxValue = Math.Max(min, max);
       Step = step;

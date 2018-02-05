@@ -90,6 +90,7 @@
   <ItemGroup>
     <Compile Include="Animation\AnimatedValueTest.cs" />
     <Compile Include="AssertionHelper.cs" />
+    <Compile Include="Bindings\BindingTest.cs" />
     <Compile Include="ExpressionCache.cs" />
     <Compile Include="FunctionRecorder.cs" />
     <Compile Include="LayoutTestStyle.cs" />

@@ -26,6 +26,19 @@ namespace Steropes.UI.Util
 {
   public static class Utils
   {
+    public static int IndexOf<T>(this IReadOnlyList<T> list, T value)
+    {
+      for (var i = 0; i < list.Count; i++)
+      {
+        if (Equals(list[i], value))
+        {
+          return i;
+        }
+      }
+
+      return -1;
+    }
+
     public static ICollection<T> AddRange<T>(this ICollection<T> c, IEnumerable<T> r)
     {
       foreach (var element in r)

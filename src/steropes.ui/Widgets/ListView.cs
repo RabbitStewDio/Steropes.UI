@@ -70,7 +70,7 @@ namespace Steropes.UI.Widgets
   ///   Content from renderer
   /// </summary>
   public class ListView<T> : InternalContentWidget<ScrollPanel<BoxGroup>>
-    where T : class
+    //where T : class
   {
     readonly ListViewStyleDefinition listViewStyle;
 
@@ -217,7 +217,7 @@ namespace Steropes.UI.Widgets
           }
           selectedIndex = value;
           OnPropertyChanged(nameof(SelectedIndex));
-          if (oldItem != SelectedItem)
+          if (!Equals(oldItem, SelectedItem))
           {
             OnPropertyChanged(nameof(SelectedItem));
           }
@@ -234,7 +234,7 @@ namespace Steropes.UI.Widgets
         {
           return DataItems[selectedIndex];
         }
-        return null;
+        return default(T);
       }
       set
       {
@@ -326,7 +326,7 @@ namespace Steropes.UI.Widgets
       {
         if (!DataItems.Contains(SelectedItem))
         {
-          SelectedItem = null;
+          SelectedItem = default(T);
         }
       }
     }
@@ -334,7 +334,7 @@ namespace Steropes.UI.Widgets
 
   public static class ListView
   {
-    public static IListDataItemRenderer DefaultCreateRenderer<TX>(IUIStyle style, TX item) where TX : class
+    public static IListDataItemRenderer DefaultCreateRenderer<TX>(IUIStyle style, TX item)
     {
       var text = item?.ToString() ?? "<NULL>";
       return new ListDataItemRenderer(style) { Content = new Label(style, text) { Enabled = false, Padding = new Insets() }, Tag = item };
