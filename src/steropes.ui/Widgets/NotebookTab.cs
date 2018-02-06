@@ -44,7 +44,7 @@ namespace Steropes.UI.Widgets
                                                                                where THeaderWidget : IWidget
   {
     new TWidget Content { get; }
-    new THeaderWidget HeaderContent { get; }
+    THeaderWidget HeaderContent { get; }
   }
 
   public class NotebookTab<TWidget, THeaderWidget> : InternalContentWidget<DockPanel>,

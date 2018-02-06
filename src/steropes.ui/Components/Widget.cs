@@ -1322,9 +1322,14 @@ namespace Steropes.UI.Components
       return 0;
     }
 
-    public virtual IEnumerator<IWidget> GetEnumerator()
+    public WidgetEnumerator GetEnumerator()
     {
       return new WidgetEnumerator(this);
+    }
+
+    IEnumerator<IWidget> IEnumerable<IWidget>.GetEnumerator()
+    {
+      return GetEnumerator();
     }
 
     public virtual IWidget GetFirstFocusableDescendant(Direction direction)
@@ -1692,7 +1697,7 @@ namespace Steropes.UI.Components
       }
     }
 
-    struct WidgetEnumerator : IEnumerator<IWidget>
+    public struct WidgetEnumerator : IEnumerator<IWidget>
     {
       readonly IWidget widget;
 
@@ -1700,7 +1705,7 @@ namespace Steropes.UI.Components
 
       IWidget current;
 
-      public WidgetEnumerator(IWidget widget) : this()
+      internal WidgetEnumerator(IWidget widget) : this()
       {
         this.widget = widget;
         index = -1;
@@ -1738,7 +1743,7 @@ namespace Steropes.UI.Components
         {
           if (index < 0 || index >= widget.Count)
           {
-            return null;
+            throw new InvalidOperationException();
           }
           return current;
         }

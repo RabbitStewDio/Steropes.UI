@@ -29,8 +29,7 @@ namespace Steropes.UI.Bindings
       return new ConstBinding<TSource>(source).Bind(memberExpression);
     }
 
-    public static IReadOnlyObservableValue<TValue> Bind<TSource, TValue>(
-      this IReadOnlyObservableValue<TSource> source,
+    public static IReadOnlyObservableValue<TValue> Bind<TSource, TValue>(this IReadOnlyObservableValue<TSource> source,
       Expression<Func<TSource, TValue>> memberExpression)
     {
       string propertyName = null;
@@ -48,6 +47,11 @@ namespace Steropes.UI.Bindings
       }
 
       return new TypeSafePropertyBinding<TSource, TValue>(source, propertyName, memberExpression.Compile());
+    }
+
+    public static IReadOnlyObservableValue<TValue> BindingFor<TSource, TValue>(this TSource source, string propertyName, Func<TSource, TValue> getter)
+    {
+      return new TypeSafePropertyBinding<TSource, TValue>(new ConstBinding<TSource>(source), propertyName, getter);
     }
 
     public static void BindTo<TValue>(this IReadOnlyObservableValue<TValue> value, Action<TValue> setter)
@@ -85,7 +89,7 @@ namespace Steropes.UI.Bindings
 
     public static IReadOnlyObservableValue Map(this IReadOnlyObservableValue source, Func<object, object> mapping)
     {
-      return new MonadicBinding(source, mapping);
+      return new TransformingBinding(source, mapping);
     }
 
     public static IReadOnlyObservableValue<TTarget> Map<TSource, TTarget>(
