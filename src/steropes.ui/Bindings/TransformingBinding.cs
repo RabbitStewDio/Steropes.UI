@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Steropes.UI.Bindings
 {
@@ -7,11 +8,9 @@ namespace Steropes.UI.Bindings
     readonly IReadOnlyObservableValue source;
     readonly Func<object, object> mapping;
 
-
     public TransformingBinding(IReadOnlyObservableValue source, Func<object, object> mapping)
     {
       this.source = source ?? throw new ArgumentNullException(nameof(source));
-      this.source = source;
       this.mapping = mapping ?? throw new ArgumentNullException(nameof(mapping));
       this.source.PropertyChanged += OnSourcePropertyChange;
       Value = mapping(source.Value);
@@ -21,15 +20,21 @@ namespace Steropes.UI.Bindings
     {
       return mapping(source.Value);
     }
+
+    public override void Dispose()
+    {
+      this.source.PropertyChanged -= OnSourcePropertyChange;
+    }
+
+    public override IReadOnlyList<IBindingSubscription> Sources => new[] { source };
   }
 
-  internal class MonadicBinding<TSource, TTarget> : DerivedBinding<TTarget>
+  internal class TransformingBinding<TSource, TTarget> : DerivedBinding<TTarget>
   {
     readonly IReadOnlyObservableValue<TSource> source;
     readonly Func<TSource, TTarget> mapping;
 
-
-    public MonadicBinding(IReadOnlyObservableValue<TSource> source, Func<TSource, TTarget> mapping)
+    public TransformingBinding(IReadOnlyObservableValue<TSource> source, Func<TSource, TTarget> mapping)
     {
       this.source = source ?? throw new ArgumentNullException(nameof(source));
       this.source = source;
@@ -42,5 +47,12 @@ namespace Steropes.UI.Bindings
     {
       return mapping(source.Value);
     }
+
+    public override void Dispose()
+    {
+      this.source.PropertyChanged -= OnSourcePropertyChange;
+    }
+
+    public override IReadOnlyList<IBindingSubscription> Sources => new[] { source };
   }
 }

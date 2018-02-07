@@ -8,11 +8,12 @@
 // work.If not, see<http://creativecommons.org/publicdomain/zero/1.0/>.
 
 using Microsoft.Xna.Framework;
-
+using Steropes.UI.Components;
 using Steropes.UI.Input;
 using Steropes.UI.Styles;
 using Steropes.UI.Util;
 using Steropes.UI.Widgets;
+using Steropes.UI.Widgets.Container;
 
 namespace Steropes.UI.Quickstart
 {
@@ -49,7 +50,14 @@ namespace Steropes.UI.Quickstart
       var styles = styleSystem.LoadStyles("Content/UI/Metro/style.xml", "UI/Metro", GraphicsDevice);
       styleSystem.StyleResolver.StyleRules.AddRange(styles);
 
-      uiManager.Root.Content = new Label(styleSystem, "Hello World!");
+      uiManager.Root.Content = new Group(styleSystem)
+      {
+        new Label(styleSystem)
+        {
+          Text = "Hello World",
+          Anchor = AnchoredRect.CreateCentered()
+        }
+      };
     }
   }
 }

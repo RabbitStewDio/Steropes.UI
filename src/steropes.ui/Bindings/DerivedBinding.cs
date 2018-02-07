@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Steropes.UI.Annotations;
 
@@ -7,6 +8,7 @@ namespace Steropes.UI.Bindings
   internal abstract class DerivedBinding<T> : IReadOnlyObservableValue<T>
   {
     T value;
+    protected bool AlreadyHandlingEvent { get; set; }
 
     protected DerivedBinding()
     {
@@ -16,6 +18,9 @@ namespace Steropes.UI.Bindings
     {
       this.value = value;
     }
+
+    public abstract void Dispose();
+    public abstract IReadOnlyList<IBindingSubscription> Sources { get; }
 
     public event PropertyChangedEventHandler PropertyChanged;
 
@@ -49,7 +54,18 @@ namespace Steropes.UI.Bindings
     [NotifyPropertyChangedInvocator]
     void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
-      PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+      if (!AlreadyHandlingEvent)
+      {
+        try
+        {
+          AlreadyHandlingEvent = true;
+          PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+        finally
+        {
+          AlreadyHandlingEvent = false;
+        }
+      }
     }
 
   }

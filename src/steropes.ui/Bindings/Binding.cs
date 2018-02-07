@@ -96,7 +96,7 @@ namespace Steropes.UI.Bindings
       this IReadOnlyObservableValue<TSource> source,
       Func<TSource, TTarget> mapping)
     {
-      return new MonadicBinding<TSource, TTarget>(source, mapping);
+      return new TransformingBinding<TSource, TTarget>(source, mapping);
     }
 
     public static IReadOnlyObservableValue Filter(this IReadOnlyObservableValue source, Func<object, bool> filter)

@@ -23,6 +23,14 @@ namespace Steropes.UI.Bindings
         ((INotifyCollectionChanged) self).CollectionChanged += OnParentCollectionChanged;
       }
 
+      public void Dispose()
+      {
+        ((INotifyPropertyChanged) self).PropertyChanged -= OnParentPropertyChanged;
+        ((INotifyCollectionChanged) self).CollectionChanged -= OnParentCollectionChanged;
+      }
+
+      public IReadOnlyList<IBindingSubscription> Sources => new IReadOnlyObservableValue[0];
+
       IEnumerator IEnumerable.GetEnumerator()
       {
         return GetEnumerator();
@@ -68,6 +76,13 @@ namespace Steropes.UI.Bindings
         this.count = data?.Count ?? 0;
       }
 
+      public override void Dispose()
+      {
+        this.listValue.PropertyChanged -= OnDataChanged;
+      }
+
+      public override IReadOnlyList<IBindingSubscription> Sources => new IBindingSubscription[] { listValue };
+
       void OnDataChanged(object sender, PropertyChangedEventArgs e)
       {
         data = listValue.Value;
@@ -111,10 +126,17 @@ namespace Steropes.UI.Bindings
                                    Func<IReadOnlyList<T>, IReadOnlyList<T>> onChange)
       {
         this.parent = parent ?? throw new ArgumentNullException(nameof(parent));
-        this.onChange = onChange;
+        this.onChange = onChange ?? throw new ArgumentNullException(nameof(onChange));
         this.parent.PropertyChanged += OnParentPropertyChanged;
         this.data = onChange(parent) ?? empty;
       }
+
+      public override void Dispose()
+      {
+        this.parent.PropertyChanged -= OnParentPropertyChanged;
+      }
+
+      public override IReadOnlyList<IBindingSubscription> Sources => new IBindingSubscription[] { parent };
 
       void Refresh()
       {
@@ -145,12 +167,12 @@ namespace Steropes.UI.Bindings
       public override event NotifyCollectionChangedEventHandler CollectionChanged;
     }
 
-    public static IObservableListBinding<T> From<T>(this ObservableCollection<T> self)
+    public static IObservableListBinding<T> ToBinding<T>(this ObservableCollection<T> self)
     {
       return new ObservableListBinding<T>(self);
     }
 
-    public static IReadOnlyObservableListBinding<T> From<T>(this ReadOnlyObservableCollection<T> self)
+    public static IReadOnlyObservableListBinding<T> ToBinding<T>(this ReadOnlyObservableCollection<T> self)
     {
       return new ReadOnlyObservableCollectionWrapper<T>(self);
     }
@@ -166,8 +188,7 @@ namespace Steropes.UI.Bindings
       return self.BindingFor(IndexerName, s => s.ToArray());
     }
 
-    public static IReadOnlyObservableListBinding<T> AsListBinding<T>(
-      this IReadOnlyObservableValue<IReadOnlyList<T>> self)
+    public static IReadOnlyObservableListBinding<T> ToListBinding<T>(this IReadOnlyObservableValue<IReadOnlyList<T>> self)
     {
       return new ObservableArrayBinding<T>(self);
     }
@@ -201,7 +222,7 @@ namespace Steropes.UI.Bindings
       });
     }
 
-    public static IReadOnlyObservableListBinding<T> GetRangeBinding<T>(this IReadOnlyObservableListBinding<T> source,
+    public static IReadOnlyObservableListBinding<T> RangeBinding<T>(this IReadOnlyObservableListBinding<T> source,
                                                                        int index,
                                                                        int count)
     {
@@ -250,14 +271,29 @@ namespace Steropes.UI.Bindings
                                                                                ConditionalGet);
     }
 
-    public static void BindTo<T>(this IReadOnlyObservableListBinding<T> source,
+    public static IDisposable BindTo<T>(this IReadOnlyObservableValue<IReadOnlyList<T>> source,
                                  ObservableCollection<T> target)
     {
+      return new OneWayListBinding<T>(target.ToBinding(), source);
     }
 
-    public static void BindTwoWay<T>(this IReadOnlyObservableListBinding<T> source,
-                                     ObservableCollection<T> target)
+    public static IDisposable BindTo<T>(this IReadOnlyObservableListBinding<T> source,
+                                 ObservableCollection<T> target)
     {
+      return new OneWayListBinding<T>(target.ToBinding(), source);
+    }
+
+    public static IDisposable BindTwoWay<T>(this IObservableListBinding<T> source,
+                                            ObservableCollection<T> target)
+    {
+      var targetBinding = target.ToBinding();
+      return new TwoWayListBinding<T>(targetBinding, source);
+    }
+
+    public static IDisposable BindTwoWay<T>(this IObservableListBinding<T> source,
+                                            IObservableListBinding<T> target)
+    {
+      return new TwoWayListBinding<T>(target, source);
     }
   }
 }

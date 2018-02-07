@@ -55,7 +55,14 @@ namespace Steropes.UI
       var cm = new ContentManager(game.Services) { RootDirectory = rootDirectory };
 
       var uiManager = new UIManager(inputManager, drawingService, windowService, cm);
-      return new UIManagerComponent(game, uiManager);
+      uiManager.Start();
+
+      var component = new UIManagerComponent(game, uiManager)
+      {
+        UpdateOrder = 100000,
+        DrawOrder = 100000
+      };
+      return component;
     }
 
     public static UIManagerComponent CreateAndInit(Game game, IInputManager inputManager, string rootDirectory = null)
@@ -66,9 +73,6 @@ namespace Steropes.UI
         game.Components.Add(inputManagerAsComponent);
       }
       game.Components.Add(uiManagerComponent);
-
-      var uiManager = uiManagerComponent.Manager;
-      uiManager.Start();
       return uiManagerComponent;
     }
 

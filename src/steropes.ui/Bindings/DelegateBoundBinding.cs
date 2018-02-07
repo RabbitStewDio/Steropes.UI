@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Steropes.UI.Bindings
 {
@@ -16,6 +17,16 @@ namespace Steropes.UI.Bindings
         source.PropertyChanged += OnSourcePropertyChange;
       }
     }
+
+    public override void Dispose()
+    {
+      foreach (var source in sources)
+      {
+        source.PropertyChanged -= OnSourcePropertyChange;
+      }
+    }
+
+    public override IReadOnlyList<IBindingSubscription> Sources => sources;
 
     protected override T ComputeValue()
     {

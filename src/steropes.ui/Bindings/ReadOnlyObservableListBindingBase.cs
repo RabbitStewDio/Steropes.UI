@@ -6,7 +6,7 @@ using System.ComponentModel;
 
 namespace Steropes.UI.Bindings
 {
-  internal abstract class ReadOnlyObservableListBindingBase<T> : IReadOnlyObservableListBinding<T>
+  public abstract class ReadOnlyObservableListBindingBase<T> : IReadOnlyObservableListBinding<T>
   {
     public abstract int Count { get; }
 
@@ -14,7 +14,10 @@ namespace Steropes.UI.Bindings
     {
       return GetEnumerator();
     }
-    
+
+    public abstract void Dispose();
+    public abstract IReadOnlyList<IBindingSubscription> Sources { get; }
+
     public virtual void CopyTo(T[] array, int arrayIndex)
     {
       for (var i = 0; i < this.Count; i++)

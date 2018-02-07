@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Steropes.UI.Annotations;
@@ -27,6 +28,14 @@ namespace Steropes.UI.Bindings
 
       Source = sourceBinding.Value;
     }
+
+    public void Dispose()
+    {
+      this.sourceBinding.PropertyChanged -= OnSourceBindingChanged;
+      Value = default(TValue);
+    }
+
+    public IReadOnlyList<IBindingSubscription> Sources => new[] { sourceBinding };
 
     TSource Source
     {

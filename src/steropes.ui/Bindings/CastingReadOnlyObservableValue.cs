@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Steropes.UI.Annotations;
@@ -30,6 +31,13 @@ namespace Steropes.UI.Bindings
         }
       }
     }
+
+    public void Dispose()
+    {
+      this.parent.PropertyChanged -= OnSourceChanged;
+    }
+
+    public IReadOnlyList<IBindingSubscription> Sources => new[] { parent };
 
     public event PropertyChangedEventHandler PropertyChanged;
 

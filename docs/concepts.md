@@ -80,7 +80,7 @@ stream of InputEvents. Whenever the state changes, the input
 manager generates new events for the UI system to process.
 
 The ``CreateAndInit`` method instantiates the core service
-needed to render the (this code is :
+needed to render the UI. This initialisation code is equivalent to 
 
     var drawingService = new BatchedDrawingService(game);
     var windowService = new GameWindowService(game);

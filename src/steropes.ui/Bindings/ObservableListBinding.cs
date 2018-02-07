@@ -8,7 +8,8 @@ using System.ComponentModel;
 namespace Steropes.UI.Bindings
 {
   /// <summary>
-  ///  A simple wrapper around ObservableCollection.
+  ///  A simple wrapper around ObservableCollection. This acts as a source 
+  ///  in a binding chain.
   /// 
   ///  Lifting class that takes an ordinary ReadOnlyCollection and lifts it
   ///  into an IObservableListBinding instance. If the library designers of
@@ -27,6 +28,14 @@ namespace Steropes.UI.Bindings
       self.CollectionChanged += OnParentCollectionChanged;
     }
 
+    public void Dispose()
+    {
+      ((INotifyPropertyChanged) this.self).PropertyChanged -= OnParentPropertyChanged;
+      self.CollectionChanged -= OnParentCollectionChanged;
+    }
+
+    public IReadOnlyList<IBindingSubscription> Sources => new IBindingSubscription[0];
+
     void OnParentCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
       CollectionChanged?.Invoke(this, e);
@@ -42,6 +51,11 @@ namespace Steropes.UI.Bindings
     IEnumerator IEnumerable.GetEnumerator()
     {
       return GetEnumerator();
+    }
+
+    public void Move(int sourceIdx, int targetIdx)
+    {
+      self.Move(sourceIdx, targetIdx);
     }
 
     public void CopyTo(Array array, int index)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -25,11 +26,15 @@ namespace Steropes.UI.Bindings
       }
 
       Source = source.Value;
-      if (source is INotifyPropertyChanged nc)
-      {
-        nc.PropertyChanged += OnSourcePropertyChanged;
-      }
     }
+
+    public void Dispose()
+    {
+      this.eventSource.PropertyChanged -= OnBindingValueChanged;
+      Source = null;
+    }
+
+    public IReadOnlyList<IBindingSubscription> Sources => new[] { eventSource };
 
     void OnSourcePropertyChanged(object sender, PropertyChangedEventArgs e)
     {
@@ -48,7 +53,7 @@ namespace Steropes.UI.Bindings
 
       this.propertyName = propertyInfo.Name;
       propertyAccess = CreatePropertyAccess(propertyInfo);
-      value = propertyAccess(Source);
+      Value = propertyAccess(Source);
     }
 
     public PropertyMemberBinding(IReadOnlyObservableValue source, FieldInfo propertyInfo) : this(source)
@@ -60,7 +65,7 @@ namespace Steropes.UI.Bindings
 
       this.propertyName = propertyInfo.Name;
       propertyAccess = CreateFieldAccess(propertyInfo);
-      value = propertyAccess(Source);
+      Value = propertyAccess(Source);
     }
 
     public object Value

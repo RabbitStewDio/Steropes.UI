@@ -14,7 +14,7 @@ namespace Steropes.UI.Bindings
     public TransformingListBinding(IReadOnlyObservableListBinding<TSource> parent, Func<TSource, TTarget> mappingFunction)
     {
       this.parent = parent ?? throw new ArgumentNullException(nameof(parent));
-      this.mappingFunction = mappingFunction;
+      this.mappingFunction = mappingFunction ?? throw new ArgumentNullException(nameof(mappingFunction));
       this.parent.PropertyChanged += OnParentPropertyChanged;
       this.parent.CollectionChanged += OnParentCollectionChanged;
     }
@@ -74,5 +74,13 @@ namespace Steropes.UI.Bindings
 
     public override event PropertyChangedEventHandler PropertyChanged;
     public override event NotifyCollectionChangedEventHandler CollectionChanged;
+
+    public override void Dispose()
+    {
+      this.parent.PropertyChanged -= OnParentPropertyChanged;
+      this.parent.CollectionChanged -= OnParentCollectionChanged;
+    }
+
+    public override IReadOnlyList<IBindingSubscription> Sources => new IBindingSubscription[] { parent };
   }
 }

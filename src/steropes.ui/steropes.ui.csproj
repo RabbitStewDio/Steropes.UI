@@ -88,9 +88,14 @@
     <Compile Include="Bindings\ConstBinding.cs" />
     <Compile Include="Bindings\DelegateBoundBinding.cs" />
     <Compile Include="Bindings\DerivedBinding.cs" />
+    <Compile Include="Bindings\IObservableListBinding.cs" />
+    <Compile Include="Bindings\IObservableValue.cs" />
+    <Compile Include="Bindings\IReadOnlyObservableListBinding.cs" />
     <Compile Include="Bindings\IReadOnlyObservableValue.cs" />
     <Compile Include="Bindings\ListBinding.cs" />
     <Compile Include="Bindings\ObservableListBinding.cs" />
+    <Compile Include="Bindings\ObservableValue.cs" />
+    <Compile Include="Bindings\OneWayListBinding.cs" />
     <Compile Include="Bindings\ReadOnlyObservableListBindingBase.cs" />
     <Compile Include="Bindings\TransformingBinding.cs" />
     <Compile Include="Bindings\TransformingListBinding.cs" />
@@ -252,6 +257,7 @@
     <Compile Include="Components\Orientation.cs" />
     <Compile Include="Components\Size.cs" />
     <Compile Include="Widgets\Container\Window.cs" />
+    <Compile Include="Widgets\InputPlaceholder.cs" />
     <Compile Include="Widgets\IToolTip.cs" />
     <Compile Include="Widgets\ScrollbarMode.cs" />
     <Compile Include="Widgets\SliderTrack.cs" />

@@ -6,7 +6,13 @@ using System.ComponentModel;
 
 namespace Steropes.UI.Bindings
 {
-  internal abstract class ObservableListBindingBase<T> : IObservableListBinding<T>
+  /// <summary>
+  ///  A base implementation of IObservableListBinding to take the pain out of 
+  ///  creating new binding implementations. This class implements common 
+  ///  boilerplate code that makes up most of the IList and IList[T] interfaces.
+  /// </summary>
+  /// <typeparam name="T"></typeparam>
+  public abstract class ObservableListBindingBase<T> : IObservableListBinding<T>
   {
     public abstract int Count { get; }
 
@@ -15,19 +21,37 @@ namespace Steropes.UI.Bindings
       return GetEnumerator();
     }
 
+    public abstract void Dispose();
+    public abstract IReadOnlyList<IBindingSubscription> Sources { get; }
+
+    public abstract void Move(int sourceIdx, int targetIdx);
+
     void ICollection.CopyTo(Array array, int index)
     {
       if (array == null)
+      {
         throw new ArgumentNullException(nameof(array));
-      if (array.Rank != 1)
-        throw new ArgumentException("Array must have a rank of 1");
-      if (array.GetLowerBound(0) != 0)
-        throw new ArgumentException("Array must have a lower bound of zero");
-      if (index < 0)
-        throw new ArgumentOutOfRangeException(nameof(index), "Index cannot be negative");
+      }
 
-      if (array.Length - index < this.Count)
+      if (array.Rank != 1)
+      {
+        throw new ArgumentException("Array must have a rank of 1");
+      }
+
+      if (array.GetLowerBound(0) != 0)
+      {
+        throw new ArgumentException("Array must have a lower bound of zero");
+      }
+
+      if (index < 0)
+      {
+        throw new ArgumentOutOfRangeException(nameof(index), "Index cannot be negative");
+      }
+
+      if (array.Length - index < Count)
+      {
         throw new ArgumentException("Array is not large enough.");
+      }
 
       if (array is T[] typedArray)
       {
@@ -35,18 +59,25 @@ namespace Steropes.UI.Bindings
       }
       else
       {
-        Type elementType = array.GetType().GetElementType();
-        Type c = typeof(T);
-        if (elementType == null || (!elementType.IsAssignableFrom(c) && !c.IsAssignableFrom(elementType)))
+        var elementType = array.GetType().GetElementType();
+        var c = typeof(T);
+        if (elementType == null || !elementType.IsAssignableFrom(c) && !c.IsAssignableFrom(elementType))
+        {
           throw new ArgumentException("This array is not compatible with the collection type.");
+        }
 
         if (!(array is object[] objArray))
+        {
           throw new ArgumentException("This array must be an object array.");
-        int count = Count;
+        }
+
+        var count = Count;
         try
         {
-          for (int index1 = 0; index1 < count; ++index1)
+          for (var index1 = 0; index1 < count; ++index1)
+          {
             objArray[index++] = this[index1];
+          }
         }
         catch (ArrayTypeMismatchException)
         {
@@ -57,12 +88,11 @@ namespace Steropes.UI.Bindings
 
     public virtual void CopyTo(T[] array, int arrayIndex)
     {
-      for (var i = 0; i < this.Count; i++)
+      for (var i = 0; i < Count; i++)
       {
         array[arrayIndex + i] = this[i];
       }
     }
-
 
     int ICollection.Count
     {
@@ -75,7 +105,7 @@ namespace Steropes.UI.Bindings
     int IList.Add(object value)
     {
       Add((T) value);
-      return this.Count - 1;
+      return Count - 1;
     }
 
     bool IList.Contains(object value)
@@ -86,11 +116,6 @@ namespace Steropes.UI.Bindings
       }
 
       return false;
-    }
-
-    public ListEnumerator GetEnumerator()
-    {
-      return new ListEnumerator(this);
     }
 
     IEnumerator<T> IEnumerable<T>.GetEnumerator()
@@ -135,6 +160,7 @@ namespace Steropes.UI.Bindings
 
       return -1;
     }
+
     public abstract void Insert(int index, T item);
     public abstract void RemoveAt(int index);
     public abstract T this[int index] { get; set; }
@@ -188,11 +214,16 @@ namespace Steropes.UI.Bindings
     public abstract bool IsFixedSize { get; }
     public abstract event PropertyChangedEventHandler PropertyChanged;
     public abstract event NotifyCollectionChangedEventHandler CollectionChanged;
-    
+
+    public ListEnumerator GetEnumerator()
+    {
+      return new ListEnumerator(this);
+    }
+
     public struct ListEnumerator : IEnumerator<T>
     {
       readonly IList<T> widget;
-      
+
       int index;
 
       T current;
@@ -210,7 +241,7 @@ namespace Steropes.UI.Bindings
 
       public bool MoveNext()
       {
-        IList<T> w = widget;
+        var w = widget;
         if (index + 1 < w.Count)
         {
           index += 1;
@@ -228,7 +259,10 @@ namespace Steropes.UI.Bindings
         current = default(T);
       }
 
-      object IEnumerator.Current => Current;
+      object IEnumerator.Current
+      {
+        get { return Current; }
+      }
 
       public T Current
       {
@@ -238,6 +272,7 @@ namespace Steropes.UI.Bindings
           {
             throw new InvalidOperationException();
           }
+
           return current;
         }
       }
