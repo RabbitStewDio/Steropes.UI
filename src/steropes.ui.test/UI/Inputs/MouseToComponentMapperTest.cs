@@ -104,8 +104,7 @@ namespace Steropes.UI.Test.UI.Inputs
       events.PushEvent(CreateMove(20, 20, InputFlags.Mouse1));
       events.PushEvent(CreateMove(30, 30, InputFlags.Mouse1));
 
-      MouseEventData data;
-      componentMapper.PullEventData(out data);
+      componentMapper.PullEventData(out var data);
       data.EventType.Should().Be(MouseEventType.Entered);
       data.Position.Should().Be(new Point(10, 10));
 
@@ -132,8 +131,7 @@ namespace Steropes.UI.Test.UI.Inputs
       events.PushEvent(CreateMove(20, 20));
       events.PushEvent(CreateMove(30, 30));
 
-      MouseEventData data;
-      componentMapper.PullEventData(out data);
+      componentMapper.PullEventData(out var data);
       data.EventType.Should().Be(MouseEventType.Entered);
       data.Position.Should().Be(new Point(10, 10));
 
@@ -154,8 +152,7 @@ namespace Steropes.UI.Test.UI.Inputs
     {
       var retval = new List<Tuple<MouseEventType, Point, string>>();
 
-      MouseEventData data;
-      while (componentMapper.PullEventData(out data))
+      while (componentMapper.PullEventData(out var data))
       {
         var currentWidget = componentMapper.Component;
         var name = currentWidget.As<INamedWidget>()?.Name ?? currentWidget?.ToString();

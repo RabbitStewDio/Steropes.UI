@@ -208,8 +208,7 @@ namespace Steropes.UI.Test
 
       public IUIFont LoadFont(string font)
       {
-        IUIFont f;
-        if (fonts.TryGetValue(font, out f))
+        if (fonts.TryGetValue(font, out var f))
         {
           return f;
         }

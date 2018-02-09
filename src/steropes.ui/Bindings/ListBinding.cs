@@ -277,26 +277,26 @@ namespace Steropes.UI.Bindings
                                                                                ConditionalGet);
     }
 
-    public static IDisposable BindTo<T>(this IReadOnlyObservableValue<IReadOnlyList<T>> source,
+    public static IBindingSubscription BindTo<T>(this IReadOnlyObservableValue<IReadOnlyList<T>> source,
                                  ObservableCollection<T> target)
     {
       return new OneWayListBinding<T>(target.ToBinding(), source);
     }
 
-    public static IDisposable BindTo<T>(this IReadOnlyObservableListBinding<T> source,
+    public static IBindingSubscription BindTo<T>(this IReadOnlyObservableListBinding<T> source,
                                  ObservableCollection<T> target)
     {
-      return new OneWayListBinding<T>(target.ToBinding(), source);
+      return new OneWayObservableListBinding<T>(target.ToBinding(), source);
     }
 
-    public static IDisposable BindTwoWay<T>(this IObservableListBinding<T> source,
+    public static IBindingSubscription BindTwoWay<T>(this IObservableListBinding<T> source,
                                             ObservableCollection<T> target)
     {
       var targetBinding = target.ToBinding();
       return new TwoWayListBinding<T>(targetBinding, source);
     }
 
-    public static IDisposable BindTwoWay<T>(this IObservableListBinding<T> source,
+    public static IBindingSubscription BindTwoWay<T>(this IObservableListBinding<T> source,
                                             IObservableListBinding<T> target)
     {
       return new TwoWayListBinding<T>(target, source);

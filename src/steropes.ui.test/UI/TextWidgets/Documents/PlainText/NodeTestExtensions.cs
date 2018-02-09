@@ -46,8 +46,7 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
 
     public static Point RecordPosition<T>(this ITextView<T> p, int offset) where T : ITextDocument
     {
-      Rectangle rect;
-      p.ModelToView(offset, out rect).Should().Be(true);
+      p.ModelToView(offset, out var rect).Should().Be(true);
       return rect.Location;
     }
 
