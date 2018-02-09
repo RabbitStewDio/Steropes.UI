@@ -21,7 +21,7 @@ using FluentAssertions;
 using Microsoft.Xna.Framework;
 
 using NSubstitute;
-
+using NSubstitute.ReturnsExtensions;
 using NUnit.Framework;
 
 using Steropes.UI.Components;
@@ -37,14 +37,19 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
     [Test]
     public void Input_NewLine_BreakAtEnd()
     {
-      var parent = Substitute.For<IWidget>();
+      var parent = StubParent();
+      parent.Parent.Should().BeNull();
 
       var chunk = CreateView("Hello World");
       chunk.AddNotify(parent);
+
+
+      ((object) chunk.Parent).Should().Be(parent);
+
+      
       chunk.Measure(Size.Auto);
       chunk.Arrange(new Rectangle(10, 20, 200, 400));
       chunk.Document.InsertAt(11, '\n');
-
       chunk.ExposedRootView.Count.Should().Be(2);
       chunk.ExposedRootView[0].Offset.Should().Be(0);
       chunk.ExposedRootView[0].EndOffset.Should().Be(12);
@@ -52,10 +57,18 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
       chunk.ExposedRootView[1].EndOffset.Should().Be(12);
     }
 
+    static IWidget StubParent()
+    {
+      var parent = Substitute.For<IWidget>();
+      parent.Parent.ReturnsNull();
+      parent.GetStyleParent().ReturnsNull();
+      return parent;
+    }
+
     [Test]
     public void Input_NewLine_Breaks_Lines()
     {
-      var parent = Substitute.For<IWidget>();
+      var parent = StubParent();
 
       var chunk = CreateView();
       chunk.AddNotify(parent);
@@ -69,7 +82,7 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
     [Test]
     public void Input_NewLine_Triggers_LayoutInvalid()
     {
-      var parent = Substitute.For<IWidget>();
+      var parent = StubParent();
 
       var chunk = CreateView();
       chunk.AddNotify(parent);

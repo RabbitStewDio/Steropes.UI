@@ -21,6 +21,7 @@ using System;
 using FluentAssertions;
 using Microsoft.Xna.Framework;
 using NSubstitute;
+using NSubstitute.ReturnsExtensions;
 using NUnit.Framework;
 using Steropes.UI.Components;
 using Steropes.UI.Platform;
@@ -32,6 +33,13 @@ namespace Steropes.UI.Test.UI
     [Category("Basic Widget Behaviour")]
     public class ArrangeChildExtension
     {
+      static IWidget StubParent()
+      {
+        var parent = Substitute.For<IWidget>();
+        parent.Parent.ReturnsNull();
+        return parent;
+      }
+
       static readonly TestCaseData[] ValidateFixedSizeData =
       {
         new TestCaseData(AnchoredRect.Full).Returns(new Rectangle(10, 20, 200, 100)),
@@ -61,7 +69,7 @@ namespace Steropes.UI.Test.UI
       [TestCaseSource(nameof(ValidateFixedSizeData))]
       public Rectangle ValidateFixedSizeChild(AnchoredRect rect)
       {
-        var widget = Substitute.For<IWidget>();
+        var widget = StubParent();
         widget.DesiredSize.Returns(new Size(50, 40));
         widget.Anchor.Returns(rect);
 
@@ -72,7 +80,7 @@ namespace Steropes.UI.Test.UI
       [TestCaseSource(nameof(ValidateFixedSizeDataSmall))]
       public Rectangle ValidateFixedSizeChildSmall(AnchoredRect rect)
       {
-        var widget = Substitute.For<IWidget>();
+        var widget = StubParent();
         widget.DesiredSize.Returns(new Size(50, 40));
         widget.Anchor.Returns(rect);
 

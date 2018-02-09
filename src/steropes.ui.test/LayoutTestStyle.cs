@@ -18,6 +18,7 @@
 // SOFTWARE.
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 
 using Microsoft.Xna.Framework;
@@ -43,13 +44,59 @@ namespace Steropes.UI.Test
     public IUIFont SmallFont { get; set; }
   }
 
+  class TestStyleResolver : IStyleResolver
+  {
+    readonly IStyleResolver parent;
+    readonly bool acceptAll;
+
+    public TestStyleResolver(IStyleResolver parent, bool acceptAll)
+    {
+      this.parent = parent ?? throw new ArgumentNullException(nameof(parent));
+      this.acceptAll = acceptAll;
+    }
+
+    public ObservableCollection<IStyleRule> StyleRules
+    {
+      get { return parent.StyleRules; }
+    }
+
+    public void AddRoot(IWidget root)
+    {
+      parent.AddRoot(root);
+    }
+
+    public IResolvedStyle CreateStyleFor(IWidget widget)
+    {
+      return parent.CreateStyleFor(widget);
+    }
+
+    public void RemoveRoot(IWidget root)
+    {
+      parent.RemoveRoot(root);
+    }
+
+    public bool Revalidate()
+    {
+      return parent.Revalidate();
+    }
+
+    public bool IsRegistered(IWidget widget)
+    {
+      if (acceptAll)
+      {
+        return true;
+      }
+      return parent.IsRegistered(widget);
+    }
+  }
+
   public class TestUIStyle : IUIStyle
   {
-    public TestUIStyle(IContentLoader loader, Style style)
+    public TestUIStyle(IContentLoader loader, Style style, bool acceptAll = true)
     {
       Style = style;
       StyleSystem = new StyleSystem(loader);
-      StyleResolver = new StyleResolver(StyleSystem);
+      StyleResolver = new TestStyleResolver(new StyleResolver(StyleSystem), acceptAll);
     }
 
     public Style Style { get; }
@@ -61,11 +108,11 @@ namespace Steropes.UI.Test
 
   public class LayoutTestStyle
   {
-    public static TestUIStyle Create()
+    public static TestUIStyle Create(bool treatAllAsRegistered = true)
     {
       var legacyStyle = CreateStyle();
       var loader = new TestContentLoader(legacyStyle);
-      var style = new TestUIStyle(loader, legacyStyle);
+      var style = new TestUIStyle(loader, legacyStyle, treatAllAsRegistered);
       var styleRules = new StyleLoader().LoadRules(style.StyleSystem);
       var resolver = style.StyleResolver;
       foreach (var r in styleRules)

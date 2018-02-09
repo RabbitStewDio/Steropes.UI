@@ -22,6 +22,21 @@ namespace Steropes.UI.Bindings
       }
     }
 
+    /// <summary>
+    ///  Returns a binding for the property accessed by the given expression. This method attempts
+    ///  to parse the expression tree to extract the name of the property that should be monitored.
+    ///  It will select the first property or field access it finds as property name for monitoring.
+    ///  <para/>
+    ///  Although it is possible to perform basic arithmetics or even function calls here, I 
+    ///  recommend that such operations are performed in a separate #Map(..) call instead. This will
+    ///  create bindings that express the intent of these operations more clearly and will yield more 
+    ///  stable bindings that are resilient to refactorings or other code changes.
+    /// </summary>
+    /// <typeparam name="TSource"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="memberExpression"></param>
+    /// <returns></returns>
     public static IReadOnlyObservableValue<TValue> BindingFor<TSource, TValue>(
       this TSource source,
       Expression<Func<TSource, TValue>> memberExpression)
@@ -104,13 +119,18 @@ namespace Steropes.UI.Bindings
       return Map(source, v => filter(v) ? v : null);
     }
 
-    public static IReadOnlyObservableValue OrElse(this IReadOnlyObservableValue source, object fallback)
+    public static IReadOnlyObservableValue Filter<T>(this IReadOnlyObservableValue<T> source, Func<T, bool> filter)
     {
-      return Map(source, v => v ?? fallback);
+      return source.Map(v => filter(v) ? v : default(T));
     }
 
-    public static IReadOnlyObservableValue OrElse(this IReadOnlyObservableValue source,
-                                                  IReadOnlyObservableValue fallback)
+    public static IReadOnlyObservableValue OrElse<T>(this IReadOnlyObservableValue<T> source, T fallback) where T: class
+    {
+      return source.Map(v => v ?? fallback);
+    }
+
+    public static IReadOnlyObservableValue<T> OrElse<T>(this IReadOnlyObservableValue<T> source,
+                                                        IReadOnlyObservableValue<T> fallback) where T: class
     {
       return Combine(source, fallback, (a, b) => a ?? b);
     }

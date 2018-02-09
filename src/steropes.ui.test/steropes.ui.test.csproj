@@ -55,13 +55,8 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FluentAssertions, Version=4.18.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
-      <HintPath>..\packages\FluentAssertions.4.18.0\lib\net45\FluentAssertions.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="FluentAssertions.Core, Version=4.18.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
-      <HintPath>..\packages\FluentAssertions.4.18.0\lib\net45\FluentAssertions.Core.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="FluentAssertions, Version=5.0.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
+      <HintPath>..\packages\FluentAssertions.5.0.0\lib\net45\FluentAssertions.dll</HintPath>
     </Reference>
     <Reference Include="MonoGame.Framework, Version=3.6.0.1625, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MonoGame.Framework.WindowsDX.3.6.0.1625\lib\net40\MonoGame.Framework.dll</HintPath>
@@ -80,6 +75,9 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.ValueTuple, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.3.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -90,7 +88,14 @@
   <ItemGroup>
     <Compile Include="Animation\AnimatedValueTest.cs" />
     <Compile Include="AssertionHelper.cs" />
-    <Compile Include="Bindings\BindingTest.cs" />
+    <Compile Include="Bindings\AutoBindingCreationTest.cs" />
+    <Compile Include="Bindings\BindingAssertions.cs" />
+    <Compile Include="Bindings\BindingFixtureElement.cs" />
+    <Compile Include="Bindings\BindingMappingTest.cs" />
+    <Compile Include="Bindings\BindingTargetTest.cs" />
+    <Compile Include="Bindings\ChainedBindingCreationTest.cs" />
+    <Compile Include="Bindings\ExplicitBindingCreationTest.cs" />
+    <Compile Include="Bindings\NColChngEvtArgFix.cs" />
     <Compile Include="ExpressionCache.cs" />
     <Compile Include="FunctionRecorder.cs" />
     <Compile Include="LayoutTestStyle.cs" />

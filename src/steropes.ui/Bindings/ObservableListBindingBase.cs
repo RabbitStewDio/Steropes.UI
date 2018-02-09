@@ -16,15 +16,17 @@ namespace Steropes.UI.Bindings
   {
     public abstract int Count { get; }
 
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-      return GetEnumerator();
-    }
-
     public abstract void Dispose();
     public abstract IReadOnlyList<IBindingSubscription> Sources { get; }
 
     public abstract void Move(int sourceIdx, int targetIdx);
+    
+    #region Hide explicit Collection and List implementations
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+      return GetEnumerator();
+    }
 
     void ICollection.CopyTo(Array array, int index)
     {
@@ -85,22 +87,12 @@ namespace Steropes.UI.Bindings
         }
       }
     }
-
-    public virtual void CopyTo(T[] array, int arrayIndex)
-    {
-      for (var i = 0; i < Count; i++)
-      {
-        array[arrayIndex + i] = this[i];
-      }
-    }
-
+    
+    
     int ICollection.Count
     {
       get { return Count; }
     }
-
-    public abstract object SyncRoot { get; }
-    public abstract bool IsSynchronized { get; }
 
     int IList.Add(object value)
     {
@@ -117,53 +109,16 @@ namespace Steropes.UI.Bindings
 
       return false;
     }
-
-    IEnumerator<T> IEnumerable<T>.GetEnumerator()
-    {
-      return GetEnumerator();
-    }
-
-    public abstract void Add(T item);
-
+    
     void ICollection<T>.Clear()
     {
       Clear();
     }
 
-    public abstract void Clear();
-
-    public virtual bool Contains(T item)
+    IEnumerator<T> IEnumerable<T>.GetEnumerator()
     {
-      foreach (var i in this)
-      {
-        if (Equals(item, i))
-        {
-          return true;
-        }
-      }
-
-      return false;
+      return GetEnumerator();
     }
-
-    public abstract bool Remove(T item);
-    public abstract bool IsReadOnly { get; }
-
-    public virtual int IndexOf(T item)
-    {
-      for (var i = 0; i < Count; i += 1)
-      {
-        if (Equals(item, this[i]))
-        {
-          return i;
-        }
-      }
-
-      return -1;
-    }
-
-    public abstract void Insert(int index, T item);
-    public abstract void RemoveAt(int index);
-    public abstract T this[int index] { get; set; }
 
     void IList.Clear()
     {
@@ -208,8 +163,62 @@ namespace Steropes.UI.Bindings
     object IList.this[int index]
     {
       get { return this[index]; }
-      set { this[index] = (T) value; }
+      set { this[index] = (T)value; }
     }
+
+
+    #endregion
+
+    public virtual void CopyTo(T[] array, int arrayIndex)
+    {
+      for (var i = 0; i < Count; i++)
+      {
+        array[arrayIndex + i] = this[i];
+      }
+    }
+
+    public abstract object SyncRoot { get; }
+    public abstract bool IsSynchronized { get; }
+    
+
+    public abstract void Add(T item);
+
+
+
+    public abstract void Clear();
+
+    public virtual bool Contains(T item)
+    {
+      foreach (var i in this)
+      {
+        if (Equals(item, i))
+        {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    public abstract bool Remove(T item);
+    public abstract bool IsReadOnly { get; }
+
+    public virtual int IndexOf(T item)
+    {
+      for (var i = 0; i < Count; i += 1)
+      {
+        if (Equals(item, this[i]))
+        {
+          return i;
+        }
+      }
+
+      return -1;
+    }
+
+    public abstract void Insert(int index, T item);
+    public abstract void RemoveAt(int index);
+    public abstract T this[int index] { get; set; }
 
     public abstract bool IsFixedSize { get; }
     public abstract event PropertyChangedEventHandler PropertyChanged;
@@ -222,7 +231,7 @@ namespace Steropes.UI.Bindings
 
     public struct ListEnumerator : IEnumerator<T>
     {
-      readonly IList<T> widget;
+      readonly IReadOnlyList<T> widget;
 
       int index;
 

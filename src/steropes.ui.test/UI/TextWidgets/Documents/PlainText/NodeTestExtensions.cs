@@ -22,7 +22,7 @@ using System.Collections.Generic;
 using FluentAssertions;
 
 using Microsoft.Xna.Framework;
-
+using NSubstitute.ReturnsExtensions;
 using Steropes.UI.Components;
 using Steropes.UI.Widgets.Styles;
 using Steropes.UI.Widgets.TextWidgets.Documents;
@@ -58,10 +58,14 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
 
       var style = LayoutTestStyle.Create();
       var textStyles = style.StyleSystem.StylesFor<TextStyleDefinition>();
+
       var documentView = new TestDocumentView<PlainTextDocument>(new PlainTextDocumentEditor(style));
       documentView.Style.SetValue(textStyles.Alignment, alignment);
       documentView.Style.SetValue(textStyles.Font, style.Style.MediumFont);
       documentView.Document = doc;
+
+      style.StyleResolver.AddRoot(documentView);
+
       return documentView;
     }
   }

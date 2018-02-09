@@ -107,7 +107,7 @@ namespace Steropes.UI.Bindings
 
       public override T this[int index]
       {
-        get { throw new NotImplementedException(); }
+        get { return data[index]; }
       }
 
       public override event PropertyChangedEventHandler PropertyChanged;
@@ -220,6 +220,12 @@ namespace Steropes.UI.Bindings
         data.Sort(c);
         return data;
       });
+    }
+
+    public static IReadOnlyObservableListBinding<T> MapAll<T>(this IReadOnlyObservableListBinding<T> source,
+                                                              Func<IReadOnlyList<T>, IReadOnlyList<T>> transform)
+    {
+      return new BulkChangeListBinding<T>(source, transform);
     }
 
     public static IReadOnlyObservableListBinding<T> RangeBinding<T>(this IReadOnlyObservableListBinding<T> source,

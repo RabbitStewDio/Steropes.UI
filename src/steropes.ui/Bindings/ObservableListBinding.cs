@@ -46,21 +46,22 @@ namespace Steropes.UI.Bindings
       PropertyChanged?.Invoke(this, e);
     }
 
-    IList SelfAsList => self;
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-      return GetEnumerator();
-    }
-
     public void Move(int sourceIdx, int targetIdx)
     {
       self.Move(sourceIdx, targetIdx);
     }
 
+    IList SelfAsList => self;
+
     public void CopyTo(Array array, int index)
     {
       SelfAsList.CopyTo(array, index);
+    }
+
+    #region Explicit Interface Implementations
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+      return GetEnumerator();
     }
 
     int IList.Add(object value)
@@ -96,13 +97,20 @@ namespace Steropes.UI.Bindings
 
     object ICollection.SyncRoot
     {
-      get { return ((ICollection) self).SyncRoot; }
+      get { return ((ICollection)self).SyncRoot; }
     }
 
     bool ICollection.IsSynchronized
     {
-      get { return ((ICollection) self).IsSynchronized; }
+      get { return ((ICollection)self).IsSynchronized; }
     }
+
+    public IEnumerator<T> GetEnumerator()
+    {
+      return self.GetEnumerator();
+    }
+
+    #endregion
 
     public T this[int index]
     {
@@ -133,11 +141,6 @@ namespace Steropes.UI.Bindings
     public bool Contains(T item)
     {
       return self.Contains(item);
-    }
-
-    public IEnumerator<T> GetEnumerator()
-    {
-      return self.GetEnumerator();
     }
 
     public int IndexOf(T item)
