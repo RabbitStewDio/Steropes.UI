@@ -95,6 +95,9 @@
     <Compile Include="Bindings\BindingTargetTest.cs" />
     <Compile Include="Bindings\ChainedBindingCreationTest.cs" />
     <Compile Include="Bindings\ExplicitBindingCreationTest.cs" />
+    <Compile Include="Bindings\ListBindingCreationTest.cs" />
+    <Compile Include="Bindings\ListBindingSinkTest.cs" />
+    <Compile Include="Bindings\ListBindingTransformationTest.cs" />
     <Compile Include="Bindings\NColChngEvtArgFix.cs" />
     <Compile Include="ExpressionCache.cs" />
     <Compile Include="FunctionRecorder.cs" />
