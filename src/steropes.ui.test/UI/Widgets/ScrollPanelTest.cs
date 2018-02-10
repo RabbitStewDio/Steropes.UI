@@ -115,6 +115,30 @@ namespace Steropes.UI.Test.UI.Widgets
       p.DesiredSize.Should().Be(new Size(610, 400));
     }
 
+    [Test]
+    public void NoZeroOffset()
+    {
+      var p = new ScrollPanel(LayoutTestStyle.Create())
+                {
+                  // CornerSize = 10,
+                  Padding = new Insets(10),
+                  VerticalScrollbarMode = ScrollbarMode.Always,
+                  Content = LayoutTestWidget.FixedSize(500, 300)
+                };
+
+      // first arrange to initialize all sizes
+      p.Arrange(new Rectangle(10, 20, 500, 200));
+      // scroll down
+      p.Scrollbar.ScrollToBottom(true);
+      // second arrange should have moved the child ..
+      p.Arrange(new Rectangle(10, 20, 500, 200));
+
+      p.Scrollbar.ScrollContentHeight.Should().Be(300);
+      p.Scrollbar.ScrollContentOrigin.Should().Be(-90);
+      p.Content.LayoutRect.Should().Be(new Rectangle(20, -90, 480, 300));
+      p.ContentRect.Bottom.Should().Be(p.Content.LayoutRect.Bottom);
+    }
+
     public class TestScrollPanel : ScrollPanel
     {
       public TestScrollPanel(IUIStyle style) : base(style)

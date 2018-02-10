@@ -52,5 +52,10 @@ namespace Steropes.UI.Styles
     {
       backend.Remove(className);
     }
+
+    public override string ToString()
+    {
+      return $"[{string.Join(",", backend)}]";
+    }
   }
 }

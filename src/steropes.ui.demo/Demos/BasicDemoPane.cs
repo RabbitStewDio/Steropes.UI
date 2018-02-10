@@ -133,6 +133,12 @@ namespace Steropes.UI.Demo.Demos
       };
     }
 
+
+    void Print()
+    {
+      WidgetVisitor.PrintLayoutVisitor().Visit(this);
+    }
+
     IWidget CreateButton()
     {
       IPopUp popup = null;

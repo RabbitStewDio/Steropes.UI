@@ -142,6 +142,7 @@
     <Compile Include="UI\Widgets\IconLabelTest.cs" />
     <Compile Include="UI\Widgets\KeyBoxTest.cs" />
     <Compile Include="UI\Widgets\LabelTest.cs" />
+    <Compile Include="UI\Widgets\ListViewWidgetTest.cs" />
     <Compile Include="UI\Widgets\NotebookTabTest.cs" />
     <Compile Include="UI\Widgets\NotebookTest.cs" />
     <Compile Include="UI\Widgets\ScrollPanelTest.cs" />

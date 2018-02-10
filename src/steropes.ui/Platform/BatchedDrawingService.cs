@@ -100,6 +100,7 @@ namespace Steropes.UI.Platform
   {
     readonly Stack<Rectangle> scissorRects = new Stack<Rectangle>();
     readonly UITexture whitePixelTex;
+    bool disabled;
 
     IUITexture whitePixel;
 
@@ -301,7 +302,6 @@ namespace Steropes.UI.Platform
       var parentRect = ScissorRectangle;
 
       var newRect = parentRect.Clip(rect).Clip(GraphicsDevice.Viewport.Bounds);
-
       SuspendBatch();
       scissorRects.Push(newRect);
       ResumeBatch();
@@ -313,10 +313,11 @@ namespace Steropes.UI.Platform
       if (scissorRects.Count > 0)
       {
         var rect = scissorRects.Peek();
-        if (rect.Width > 0 && rect.Height > 0)
-        {
-          GraphicsDevice.ScissorRectangle = rect;
-        }
+        GraphicsDevice.ScissorRectangle = rect;
+//        if (rect.Width > 0 && rect.Height > 0)
+//        {
+//          disabled = rect.IsEmpty;
+//        }
 
         StartSpriteBatch(ScissorRasterizerState);
       }

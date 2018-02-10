@@ -301,6 +301,12 @@ namespace Steropes.UI.Widgets.Container
 
     protected override Rectangle ArrangeOverride(Rectangle layoutSize)
     {
+      if (layoutSize.Width != DesiredSize.WidthInt ||
+          layoutSize.Height != DesiredSize.HeightInt)
+      {
+        MeasureOverride(new Size(layoutSize.Width, layoutSize.Height));
+      }
+
       var colStarts = RunningSum(columnWidths, layoutSize.X, Spacing);
       var rowStarts = RunningSum(rowHeights, layoutSize.Y, Spacing);
 
@@ -339,7 +345,9 @@ namespace Steropes.UI.Widgets.Container
         widget.Measure(size);
       }
 
-      return new Size(columnWidths.Sum(), rowHeights.Sum());
+      var effectiveSpacingX = Math.Max(columnWidths.Length - 1, 0) * Spacing;
+      var effectiveSpacingY = Math.Max(rowHeights.Length - 1, 0) * Spacing;
+      return new Size(columnWidths.Sum() + effectiveSpacingX, rowHeights.Sum() + effectiveSpacingY);
     }
 
     protected override void OnChildAdded(IWidget child, int index, Point constraint)

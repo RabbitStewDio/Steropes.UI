@@ -16,10 +16,9 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 using System;
-
 using Microsoft.Xna.Framework;
-
 using Steropes.UI.Components;
 using Steropes.UI.Input.MouseInput;
 
@@ -49,14 +48,8 @@ namespace Steropes.UI.Widgets
 
     public ScrollbarMode VerticalScrollbarMode
     {
-      get
-      {
-        return Scrollbar.ScrollbarMode;
-      }
-      set
-      {
-        Scrollbar.ScrollbarMode = value;
-      }
+      get { return Scrollbar.ScrollbarMode; }
+      set { Scrollbar.ScrollbarMode = value; }
     }
 
     protected IScrollable Scrollable { get; private set; }
@@ -71,26 +64,66 @@ namespace Steropes.UI.Widgets
         {
           return Scrollbar;
         }
+
         if (index == 1 && Content != null)
         {
           return Content;
         }
+
         throw new IndexOutOfRangeException();
       }
     }
 
-    public void ScrollTo(Rectangle visibleBox)
+    public void ScrollTo(Rectangle visibleBox, bool now = false)
     {
       var contentRect = ContentRect;
       if (visibleBox.Top < contentRect.Top)
       {
         var delta = visibleBox.Top - contentRect.Top;
-        Scrollbar.Scroll(delta);
+        Scrollbar.Scroll(delta, now);
       }
       else if (visibleBox.Bottom > contentRect.Bottom)
       {
         var delta = visibleBox.Bottom - contentRect.Bottom;
-        Scrollbar.Scroll(delta);
+        Scrollbar.Scroll(delta, now);
+      }
+    }
+
+    Rectangle MeasureChildWithScrollPolicy(ScrollbarMode mode, Rectangle layoutSize)
+    {
+      switch (mode)
+      {
+        case ScrollbarMode.None:
+        {
+          return layoutSize;
+        }
+        case ScrollbarMode.Auto:
+        {
+          Content.Measure(new Size(layoutSize.Width, layoutSize.Height));
+          var rawContentHeight = Math.Max(Content.DesiredSize.HeightInt, layoutSize.Height);
+          if (rawContentHeight > layoutSize.Height)
+          {
+            return MeasureChildWithScrollPolicy(ScrollbarMode.Always, layoutSize);
+          }
+
+          return MeasureChildWithScrollPolicy(ScrollbarMode.None, layoutSize);
+        }
+        case ScrollbarMode.Always:
+        {
+          var scrollbarWidth = Scrollbar.DesiredSize.WidthInt;
+          Content.Measure(new Size(layoutSize.Width, layoutSize.Height - scrollbarWidth));
+          Scrollbar.Measure(new Size(scrollbarWidth, layoutSize.Height));
+          Scrollbar.ScrollContentHeight = Math.Max(Scrollbar.DesiredSize.HeightInt, Content.DesiredSize.HeightInt);
+
+          return new Rectangle(layoutSize.X,
+                               layoutSize.Y - (int) Scrollbar.LerpOffset,
+                               layoutSize.Width - scrollbarWidth,
+                               Scrollbar.ScrollContentHeight);
+        }
+        default:
+        {
+          throw new ArgumentOutOfRangeException(nameof(mode), mode, null);
+        }
       }
     }
 
@@ -100,28 +133,12 @@ namespace Steropes.UI.Widgets
 
       if (Content != null)
       {
-        var consumedSize = Content.MeasureAsAnchoredChild(new Size(layoutSize.Width, layoutSize.Height));
-        Scrollbar.ScrollContentHeight = consumedSize.HeightInt;
-
-        Rectangle childRectangle;
-        if (VerticalScrollbarMode == ScrollbarMode.Always || 
-            (VerticalScrollbarMode == ScrollbarMode.Auto && consumedSize.Height > layoutSize.Height))
-        {
-          Scrollbar.Measure(new Size(scrollbarWidth, layoutSize.Height));
-          var contentHeight = Math.Max(Scrollbar.DesiredSize.HeightInt, consumedSize.HeightInt);
-
-          childRectangle = new Rectangle(layoutSize.X, layoutSize.Y - (int)Scrollbar.LerpOffset, layoutSize.Width - scrollbarWidth, contentHeight);
-        }
-        else
-        {
-          childRectangle = layoutSize;
-        }
-
-        var childLayoutRect = Content.ArrangeChild(childRectangle);
-        Content.Arrange(childLayoutRect);
+        var childRectangle = MeasureChildWithScrollPolicy(VerticalScrollbarMode, layoutSize);
+        Content.Arrange(childRectangle);
       }
 
-      Rectangle scrollbarBounds = new Rectangle(layoutSize.Right - scrollbarWidth, layoutSize.Y, scrollbarWidth, layoutSize.Height);
+      Rectangle scrollbarBounds =
+        new Rectangle(layoutSize.Right - scrollbarWidth, layoutSize.Y, scrollbarWidth, layoutSize.Height);
       Scrollbar.Arrange(scrollbarBounds);
       return layoutSize;
     }
@@ -149,7 +166,7 @@ namespace Steropes.UI.Widgets
       base.OnContentUpdated();
       if (Content is IScrollable)
       {
-        Scrollable = (IScrollable)Content;
+        Scrollable = (IScrollable) Content;
       }
       else
       {

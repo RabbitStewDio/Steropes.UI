@@ -20,13 +20,13 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Xna.Framework;
-
 using Steropes.UI.Components;
 using Steropes.UI.Platform;
 using Steropes.UI.Styles;
@@ -38,7 +38,7 @@ namespace Steropes.UI.Widgets
   public interface IListDataItemRenderer : IWidget
   {
     event EventHandler<ListSelectionEventArgs> SelectionChanged;
-    
+
     EventHandler<ListSelectionEventArgs> OnSelectionChanged { get; set; }
 
     bool Selected { get; set; }
@@ -70,9 +70,9 @@ namespace Steropes.UI.Widgets
   ///   Content from renderer
   /// </summary>
   public class ListView<T> : InternalContentWidget<ScrollPanel<BoxGroup>>
-    //where T : class
   {
     readonly ListViewStyleDefinition listViewStyle;
+    readonly EventSupport<ListSelectionEventArgs> selectionChangedSupport;
 
     Func<IUIStyle, T, IListDataItemRenderer> createRenderer;
 
@@ -81,7 +81,6 @@ namespace Steropes.UI.Widgets
     int minimumWidth;
 
     int selectedIndex;
-    readonly EventSupport<ListSelectionEventArgs> selectionChangedSupport;
 
     public ListView(IUIStyle style) : base(style)
     {
@@ -90,14 +89,20 @@ namespace Steropes.UI.Widgets
 
       selectedIndex = -1;
 
-      InternalContent = new ScrollPanel<BoxGroup>(UIStyle) { Content = new BoxGroup(UIStyle) { Orientation = Orientation.Vertical } };
+      InternalContent = new ScrollPanel<BoxGroup>(UIStyle)
+      {
+        Content = new BoxGroup(UIStyle)
+        {
+          Orientation = Orientation.Vertical
+        }
+      };
 
       DataItems = new ObservableCollection<T>();
       DataItems.CollectionChanged += (s, e) =>
-        {
-          RebuildDataRenderers();
-          InvalidateLayout();
-        };
+      {
+        RebuildDataRenderers();
+        InvalidateLayout();
+      };
 
       CreateRenderer = ListView.DefaultCreateRenderer;
 
@@ -119,10 +124,7 @@ namespace Steropes.UI.Widgets
 
     public Func<IUIStyle, T, IListDataItemRenderer> CreateRenderer
     {
-      get
-      {
-        return createRenderer;
-      }
+      get { return createRenderer; }
       set
       {
         createRenderer = value;
@@ -144,53 +146,32 @@ namespace Steropes.UI.Widgets
 
     public int MaxHeight
     {
-      get
-      {
-        return Style.GetValue(listViewStyle.MaxHeight);
-      }
-      set
-      {
-        Style.SetValue(listViewStyle.MaxHeight, value);
-      }
+      get { return Style.GetValue(listViewStyle.MaxHeight); }
+      set { Style.SetValue(listViewStyle.MaxHeight, value); }
     }
 
     public int MaxLinesVisible
     {
-      get
-      {
-        return Style.GetValue(listViewStyle.MaxLinesVisible);
-      }
-      set
-      {
-        Style.SetValue(listViewStyle.MaxLinesVisible, value);
-      }
+      get { return Style.GetValue(listViewStyle.MaxLinesVisible); }
+      set { Style.SetValue(listViewStyle.MaxLinesVisible, value); }
     }
 
     public int MinHeight
     {
-      get
-      {
-        return Style.GetValue(listViewStyle.MinHeight);
-      }
-      set
-      {
-        Style.SetValue(listViewStyle.MinHeight, value);
-      }
+      get { return Style.GetValue(listViewStyle.MinHeight); }
+      set { Style.SetValue(listViewStyle.MinHeight, value); }
     }
 
     public int MinimumWidth
     {
-      get
-      {
-        return minimumWidth;
-      }
+      get { return minimumWidth; }
       set
       {
         if (value == minimumWidth)
         {
           return;
         }
-        
+
         minimumWidth = Math.Max(0, value);
         OnPropertyChanged();
         InvalidateLayout();
@@ -199,10 +180,7 @@ namespace Steropes.UI.Widgets
 
     public int SelectedIndex
     {
-      get
-      {
-        return selectedIndex;
-      }
+      get { return selectedIndex; }
       set
       {
         if (selectedIndex != value)
@@ -215,12 +193,14 @@ namespace Steropes.UI.Widgets
               r.Selected = widgetItem == value;
             }
           }
+
           selectedIndex = value;
           OnPropertyChanged(nameof(SelectedIndex));
           if (!Equals(oldItem, SelectedItem))
           {
             OnPropertyChanged(nameof(SelectedItem));
           }
+
           RaiseSelectionChanged(ListSelectionEventArgs.Adjusted);
         }
       }
@@ -234,24 +214,16 @@ namespace Steropes.UI.Widgets
         {
           return DataItems[selectedIndex];
         }
+
         return default(T);
       }
-      set
-      {
-        SelectedIndex = DataItems.IndexOf(value);
-      }
+      set { SelectedIndex = DataItems.IndexOf(value); }
     }
 
     public bool UniformItemHeight
     {
-      get
-      {
-        return Style.GetValue(listViewStyle.UniformItemHeight);
-      }
-      set
-      {
-        Style.SetValue(listViewStyle.UniformItemHeight, value);
-      }
+      get { return Style.GetValue(listViewStyle.UniformItemHeight); }
+      set { Style.SetValue(listViewStyle.UniformItemHeight, value); }
     }
 
     public void AddAll(IEnumerable<T> items)
@@ -309,14 +281,14 @@ namespace Steropes.UI.Widgets
         renderer.MouseWheel += (s, e) => InternalContent.DispatchEvent(e.Derive());
 
         renderer.SelectionChanged += (s, a) =>
+        {
+          SelectedIndex = closureIndex;
+          if (a.Adjusting == false)
           {
-            SelectedIndex = closureIndex;
-            if (a.Adjusting == false)
-            {
-              // the adjusting event is fired naturally already.
-              RaiseSelectionChanged(a);
-            }
-          };
+            // the adjusting event is fired naturally already.
+            RaiseSelectionChanged(a);
+          }
+        };
 
         InternalContent.Content.Add(renderer);
       }
@@ -337,7 +309,15 @@ namespace Steropes.UI.Widgets
     public static IListDataItemRenderer DefaultCreateRenderer<TX>(IUIStyle style, TX item)
     {
       var text = item?.ToString() ?? "<NULL>";
-      return new ListDataItemRenderer(style) { Content = new Label(style, text) { Enabled = false, Padding = new Insets() }, Tag = item };
+      return new ListDataItemRenderer(style)
+      {
+        Content = new Label(style, text)
+        {
+          Enabled = false,
+          Padding = new Insets()
+        },
+        Tag = item
+      };
     }
   }
 }

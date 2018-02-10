@@ -32,7 +32,7 @@ namespace Steropes.UI.Demo
     {
       Content.RootDirectory = "Content";
 
-      Graphics = new GraphicsDeviceManager(this) { PreferredBackBufferWidth = 1280, PreferredBackBufferHeight = 720, SynchronizeWithVerticalRetrace = false};
+      Graphics = new GraphicsDeviceManager(this) { PreferredBackBufferWidth = 1280, PreferredBackBufferHeight = 520, SynchronizeWithVerticalRetrace = false};
       IsFixedTimeStep = false;
     }
 

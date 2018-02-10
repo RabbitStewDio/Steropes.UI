@@ -43,6 +43,7 @@ namespace Steropes.UI.Demo.Demos
       {
         Anchor = AnchoredRect.CreateFull(10),
         Collapsable = true,
+        Collapsed = true,
         FirstPane = new BoxGroup(uiStyle, Orientation.Vertical, 0)
         {
           { CreateDemoButton("Basic", demoPanel, basicDemoPane), true },

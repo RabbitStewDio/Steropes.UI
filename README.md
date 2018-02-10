@@ -45,6 +45,13 @@ The Steropes-UI library follows three simple guiding principles:
    Similar to how WPF uses a visual component tree to build complex behaviour out of
    predefined building blocks, most Steropes-UI widgets are assemblies of other widgets
    and primitive textures. 
+
+   Widgets can be assembled using an simple object initializer syntax so that
+   code is both expressive and readable.
+
+   Data can be transfered from your model into the UI via simple (and typesafe) 
+   data bindings. The bindings created here are expressed as code and resilient to 
+   changes and refactoring of your code.
    
    Styling is separate from the compiled code. Steropes-UI uses a CSS inspired style
    system with selectors and style-sheets to define the visual look and feel of widgets.
@@ -144,6 +151,12 @@ You can find all documentation in the [documentation folder](docs/README.md).
 
 There are a few areas I think that need additional work at a later stage:
 
+* Support scaled UIs. Right now the UI is always rendered at the native resolution.
+  This is OK when the screen size is well known or when the UI should not adapt
+  to different resolutions (for instance while using resizable windows), but 
+  behaves badly when the UI should look the same regardless of the underlying
+  resolution (for instance in full-screen display modes).
+
 * Add tree and table widgets for data centric UIs. Hardcore strategy games would benefit 
   from that.
 
@@ -153,6 +166,7 @@ There are a few areas I think that need additional work at a later stage:
   These could be implemented right now using the CustomViewport widget, but having 
   something out of the box would be much nicer.
 
-* Add basic data binding. Thats here because I am way to lazy to manually and 
-  repeatedly write mostly similar listener code over and over again just to get data 
-  in and out of the UI. 
+* Add Drag and Drop support to the standard widgets. Although the underlying events
+  are already generated, advanced features like reordering list items or inserting
+  and removing items from a list or table via drag-and-drop require support from 
+  the list and table implementations.

@@ -20,6 +20,14 @@ using System.Collections.Generic;
 
 namespace Steropes.UI.Util
 {
+  /// <summary>
+  ///  A dictionary implementation for a limited number of keys. This statically
+  ///  maps the keys into an array-index position using a static lookup dictionary.
+  ///  This avoids some memory allocations that would happen otherwise while modifying
+  ///  the enum map.
+  /// </summary>
+  /// <typeparam name="TEnum"></typeparam>
+  /// <typeparam name="TValueType"></typeparam>
   public class EnumMap<TEnum, TValueType>
   {
     readonly TValueType[] data;

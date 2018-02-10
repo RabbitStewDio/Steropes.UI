@@ -71,6 +71,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\WidgetVisitor.cs">
+      <Link>WidgetVisitor.cs</Link>
+    </Compile>
     <Compile Include="Animation\AnimatedValue.cs" />
     <Compile Include="Animation\AnimatedValueExtensions.cs" />
     <Compile Include="Animation\AnimationDirection.cs" />
