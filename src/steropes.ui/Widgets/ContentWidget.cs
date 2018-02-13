@@ -64,11 +64,18 @@ namespace Steropes.UI.Widgets
           return;
         }
         var old = internalContent;
-        internalContent?.RemoveNotify(this);
+        if (old != null)
+        {
+          old.RemoveNotify(this);
+          RaiseChildRemoved(0, old);
+        }
         internalContent = value;
-        internalContent?.AddNotify(this);
+        if (internalContent != null)
+        {
+          internalContent.AddNotify(this);
+          RaiseChildAdded(0, value);
+        }
 
-        RaiseChildrenChanged(old, value);
         OnContentUpdated();
         InvalidateLayout();
       }

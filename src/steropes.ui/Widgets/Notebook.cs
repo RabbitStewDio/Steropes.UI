@@ -42,11 +42,11 @@ namespace Steropes.UI.Widgets
       Tabs = new NotebookTabList(UIStyle);
       Tabs.ActiveTabChanged += (s, e) => { panel.Content = Tabs.ActiveTab?.Content; };
       Tabs.AddNotify(this);
-      RaiseChildrenChanged(null, Tabs);
+      RaiseChildAdded(0, Tabs);
 
       panel = new ScrollPanel(UIStyle);
       panel.AddNotify(this);
-      RaiseChildrenChanged(null, panel);
+      RaiseChildAdded(1, panel);
 
       KeyPressed += OnKeyPressed;
     }

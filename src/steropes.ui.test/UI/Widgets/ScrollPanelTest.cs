@@ -34,7 +34,7 @@ namespace Steropes.UI.Test.UI.Widgets
   public class ScrollPanelTest
   {
     [Test]
-    public void Arrange()
+    public void Arrange_Ignores_AnchorRects()
     {
       var p = new TestScrollPanel(LayoutTestStyle.Create())
                 {
@@ -47,17 +47,19 @@ namespace Steropes.UI.Test.UI.Widgets
       p.UIStyle.StyleResolver.AddRoot(p);
       p.Arrange(new Rectangle(10, 20, 300, 200));
 
+      WidgetVisitor.PrintLayoutVisitor().Visit(p);
+
       p.DesiredSize.Should().Be(new Size(610, 400));
       p.Content.DesiredSize.Should().Be(new Size(500, 300));
 
       p.LayoutRect.Should().Be(new Rectangle(10, 20, 300, 200));
 
       // width = 300 - 2*40 (anchor) - 2*10 (padding) - 10 (scrollbar)
-      p.Content.LayoutRect.Should().Be(new Rectangle(60, 70, 190, 300));
+      p.Content.LayoutRect.Should().Be(new Rectangle(20, 30, 270, 300));
       p.TestScrollbar.LayoutRect.Should().Be(new Rectangle(290, 30, 10, 180));
 
       // height = 300 + 2*40 from anchor
-      p.TestScrollbar.ScrollContentHeight.Should().Be(380);
+      p.TestScrollbar.ScrollContentHeight.Should().Be(300);
     }
 
     [Test]

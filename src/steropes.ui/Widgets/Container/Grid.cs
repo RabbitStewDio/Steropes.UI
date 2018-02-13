@@ -312,7 +312,7 @@ namespace Steropes.UI.Widgets.Container
 
       var maxX = 0;
       var maxY = 0;
-      var widgetsAndConstraints = WidgetsWithConstraints();
+      var widgetsAndConstraints = WidgetsWithConstraints;
       for (var index = 0; index < widgetsAndConstraints.Count; index++)
       {
         var pair = widgetsAndConstraints[index];
@@ -335,7 +335,7 @@ namespace Steropes.UI.Widgets.Container
       columnWidths = ComputeSpaceConstraints(ColumnConstraints, availableSize.Width, false, columnWidths);
       rowHeights = ComputeSpaceConstraints(RowConstraints, availableSize.Height, true, rowHeights);
 
-      var widgetsAndConstraints = WidgetsWithConstraints();
+      var widgetsAndConstraints = WidgetsWithConstraints;
       for (var index = 0; index < widgetsAndConstraints.Count; index++)
       {
         var pair = widgetsAndConstraints[index];
@@ -524,7 +524,7 @@ namespace Steropes.UI.Widgets.Container
       var usedSize = new Size();
       var size = new Size(float.PositiveInfinity, float.PositiveInfinity);
 
-      var widgetsWithConstraints = WidgetsWithConstraints();
+      var widgetsWithConstraints = WidgetsWithConstraints;
       for (var index = 0; index < widgetsWithConstraints.Count; index++)
       {
         var pair = widgetsWithConstraints[index];

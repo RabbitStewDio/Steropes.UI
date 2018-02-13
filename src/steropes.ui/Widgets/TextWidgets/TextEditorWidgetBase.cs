@@ -54,7 +54,7 @@ namespace Steropes.UI.Widgets.TextWidgets
 
       Caret = new Caret<TView, TDocument>(UIStyle, Content);
       Caret.AddNotify(this);
-      RaiseChildrenChanged(null, Caret);
+      RaiseChildAdded(0, Caret);
 
       KeyTyped += OnKeyTyped;
       KeyPressed += OnKeyPressed;
@@ -461,7 +461,7 @@ namespace Steropes.UI.Widgets.TextWidgets
       for (var index = 0; index < e.OldItems.Count; index++)
       {
         var item = (ICaret)e.OldItems[index];
-        RaiseChildrenChanged(item, null);
+        RaiseChildRemoved(index, item);
         item.RemoveNotify(this);
       }
 
@@ -469,7 +469,7 @@ namespace Steropes.UI.Widgets.TextWidgets
       {
         var item = (ICaret)e.NewItems[index];
         item.AddNotify(this);
-        RaiseChildrenChanged(null, item);
+        RaiseChildAdded(index, item);
       }
     }
   }

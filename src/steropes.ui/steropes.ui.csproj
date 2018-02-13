@@ -110,6 +110,7 @@
     <Compile Include="Bindings\StaticNumericBindings.cs" />
     <Compile Include="Bindings\StringBindings.cs" />
     <Compile Include="Bindings\TypeSafePropertyBinding.cs" />
+    <Compile Include="Bindings\WidgetBinding.cs" />
     <Compile Include="Components\Window\FrameRateCalculator.cs" />
     <Compile Include="Components\Window\IMouseCursorService.cs" />
     <Compile Include="Components\Window\IRootPane.cs" />
@@ -179,6 +180,7 @@
     <Compile Include="Styles\SubStyleSystem.cs" />
     <Compile Include="Util\PropertyChangedEventSupport.cs" />
     <Compile Include="Util\TracingUtil.cs" />
+    <Compile Include="Widgets\Container\ContainerEventArgs.cs" />
     <Compile Include="Widgets\Container\LayeredPane.cs" />
     <Compile Include="Widgets\Container\OptionPaneActionArgs.cs" />
     <Compile Include="Styles\Conditions\AndCondition.cs" />

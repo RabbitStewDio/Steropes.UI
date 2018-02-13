@@ -46,7 +46,8 @@ namespace Steropes.UI.Test.UI.Widgets
       style.StyleResolver.AddRoot(l);
 
       l.Measure(Size.Auto);
-      l.DesiredSize.Should().Be(new Size(10, 10));
+      l.DesiredSize.Should().Be(new Size(30, 30), 
+                                "ScrollPanel is defined as Padding: 10 with scroll-thumb padding:5 on each side.");
     }
   }
 }

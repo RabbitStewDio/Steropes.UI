@@ -49,7 +49,7 @@ namespace Steropes.UI.Widgets.TextWidgets
       lineNumberRenderer.AddNotify(this);
       lineNumberRenderer.Anchor = AnchoredRect.CreateLeftAnchored();
       lineNumberRenderer.DocumentView = Content;
-      RaiseChildrenChanged(null, lineNumberRenderer);
+      RaiseChildAdded(0, lineNumberRenderer);
 
       DisplayLineNumbers = true;
       Caret.CaretChanged += OnCaretChanged;

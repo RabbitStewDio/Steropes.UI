@@ -64,7 +64,7 @@ namespace Steropes.UI.Widgets.Container
       splitterBar = new SplitterBar(style);
       splitterBar.AddNotify(this);
       splitterBar.PropertyChanged += OnSplitterBarPropertyChange;
-      RaiseChildrenChanged(null, splitterBar);
+      RaiseChildAdded(0, splitterBar, null);
 
       collapseAnim = new SmoothValue(0f, 1f, 0.2f);
 
@@ -145,7 +145,7 @@ namespace Steropes.UI.Widgets.Container
       {
         if (firstPane != null)
         {
-          RaiseChildrenChanged(firstPane, null);
+          RaiseChildRemoved(1, firstPane);
           firstPane.RemoveNotify(this);
         }
 
@@ -154,7 +154,7 @@ namespace Steropes.UI.Widgets.Container
         if (firstPane != null)
         {
           firstPane.AddNotify(this);
-          RaiseChildrenChanged(null, firstPane);
+          RaiseChildAdded(1, firstPane);
         }
       }
     }
@@ -212,7 +212,7 @@ namespace Steropes.UI.Widgets.Container
       {
         if (secondPane != null)
         {
-          RaiseChildrenChanged(secondPane, null);
+          RaiseChildRemoved(2, secondPane);
           secondPane.RemoveNotify(this);
         }
 
@@ -220,7 +220,7 @@ namespace Steropes.UI.Widgets.Container
 
         if (secondPane != null)
         {
-          RaiseChildrenChanged(null, secondPane);
+          RaiseChildAdded(2, secondPane);
           secondPane.AddNotify(this);
         }
       }

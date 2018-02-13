@@ -90,6 +90,7 @@
     <Compile Include="AssertionHelper.cs" />
     <Compile Include="Bindings\AutoBindingCreationTest.cs" />
     <Compile Include="Bindings\BindingAssertions.cs" />
+    <Compile Include="Bindings\BindingExample.cs" />
     <Compile Include="Bindings\BindingFixtureElement.cs" />
     <Compile Include="Bindings\BindingMappingTest.cs" />
     <Compile Include="Bindings\BindingTargetTest.cs" />

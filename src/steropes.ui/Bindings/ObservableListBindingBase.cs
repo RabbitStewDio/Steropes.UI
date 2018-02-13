@@ -177,8 +177,8 @@ namespace Steropes.UI.Bindings
       }
     }
 
-    public abstract object SyncRoot { get; }
-    public abstract bool IsSynchronized { get; }
+    public virtual object SyncRoot => this;
+    public virtual bool IsSynchronized => false;
     
 
     public abstract void Add(T item);
@@ -201,7 +201,7 @@ namespace Steropes.UI.Bindings
     }
 
     public abstract bool Remove(T item);
-    public abstract bool IsReadOnly { get; }
+    public virtual bool IsReadOnly => false;
 
     public virtual int IndexOf(T item)
     {
@@ -220,7 +220,7 @@ namespace Steropes.UI.Bindings
     public abstract void RemoveAt(int index);
     public abstract T this[int index] { get; set; }
 
-    public abstract bool IsFixedSize { get; }
+    public virtual bool IsFixedSize => false;
     public abstract event PropertyChangedEventHandler PropertyChanged;
     public abstract event NotifyCollectionChangedEventHandler CollectionChanged;
 

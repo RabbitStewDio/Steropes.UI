@@ -943,7 +943,7 @@ namespace Steropes.UI.Components
         tooltip?.RemoveNotify(this);
         tooltip = value;
         tooltip?.AddNotify(this);
-        RaiseChildrenChanged(old, tooltip);
+        RaiseChildrenChanged(-1, old, null, tooltip, null);
         OnPropertyChanged();
       }
     }
@@ -1535,9 +1535,19 @@ namespace Steropes.UI.Components
       GetSibling(direction, this)?.GetFirstFocusableDescendant(direction)?.RequestFocus();
     }
 
-    protected void RaiseChildrenChanged(IWidget oldWidget, IWidget newWidget)
+    protected void RaiseChildAdded(int index, IWidget widget, object constraints = null)
     {
-      childrenChangedSupport?.Raise(this, new ContainerEventArgs(oldWidget, newWidget));
+      RaiseChildrenChanged(index, null, null, widget, constraints);
+    }
+
+    protected void RaiseChildRemoved(int index, IWidget widget, object constraints = null)
+    {
+      RaiseChildrenChanged(index, widget, constraints, null, null);
+    }
+
+    protected void RaiseChildrenChanged(int index, IWidget oldWidget, object oldConstraints, IWidget newWidget, object newConstraints)
+    {
+      childrenChangedSupport?.Raise(this, new ContainerEventArgs(index, oldWidget, oldConstraints, newWidget, newConstraints));
     }
 
     void OnGamePadButtonDown(object source, GamePadEventArgs args)

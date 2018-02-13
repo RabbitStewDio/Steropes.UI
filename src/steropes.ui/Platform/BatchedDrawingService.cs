@@ -100,7 +100,6 @@ namespace Steropes.UI.Platform
   {
     readonly Stack<Rectangle> scissorRects = new Stack<Rectangle>();
     readonly UITexture whitePixelTex;
-    bool disabled;
 
     IUITexture whitePixel;
 

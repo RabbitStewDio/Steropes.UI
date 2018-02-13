@@ -97,7 +97,7 @@ namespace Steropes.UI.Widgets.Container
       {
         // Sort order is "Top, Left, Right, Bottom".
         sortedWidgets.Clear();
-        var list = WidgetsWithConstraints();
+        var list = WidgetsWithConstraints;
         for (int idx = 0; idx < list.Count; idx += 1)
         {
           var widget = list[idx];
@@ -250,7 +250,7 @@ namespace Steropes.UI.Widgets.Container
       float verticalWidgetWidth = 0;
       float verticalWidgetHeight = 0;
 
-      var widgetsAndConstraints = WidgetsWithConstraints();
+      var widgetsAndConstraints = WidgetsWithConstraints;
       for (var index = 0; index < widgetsAndConstraints.Count; index++)
       {
         var widgetAndConstraint = widgetsAndConstraints[index];

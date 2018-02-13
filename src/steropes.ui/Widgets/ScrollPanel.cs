@@ -34,7 +34,7 @@ namespace Steropes.UI.Widgets
     {
       Scrollbar = new Scrollbar(style) { ScrollbarMode = ScrollbarMode.Auto };
       Scrollbar.AddNotify(this);
-      RaiseChildrenChanged(null, Scrollbar);
+      RaiseChildAdded(0, Scrollbar);
       Clip = true;
 
       MouseClicked += OnMouseClick;
