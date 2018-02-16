@@ -19,6 +19,36 @@ namespace Steropes.UI.Bindings
       return that.Map(b => b.Length);
     }
 
+    public static IReadOnlyObservableValue<string> Substring(this IReadOnlyObservableValue<string> that, int start, int count)
+    {
+      string SafeSubstring(string source)
+      {
+        if (source == null)
+        {
+          return null;
+        }
+
+        if (source.Length < start)
+        {
+          return "";
+        }
+
+        if (count < 0)
+        {
+          count = Math.Max(0, source.Length - start);
+        }
+
+        if (count == 0)
+        {
+          return "";
+        }
+
+        return source.Substring(start, count);
+      }
+
+      return that.Map(SafeSubstring);
+    }
+
     public static IReadOnlyObservableValue<bool> IsEqualTo(this IReadOnlyObservableValue<string> that,
                                                            string text,
                                                            StringComparison c = StringComparison.InvariantCulture)

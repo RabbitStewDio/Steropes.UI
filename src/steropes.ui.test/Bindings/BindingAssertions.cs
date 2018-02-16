@@ -34,13 +34,13 @@ namespace Steropes.UI.Test.Bindings
       
       var eventRecorder = self.Raise(nameof(INotifyCollectionChanged.CollectionChanged)).WithSender(subject);
 
-      if (!eventRecorder.First().Parameters.OfType<NotifyCollectionChangedEventArgs>().Any())
+      var targetEvents = eventRecorder.First().Parameters.OfType<NotifyCollectionChangedEventArgs>().ToList();
+      if (!targetEvents.Any())
       {
         throw new ArgumentException("No argument of event " + eventRecorder.EventName + " is of type <" + (object) typeof (NotifyCollectionChangedEventArgs) + ">.");
       }
 
-      if (eventRecorder.All(recordedEvent =>
-                              !recordedEvent.Parameters.OfType<NotifyCollectionChangedEventArgs>().Any(AssertEvent)))
+      if (!targetEvents.Any(AssertEvent))
       {
         Execute.Assertion.FailWith("Expected at least one event with arguments matching {0}, but found {1}.", args, eventRecorder.ToList());
       }

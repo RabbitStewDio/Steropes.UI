@@ -100,6 +100,7 @@
     <Compile Include="Bindings\ListBindingSinkTest.cs" />
     <Compile Include="Bindings\ListBindingTransformationTest.cs" />
     <Compile Include="Bindings\NColChngEvtArgFix.cs" />
+    <Compile Include="Bindings\WidgetBindingTests.cs" />
     <Compile Include="ExpressionCache.cs" />
     <Compile Include="FunctionRecorder.cs" />
     <Compile Include="LayoutTestStyle.cs" />

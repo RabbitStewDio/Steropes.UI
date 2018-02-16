@@ -13,6 +13,7 @@ namespace Steropes.UI.Bindings
     readonly IReadOnlyObservableValue<TSource> sourceBinding;
     TSource source;
     TValue value;
+    bool alreadyHandlingChange;
 
     public TypeSafePropertyBinding(IReadOnlyObservableValue<TSource> sourceBinding,
                                    string name,
@@ -103,7 +104,18 @@ namespace Steropes.UI.Bindings
     [NotifyPropertyChangedInvocator]
     void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
-      PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+      if (!alreadyHandlingChange)
+      {
+        try
+        {
+          alreadyHandlingChange = true;
+          PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+        finally
+        {
+          alreadyHandlingChange = false;
+        }
+      }
     }
   }
 }

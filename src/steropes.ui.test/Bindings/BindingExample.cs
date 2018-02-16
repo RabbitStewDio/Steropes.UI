@@ -11,6 +11,9 @@ using Steropes.UI.Widgets.Container;
 
 namespace Steropes.UI.Test.Bindings
 {
+  /// <summary>
+  ///  Sample code from the documentation.
+  /// </summary>
   public class BindingExample
   {
     class PowerUp : IPowerUp
@@ -81,30 +84,29 @@ namespace Steropes.UI.Test.Bindings
         new Label(style)
         {
           Anchor = AnchoredRect.CreateTopLeftAnchored(10, 10)
-        }.DoWith(l => { player.BindingFor(p => p.Name).BindTo(text => l.Text = text); }),
+        }.DoWith(l => player.BindingFor(p => p.Name).BindTo(text => l.Text = text)),
+        
         // Hitpoints in the top-right corner of the screen
         new Label(style)
         {
           Anchor = AnchoredRect.CreateTopRightAnchored(10, 10)
-        }.DoWith(l =>
-        {
-          player
-            .BindingFor(p => p.HitPoints)
-            .Map(value => $"{value:D}")
-            .BindTo(text => l.Text = text);
-        }),
+        }.DoWith(l => player
+                   .BindingFor(p => p.HitPoints)
+                   .Map(value => $"{value:D}")
+                   .BindTo(text => l.Text = text)),
+
         // Powerups in the top center of the screen
         new BoxGroup(style)
-        {
-          Anchor = new AnchoredRect(null, 10, null, null, null, null)
-        }.DoWith(bg =>
-        {
-          player.Inventory.ToBinding()
-            .Map(pu => powerUpIcons[pu] ?? notFoundIcon)
-            .Map(img => new Image(style) { Texture = img })
-            .Map(w => new WidgetAndConstraint<bool>(w, false))
-            .BindTo(bg);
-        })
+          {
+            Anchor = new AnchoredRect(null, 10, null, null, null, null)
+          }
+          // take the power-ups, map them to textures and build image-widgets.
+          // then we'll add those to a list.
+          .DoWith(bg => player.Inventory.ToBinding()
+                    .Map(pu => powerUpIcons[pu] ?? notFoundIcon)
+                    .Map(img => new Image(style) { Texture = img })
+                    .Map(w => new WidgetAndConstraint<bool>(w))
+                    .BindTo(bg))
       };
     }
   }

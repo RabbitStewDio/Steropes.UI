@@ -15,6 +15,7 @@ namespace Steropes.UI.Bindings
     readonly string propertyName;
     object source;
     object value;
+    bool alreadyHandlingChange;
 
     PropertyMemberBinding(IReadOnlyObservableValue source)
     {
@@ -147,7 +148,18 @@ namespace Steropes.UI.Bindings
     [NotifyPropertyChangedInvocator]
     void OnPropertyChanged([CallerMemberName] string propertyName1 = null)
     {
-      PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName1));
+      if (!alreadyHandlingChange)
+      {
+        try
+        {
+          alreadyHandlingChange = true;
+          PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName1));
+        }
+        finally
+        {
+          alreadyHandlingChange = false;
+        }
+      }
     }
   }
 }

@@ -7,5 +7,11 @@ namespace Steropes.UI.Bindings
   {
     new void Clear();
     void Move(int sourceIdx, int targetIdx);
+
+    new int Count { get; }
+    new T this[int index] { get; set; }
+    new bool IsReadOnly { get; }
+    new void RemoveAt(int index);
   }
+
 }

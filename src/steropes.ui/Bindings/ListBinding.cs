@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -8,164 +7,86 @@ using System.Linq;
 
 namespace Steropes.UI.Bindings
 {
-  public static class ListBinding
+  internal class IndexerBinding<T> : IObservableValue<T>
   {
-    const string IndexerName = "Item[]";
+    readonly IObservableListBinding<T> source;
+    readonly int index;
+    readonly T defaultValue;
+    bool alreadyHandlingEvent;
+    T value;
 
-    class ReadOnlyObservableCollectionWrapper<T> : IReadOnlyObservableListBinding<T>
+    public IndexerBinding(IObservableListBinding<T> source, int index, T defaultValue = default(T))
     {
-      readonly ReadOnlyObservableCollection<T> self;
-
-      public ReadOnlyObservableCollectionWrapper(ReadOnlyObservableCollection<T> self)
-      {
-        this.self = self ?? throw new ArgumentNullException(nameof(self));
-        ((INotifyPropertyChanged) this.self).PropertyChanged += OnParentPropertyChanged;
-        ((INotifyCollectionChanged) self).CollectionChanged += OnParentCollectionChanged;
-      }
-
-      public void Dispose()
-      {
-        ((INotifyPropertyChanged) self).PropertyChanged -= OnParentPropertyChanged;
-        ((INotifyCollectionChanged) self).CollectionChanged -= OnParentCollectionChanged;
-      }
-
-      public IReadOnlyList<IBindingSubscription> Sources => new IReadOnlyObservableValue[0];
-
-      IEnumerator IEnumerable.GetEnumerator()
-      {
-        return GetEnumerator();
-      }
-
-      public IEnumerator<T> GetEnumerator()
-      {
-        return self.GetEnumerator();
-      }
-
-      public int Count => self.Count;
-
-      public T this[int index]
-      {
-        get { return self[index]; }
-      }
-
-      public event PropertyChangedEventHandler PropertyChanged;
-      public event NotifyCollectionChangedEventHandler CollectionChanged;
-
-      void OnParentCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-      {
-        CollectionChanged?.Invoke(this, e);
-      }
-
-      void OnParentPropertyChanged(object sender, PropertyChangedEventArgs e)
-      {
-        PropertyChanged?.Invoke(this, e);
-      }
+      this.source = source ?? throw new ArgumentNullException(nameof(source));
+      this.index = index;
+      this.defaultValue = defaultValue;
+      this.source.CollectionChanged += OnCollectionChanged;
     }
 
-    class ObservableArrayBinding<T> : ReadOnlyObservableListBindingBase<T>
+    IList<T> SourceAsList => source;
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    public void Dispose()
     {
-      readonly IReadOnlyObservableValue<IReadOnlyList<T>> listValue;
-      IReadOnlyList<T> data;
-      int count;
+      source.CollectionChanged -= OnCollectionChanged;
+    }
 
-      public ObservableArrayBinding(IReadOnlyObservableValue<IReadOnlyList<T>> listValue)
+    void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    {
+      if (!alreadyHandlingEvent)
       {
-        this.listValue = listValue;
-        this.listValue.PropertyChanged += OnDataChanged;
-        this.data = listValue.Value;
-        this.count = data?.Count ?? 0;
-      }
-
-      public override void Dispose()
-      {
-        this.listValue.PropertyChanged -= OnDataChanged;
-      }
-
-      public override IReadOnlyList<IBindingSubscription> Sources => new IBindingSubscription[] { listValue };
-
-      void OnDataChanged(object sender, PropertyChangedEventArgs e)
-      {
-        data = listValue.Value;
-        SetCount(data?.Count ?? 0);
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IndexerName)));
-        CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-      }
-
-      public override int Count
-      {
-        get { return count; }
-      }
-
-      void SetCount(int value)
-      {
-        if (value != count)
+        try
         {
-          count = value;
-          PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
+          alreadyHandlingEvent = true;
+          Value = Fetch();
+        }
+        finally
+        {
+          alreadyHandlingEvent = false;
         }
       }
-
-      public override T this[int index]
-      {
-        get { return data[index]; }
-      }
-
-      public override event PropertyChangedEventHandler PropertyChanged;
-      public override event NotifyCollectionChangedEventHandler CollectionChanged;
     }
 
-    class BulkChangeListBinding<T> : ReadOnlyObservableListBindingBase<T>
+    T Fetch()
     {
-      static readonly T[] empty = new T[0];
-
-      readonly IReadOnlyObservableListBinding<T> parent;
-      readonly Func<IReadOnlyList<T>, IReadOnlyList<T>> onChange;
-      IReadOnlyList<T> data;
-
-      public BulkChangeListBinding(IReadOnlyObservableListBinding<T> parent,
-                                   Func<IReadOnlyList<T>, IReadOnlyList<T>> onChange)
+      if (index < SourceAsList.Count)
       {
-        this.parent = parent ?? throw new ArgumentNullException(nameof(parent));
-        this.onChange = onChange ?? throw new ArgumentNullException(nameof(onChange));
-        this.parent.PropertyChanged += OnParentPropertyChanged;
-        this.data = onChange(parent) ?? empty;
+        return SourceAsList[index];
       }
 
-      public override void Dispose()
-      {
-        this.parent.PropertyChanged -= OnParentPropertyChanged;
-      }
-
-      public override IReadOnlyList<IBindingSubscription> Sources => new IBindingSubscription[] { parent };
-
-      void Refresh()
-      {
-        this.data = onChange(parent) ?? empty;
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(IndexerName));
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
-        CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
-      }
-
-      void OnParentCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-      {
-        Refresh();
-      }
-
-      void OnParentPropertyChanged(object sender, PropertyChangedEventArgs e)
-      {
-        Refresh();
-      }
-
-      public override int Count => data.Count;
-
-      public override T this[int index]
-      {
-        get { return data[index]; }
-      }
-
-      public override event PropertyChangedEventHandler PropertyChanged;
-      public override event NotifyCollectionChangedEventHandler CollectionChanged;
+      return defaultValue;
     }
+
+    object IReadOnlyObservableValue.Value => Value;
+
+    public T Value
+    {
+      get { return value; }
+      set
+      {
+        if (Equals(value, this.value))
+        {
+          return;
+        }
+
+        while (index >= SourceAsList.Count)
+        {
+          source.Add(defaultValue);
+        }
+
+        this.value = value;
+        source[index] = value;
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Value)));
+      }
+    }
+
+    public IReadOnlyList<IBindingSubscription> Sources { get; }
+  }
+
+  public static class ListBinding
+  {
+    internal const string IndexerName = "Item[]";
 
     public static IObservableListBinding<T> ToBinding<T>(this ObservableCollection<T> self)
     {
@@ -259,7 +180,12 @@ namespace Steropes.UI.Bindings
       });
     }
 
-    public static IReadOnlyObservableValue<T> ItemAt<T>(this IReadOnlyObservableListBinding<T> source, int index)
+    public static IReadOnlyObservableValue<T> First<T>(this IReadOnlyObservableListBinding<T> source, T defaultValue = default(T))
+    {
+      return source.ItemAt(0, defaultValue);
+    }
+
+    public static IReadOnlyObservableValue<T> ItemAt<T>(this IReadOnlyObservableListBinding<T> source, int index, T defaultValue = default(T))
     {
       T ConditionalGet(IReadOnlyObservableListBinding<T> l)
       {
@@ -268,7 +194,7 @@ namespace Steropes.UI.Bindings
           return l[index];
         }
 
-        return default(T);
+        return defaultValue;
       }
 
       var constBinding = new ConstBinding<IReadOnlyObservableListBinding<T>>(source);
@@ -277,23 +203,58 @@ namespace Steropes.UI.Bindings
                                                                                ConditionalGet);
     }
 
+    public static IReadOnlyObservableValue<T> Last<T>(this IReadOnlyObservableListBinding<T> source, T defaultValue = default(T))
+    {
+      T ConditionalGet(IReadOnlyObservableListBinding<T> l)
+      {
+        if (l.Count > 0)
+        {
+          return l[l.Count - 1];
+        }
+
+        return defaultValue;
+      }
+
+      var constBinding = new ConstBinding<IReadOnlyObservableListBinding<T>>(source);
+      return new TypeSafePropertyBinding<IReadOnlyObservableListBinding<T>, T>(constBinding,
+                                                                               IndexerName,
+                                                                               ConditionalGet);
+    }
+
+    public static IObservableValue<T> ItemAt<T>(this IObservableListBinding<T> source, int index, T defaultValue = default(T))
+    {
+      return new IndexerBinding<T>(source, index, defaultValue);
+    }
+
+    public static IBindingSubscription BindTo<T>(this IReadOnlyObservableValue<IReadOnlyList<T>> source,
+                                 IObservableListBinding<T> target)
+    {
+      return new OneWayListBinding<T>(target, source);
+    }
+
+    public static IBindingSubscription BindTo<T>(this IReadOnlyObservableListBinding<T> source,
+                                 IObservableListBinding<T> target)
+    {
+      return new OneWayObservableListBinding<T>(target, source);
+    }
+
     public static IBindingSubscription BindTo<T>(this IReadOnlyObservableValue<IReadOnlyList<T>> source,
                                  ObservableCollection<T> target)
     {
-      return new OneWayListBinding<T>(target.ToBinding(), source);
+      return source.BindTo(target.ToBinding());
     }
 
     public static IBindingSubscription BindTo<T>(this IReadOnlyObservableListBinding<T> source,
                                  ObservableCollection<T> target)
     {
-      return new OneWayObservableListBinding<T>(target.ToBinding(), source);
+      return source.BindTo(target.ToBinding());
     }
 
     public static IBindingSubscription BindTwoWay<T>(this IObservableListBinding<T> source,
                                             ObservableCollection<T> target)
     {
       var targetBinding = target.ToBinding();
-      return new TwoWayListBinding<T>(targetBinding, source);
+      return source.BindTwoWay(targetBinding);
     }
 
     public static IBindingSubscription BindTwoWay<T>(this IObservableListBinding<T> source,

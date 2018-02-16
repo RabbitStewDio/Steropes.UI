@@ -130,6 +130,7 @@ namespace Steropes.UI.Widgets.TextWidgets
         {
           Content.Document.SetText(value);
           InvalidateLayout();
+          OnPropertyChanged();
         }
       }
     }

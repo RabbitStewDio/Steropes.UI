@@ -20,6 +20,7 @@ namespace Steropes.UI.Bindings
   public class ObservableListBinding<T> : IObservableListBinding<T>
   {
     readonly ObservableCollection<T> self;
+    bool alreadyHandlingChange;
 
     public ObservableListBinding(ObservableCollection<T> self)
     {
@@ -38,12 +39,35 @@ namespace Steropes.UI.Bindings
 
     void OnParentCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
-      CollectionChanged?.Invoke(this, e);
+      if (!alreadyHandlingChange)
+      {
+        try
+        {
+          alreadyHandlingChange = true;
+          CollectionChanged?.Invoke(this, e);
+        }
+        finally
+        {
+          alreadyHandlingChange = false;
+        }
+      }
     }
 
     void OnParentPropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-      PropertyChanged?.Invoke(this, e);
+      if (!alreadyHandlingChange)
+      {
+        try
+        {
+          alreadyHandlingChange = true;
+          PropertyChanged?.Invoke(this, e);
+        }
+        finally
+        {
+          alreadyHandlingChange = false;
+        }
+      }
+
     }
 
     public void Move(int sourceIdx, int targetIdx)

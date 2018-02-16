@@ -23,14 +23,35 @@ namespace Steropes.UI.Bindings
     }
 
     /// <summary>
+    ///  Returns a binding that creates a direct binding from the source object to the property 
+    ///  named in the ``propertyName`` parameter. The value for the property is extracted using 
+    ///  the provided delegate function.
+    /// <para/>
+    ///  Note: This method will create a single binding segment. If you want to bind a chain of 
+    ///  property accessors use the <see cref="ChainFor{TSource,TValue}"/> method instead.
+    /// </summary>
+    /// <typeparam name="TSource"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="propertyName"></param>
+    /// <param name="getter"></param>
+    /// <returns></returns>
+    public static IReadOnlyObservableValue<TValue> BindingFor<TSource, TValue>(this TSource source, string propertyName, Func<TSource, TValue> getter)
+    {
+      return new TypeSafePropertyBinding<TSource, TValue>(new ConstBinding<TSource>(source), propertyName, getter);
+    }
+
+
+    /// <summary>
     ///  Returns a binding for the property accessed by the given expression. This method attempts
     ///  to parse the expression tree to extract the name of the property that should be monitored.
     ///  It will select the first property or field access it finds as property name for monitoring.
     ///  <para/>
     ///  Although it is possible to perform basic arithmetics or even function calls here, I 
-    ///  recommend that such operations are performed in a separate #Map(..) call instead. This will
-    ///  create bindings that express the intent of these operations more clearly and will yield more 
-    ///  stable bindings that are resilient to refactorings or other code changes.
+    ///  recommend that such operations are performed in a separate <see cref="Map{TSource,TTarget}"/>
+    ///  call instead. This will create bindings that express the intent of these operations more 
+    ///  clearly and will yield more stable bindings that are resilient to refactorings or other 
+    ///  code changes.
     /// </summary>
     /// <typeparam name="TSource"></typeparam>
     /// <typeparam name="TValue"></typeparam>
@@ -44,6 +65,19 @@ namespace Steropes.UI.Bindings
       return new ConstBinding<TSource>(source).Bind(memberExpression);
     }
 
+    /// <summary>
+    ///  Creates a continuation binding that will bind to the value contained in the 
+    ///  ``IReadOnlyObservableValue`` provided as source using the given member expression as 
+    ///   extractor function. The binding will reevaluate when either the source-binding's
+    ///   value changes or when the contained value signals a property change.
+    /// <para/>
+    ///  Note: This does not create a chained binding.
+    /// </summary>
+    /// <typeparam name="TSource"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="memberExpression"></param>
+    /// <returns></returns>
     public static IReadOnlyObservableValue<TValue> Bind<TSource, TValue>(this IReadOnlyObservableValue<TSource> source,
       Expression<Func<TSource, TValue>> memberExpression)
     {
@@ -61,20 +95,59 @@ namespace Steropes.UI.Bindings
         throw new ArgumentException("Cannot determine property name for binding.");
       }
 
-      return new TypeSafePropertyBinding<TSource, TValue>(source, propertyName, memberExpression.Compile());
+      return Bind(source, propertyName, memberExpression.Compile());
     }
 
-    public static IReadOnlyObservableValue<TValue> BindingFor<TSource, TValue>(this TSource source, string propertyName, Func<TSource, TValue> getter)
+    /// <summary>
+    ///  Creates a continuation binding that will bind to the value contained in the 
+    ///  ``IReadOnlyObservableValue`` provided as source using the given extractor function. 
+    ///   The binding will reevaluate when either the source-binding's value changes or when 
+    ///   the contained value signals a property change for the property named in the
+    ///   ``propertyName`` parameter.
+    /// <para/>
+    ///  Note: This does not create a chained binding.
+    /// </summary>
+    /// <typeparam name="TSource"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="propertyName"></param>
+    /// <param name="memberExpression"></param>
+    /// <returns></returns>
+    public static IReadOnlyObservableValue<TValue> Bind<TSource, TValue>(this IReadOnlyObservableValue<TSource> source,
+                                                                         string propertyName, 
+                                                                         Func<TSource, TValue> memberExpression)
     {
-      return new TypeSafePropertyBinding<TSource, TValue>(new ConstBinding<TSource>(source), propertyName, getter);
+      if (propertyName == null)
+      {
+        throw new ArgumentException("Cannot determine property name for binding.");
+      }
+
+      return new TypeSafePropertyBinding<TSource, TValue>(source, propertyName, memberExpression);
     }
 
+    /// <summary>
+    ///  Binds the given observable value to the action provided. Use this to apply a bound value to
+    /// its target object.
+    /// </summary>
+    /// <typeparam name="TValue"></typeparam>
+    /// <param name="value"></param>
+    /// <param name="setter"></param>
     public static void BindTo<TValue>(this IReadOnlyObservableValue<TValue> value, Action<TValue> setter)
     {
       value.PropertyChanged += (s, a) => setter(value.Value);
       setter(value.Value);
     }
 
+    /// <summary>
+    ///  Create a chained binding for the properties accessed in the member expression. This will
+    ///  create a binding for each member access in the given expression and the resulting binding
+    ///  will change when either segment or the source signals a property change notification.
+    /// </summary>
+    /// <typeparam name="TSource"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="memberExpression"></param>
+    /// <returns></returns>
     public static IReadOnlyObservableValue<TValue> ChainFor<TSource, TValue>(
       this TSource source,
       Expression<Func<TSource, TValue>> memberExpression)
@@ -82,6 +155,16 @@ namespace Steropes.UI.Bindings
       return new ConstBinding<TSource>(source).Chain(memberExpression);
     }
 
+    /// <summary>
+    ///  Create a chained continuation binding for the properties accessed in the member expression. 
+    ///  This will create a binding for each member access in the given expression and the resulting 
+    ///  binding will change when either segment or the source signals a property change notification.
+    /// </summary>
+    /// <typeparam name="TSource"></typeparam>
+    /// <typeparam name="TValue"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="memberExpression"></param>
+    /// <returns></returns>
     public static IReadOnlyObservableValue<TValue> Chain<TSource, TValue>(
       this IReadOnlyObservableValue<TSource> source,
       Expression<Func<TSource, TValue>> memberExpression)
@@ -91,11 +174,30 @@ namespace Steropes.UI.Bindings
       return binding.AsInstanceOf<TValue>();
     }
 
-    public static IReadOnlyObservableValue<TValue> AsInstanceOf<TValue>(this IReadOnlyObservableValue source)
+    /// <summary>
+    ///  Provides a safe cast operation on the binding value. The binding will evaluate either to
+    ///  a valid TValue instance or the built-in default value (ie null for reference objects).
+    /// </summary>
+    /// <typeparam name="TValue"></typeparam>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static IReadOnlyObservableValue<TValue> AsInstanceOf<TValue>(this IReadOnlyObservableValue source, TValue defaultValue = default(TValue))
     {
-      return new CastingReadOnlyObservableValue<TValue>(source);
+      return new CastingReadOnlyObservableValue<TValue>(source, defaultValue);
     }
 
+    /// <summary>
+    ///  Creates a chained binding for the given expression. This method will try to 
+    ///  use the first member access as source of the binding chain. This first member access
+    ///  may be a implicit ```this`` or a member access to an automatically generated closure
+    ///  object. If this method results in unpredictable results, switch to the alternative
+    ///  <see cref="ChainFor{TSource,TValue}"/> or 
+    ///  <see cref="BindingFor{TSource,TValue}(TSource,System.Linq.Expressions.Expression{System.Func{TSource,TValue}})"/>
+    ///  methods instead.
+    /// </summary>
+    /// <typeparam name="TValue"></typeparam>
+    /// <param name="memberExpression"></param>
+    /// <returns></returns>
     public static IReadOnlyObservableValue Create<TValue>(Expression<Func<TValue>> memberExpression)
     {
       var currentExpression = memberExpression.Body;
@@ -114,14 +216,14 @@ namespace Steropes.UI.Bindings
       return new TransformingBinding<TSource, TTarget>(source, mapping);
     }
 
-    public static IReadOnlyObservableValue Filter(this IReadOnlyObservableValue source, Func<object, bool> filter)
+    public static IReadOnlyObservableValue Filter(this IReadOnlyObservableValue source, Func<object, bool> filter, object defaultValue = null)
     {
-      return Map(source, v => filter(v) ? v : null);
+      return source.Map(v => filter(v) ? v : defaultValue);
     }
 
-    public static IReadOnlyObservableValue Filter<T>(this IReadOnlyObservableValue<T> source, Func<T, bool> filter)
+    public static IReadOnlyObservableValue Filter<T>(this IReadOnlyObservableValue<T> source, Func<T, bool> filter, T defaultValue = default(T))
     {
-      return source.Map(v => filter(v) ? v : default(T));
+      return source.Map(v => filter(v) ? v : defaultValue);
     }
 
     public static IReadOnlyObservableValue OrElse<T>(this IReadOnlyObservableValue<T> source, T fallback) where T: class
@@ -250,6 +352,25 @@ namespace Steropes.UI.Bindings
       }
 
       throw new ArgumentException("Cannot have expression of type " + currentExpression.NodeType + " in call chain.");
+    }
+
+    public static void Unbind(this IBindingSubscription sub)
+    {
+      sub?.Dispose();
+    }
+
+    public static void UnbindChain(this IBindingSubscription sub)
+    {
+      if (sub == null)
+      {
+        return;
+      }
+
+      sub.Dispose();
+      foreach (var source in sub.Sources)
+      {
+        source.UnbindChain();
+      }
     }
   }
 }

@@ -9,11 +9,13 @@ namespace Steropes.UI.Bindings
   class CastingReadOnlyObservableValue<TValue> : IReadOnlyObservableValue<TValue>
   {
     readonly IReadOnlyObservableValue parent;
+    readonly TValue defaultValue;
     TValue value;
 
-    public CastingReadOnlyObservableValue(IReadOnlyObservableValue parent)
+    public CastingReadOnlyObservableValue(IReadOnlyObservableValue parent, TValue defaultValue)
     {
       this.parent = parent ?? throw new ArgumentNullException(nameof(parent));
+      this.defaultValue = defaultValue;
       this.parent.PropertyChanged += OnSourceChanged;
     }
 
@@ -27,7 +29,7 @@ namespace Steropes.UI.Bindings
         }
         else
         {
-          Value = default(TValue);
+          Value = defaultValue;
         }
       }
     }

@@ -87,6 +87,7 @@
     <Compile Include="Annotations\Annotations.cs" />
     <Compile Include="Bindings\Binding.cs" />
     <Compile Include="Bindings\BooleanBindings.cs" />
+    <Compile Include="Bindings\BulkChangeListBinding.cs" />
     <Compile Include="Bindings\CastingReadOnlyObservableValue.cs" />
     <Compile Include="Bindings\ConstBinding.cs" />
     <Compile Include="Bindings\DelegateBoundBinding.cs" />
@@ -97,10 +98,12 @@
     <Compile Include="Bindings\IReadOnlyObservableValue.cs" />
     <Compile Include="Bindings\ListBinding.cs" />
     <Compile Include="Bindings\ListSynchronizer.cs" />
+    <Compile Include="Bindings\ObservableArrayBinding.cs" />
     <Compile Include="Bindings\ObservableListBinding.cs" />
     <Compile Include="Bindings\ObservableValue.cs" />
     <Compile Include="Bindings\OneWayListBinding.cs" />
     <Compile Include="Bindings\OneWayObservableListBinding.cs" />
+    <Compile Include="Bindings\ReadOnlyObservableCollectionWrapper.cs" />
     <Compile Include="Bindings\ReadOnlyObservableListBindingBase.cs" />
     <Compile Include="Bindings\TransformingBinding.cs" />
     <Compile Include="Bindings\TransformingListBinding.cs" />

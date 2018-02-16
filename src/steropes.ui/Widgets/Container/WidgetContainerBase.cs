@@ -298,7 +298,7 @@ namespace Steropes.UI.Widgets.Container
 
     public TConstraint Constraint { get; }
 
-    public WidgetAndConstraint(IWidget widget, TConstraint constraint)
+    public WidgetAndConstraint(IWidget widget, TConstraint constraint = default(TConstraint))
     {
       Widget = widget;
       Constraint = constraint;

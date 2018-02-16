@@ -15,8 +15,9 @@ namespace Steropes.UI.Bindings
       return new WidgetBinding<TConstraint>(container);
     }
 
-    public static IBindingSubscription BindTo<TConstraint>(this IReadOnlyObservableListBinding<WidgetAndConstraint<TConstraint>> self,
-                                           WidgetContainer<TConstraint> widget)
+    public static IBindingSubscription BindTo<TConstraint>(
+      this IReadOnlyObservableListBinding<WidgetAndConstraint<TConstraint>> self,
+      WidgetContainer<TConstraint> widget)
     {
       return new WidgetSink<TConstraint>(self, widget);
     }
@@ -24,15 +25,59 @@ namespace Steropes.UI.Bindings
 
   class WidgetSink<TConstraint> : WidgetContainerSynchronizer<TConstraint>, IBindingSubscription
   {
-    public WidgetSink(IReadOnlyObservableListBinding<WidgetAndConstraint<TConstraint>> sourceList, 
+    bool processingEvent;
+
+    public WidgetSink(IReadOnlyObservableListBinding<WidgetAndConstraint<TConstraint>> sourceList,
                       WidgetContainer<TConstraint> target) : base(sourceList, target)
     {
-       SourceList.CollectionChanged += HandleSourceCollectionChanged;
+      if (target.Count != 0)
+      {
+        throw new InvalidOperationException("Cannot bind to a widget that already contains other content.");
+      }
+
+      target.ChildrenChanged += OnValidateChildrenChanged;
+
+      SourceList.CollectionChanged += CheckedChangeHandler;
+    }
+
+    void CheckedChangeHandler(object sender, NotifyCollectionChangedEventArgs e)
+    {
+      if (processingEvent)
+      {
+        return;
+      }
+
+      try
+      {
+        processingEvent = true;
+        HandleSourceCollectionChanged(sender, e);
+      }
+      finally
+      {
+        processingEvent = false;
+      }
+    }
+
+    void OnValidateChildrenChanged(object sender, ContainerEventArgs e)
+    {
+      if (processingEvent)
+      {
+        // probably ok
+        return;
+      }
+
+      // Not a tooltip or overlay change?
+      if (e.Index != -1)
+      {
+        throw new InvalidOperationException(
+          "This widget has an active binding and should not be modified from elsewhere.");
+      }
     }
 
     public void Dispose()
     {
-       SourceList.CollectionChanged -= HandleSourceCollectionChanged;
+      SourceList.CollectionChanged -= HandleSourceCollectionChanged;
+      Target.ChildrenChanged -= OnValidateChildrenChanged;
     }
 
     public IReadOnlyList<IBindingSubscription> Sources => new IBindingSubscription[] { SourceList };
@@ -60,7 +105,8 @@ namespace Steropes.UI.Bindings
       if (e.RemovedChild != null)
       {
         CollectionChanged?.Invoke(
-          this, Create(NotifyCollectionChangedAction.Remove, e.RemovedChild, (TConstraint) e.RemovedConstraints));
+          this,
+          Create(NotifyCollectionChangedAction.Remove, e.Index, e.RemovedChild, (TConstraint) e.RemovedConstraints));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IndexerName)));
       }
@@ -68,16 +114,19 @@ namespace Steropes.UI.Bindings
       if (e.AddedChild != null)
       {
         CollectionChanged?.Invoke(
-          this, Create(NotifyCollectionChangedAction.Add, e.AddedChild, (TConstraint) e.AddedConstraints));
+          this, Create(NotifyCollectionChangedAction.Add, e.Index, e.AddedChild, (TConstraint) e.AddedConstraints));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IndexerName)));
       }
     }
 
-    NotifyCollectionChangedEventArgs Create(NotifyCollectionChangedAction action, IWidget w, TConstraint constraint)
+    NotifyCollectionChangedEventArgs Create(NotifyCollectionChangedAction action,
+                                            int index,
+                                            IWidget w,
+                                            TConstraint constraint)
     {
-      return new NotifyCollectionChangedEventArgs(
-        action, new List<WidgetAndConstraint<TConstraint>> { new WidgetAndConstraint<TConstraint>(w, constraint) });
+      var items = new List<WidgetAndConstraint<TConstraint>> { new WidgetAndConstraint<TConstraint>(w, constraint) };
+      return new NotifyCollectionChangedEventArgs(action, items, index);
     }
 
     public override int Count => widget.Count;

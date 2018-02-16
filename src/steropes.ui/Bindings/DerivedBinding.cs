@@ -67,6 +67,5 @@ namespace Steropes.UI.Bindings
         }
       }
     }
-
   }
 }

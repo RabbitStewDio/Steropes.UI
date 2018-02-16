@@ -115,6 +115,37 @@ namespace Steropes.UI.Test.Bindings
     public void Create_ItemBinding()
     {
       var backend = new ObservableCollection<string>();
+      var binding = new ReadOnlyObservableCollection<string>(backend).ToBinding().ItemAt(1);
+
+      using (var monitoredBinding = binding.Monitor<INotifyPropertyChanged>())
+      {
+        backend.Add("Test");
+        monitoredBinding.Should().NotRaise(nameof(INotifyPropertyChanged.PropertyChanged));
+
+        binding.Value.Should().BeNull();
+      }
+
+      using (var monitoredBinding = binding.Monitor<INotifyPropertyChanged>())
+      {
+        backend.Add("Test2");
+        monitoredBinding.Should().RaisePropertyChange(binding, nameof(IReadOnlyObservableValue.Value));
+
+        binding.Value.Should().Be("Test2");
+      }
+
+      using (var monitoredBinding = binding.Monitor<INotifyPropertyChanged>())
+      {
+        backend.Insert(0, "TestFirst");
+        monitoredBinding.Should().RaisePropertyChange(binding, nameof(IReadOnlyObservableValue.Value));
+
+        binding.Value.Should().Be("Test");
+      }
+    }
+
+    [Test]
+    public void Create_TwoWay_ItemBinding()
+    {
+      var backend = new ObservableCollection<string>();
       var binding = backend.ToBinding().ItemAt(1);
 
       using (var monitoredBinding = binding.Monitor<INotifyPropertyChanged>())
@@ -140,6 +171,24 @@ namespace Steropes.UI.Test.Bindings
 
         binding.Value.Should().Be("Test");
       }
+    }
+
+    [Test]
+    public void Create_TwoWay_ItemBinding_Modifications()
+    {
+      var backend = new ObservableCollection<string>();
+      var binding = backend.ToBinding().ItemAt(10);
+
+      using (var monitoredBinding = binding.Monitor<INotifyPropertyChanged>())
+      {
+        binding.Value = "test";
+        monitoredBinding.Should().RaisePropertyChange(binding, nameof(IReadOnlyObservableValue.Value));
+
+        binding.Value.Should().Be("test");
+        backend.Count.Should().Be(11);
+        backend[10].Should().Be("test");
+      }
+
     }
   }
 }

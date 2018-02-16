@@ -10,6 +10,7 @@ namespace Steropes.UI.Bindings
     // ReSharper disable once StaticMemberInGenericType
     static readonly IReadOnlyObservableValue[] empty = new IReadOnlyObservableValue[0];
     T value;
+    bool alreadyHandlingChange;
 
     public ObservableValue()
     {
@@ -61,7 +62,18 @@ namespace Steropes.UI.Bindings
     [NotifyPropertyChangedInvocator]
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
-      PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+      if (!alreadyHandlingChange)
+      {
+        try
+        {
+          alreadyHandlingChange = true;
+          PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+        finally
+        {
+          alreadyHandlingChange = false;
+        }
+      }
     }
   }
 }

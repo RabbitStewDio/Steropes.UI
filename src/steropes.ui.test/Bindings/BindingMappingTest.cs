@@ -48,7 +48,7 @@ namespace Steropes.UI.Test.Bindings
     {
       ObservableValue<double?> subject = new ObservableValue<double?>(1000);
 
-      var binding = subject.Filter(v => v != null && v > 100);
+      var binding = subject.Filter(v => v != null && v > 100.0);
 
       using (var monitoredBinding = binding.Monitor<INotifyPropertyChanged>())
       {
@@ -84,6 +84,21 @@ namespace Steropes.UI.Test.Bindings
         monitoredBinding.Should().NotRaise(nameof(INotifyPropertyChanged.PropertyChanged));
         binding.Value.Should().Be("Fallback");
       }
+    }
+
+    [Test, MaxTime(500)]
+    public void BindingLoopTest()
+    {
+      ObservableValue<string> subject = new ObservableValue<string>("A");
+      ObservableValue<string> target = new ObservableValue<string>("A");
+
+      subject.Map(v => v + v).BindTo(v => target.Value = v);
+      target.BindTo(v => subject.Value = v);
+
+      subject.Value = "B";
+
+      subject.Value.Should().Be("BB");
+      target.Value.Should().Be("BB");
     }
   }
 }
