@@ -107,7 +107,7 @@ user input.
 ### Layout Container
 * Group - Arranges child content based on their "AnchorRect" property. Similar to 
   WPF's Canvas control.
-* LayeredPane - Like Group, but with explicit rendering/z-order for all widgets.
+* LayeredPane - Like a Group, but with explicit rendering/z-order for all widgets.
 * Grid - Arranges content into rows and columns. Similar to WPF's grid control, but 
   without row-/col-span support.
 * DockPanel - Docks content to the side of the panel. Same as the WPF class with the 
@@ -120,10 +120,8 @@ user input.
 Steropes-UI is available on NuGet. 
 
 The NuGet packages are compiled against MonoGame 3.6, but do _not_ contain 
-dependencies for the MonoGame, you will need to add a reference to 
+dependencies for the MonoGame, you will need to add a reference to a version of
 MonoGame 3.6 to your projects in addition to Steropes-UI. 
-
-The code compiles fine against MonoGame 3.5 if needed.
 
 Steropes-UI is split into a platform independend core library that only depends on the
 public Monogame API and a Windows library that contains additional, platform dependent 
@@ -157,8 +155,14 @@ There are a few areas I think that need additional work at a later stage:
   behaves badly when the UI should look the same regardless of the underlying
   resolution (for instance in full-screen display modes).
 
-* Add tree and table widgets for data centric UIs. Hardcore strategy games would benefit 
-  from that.
+* Add tree and table widgets for data centric UIs. Hardcore strategy games would 
+  benefit from that.
+
+* Add a DesktopPane/ChildWindow API so that it becomes easier to provide resizable
+  floating window widgets.
+  
+* Its funny, but we have no horizontal scroll bar and thus no ability to scroll 
+  content horizontally. That should change. 
 
 * Add a rich-text widget that is suitable for dispaying help texts. 
 
@@ -170,3 +174,7 @@ There are a few areas I think that need additional work at a later stage:
   are already generated, advanced features like reordering list items or inserting
   and removing items from a list or table via drag-and-drop require support from 
   the list and table implementations.
+  
+* Add an animation class that uses a Xna.Framework.Curve internally to describe the
+  animation. That should make it easier to model non-regular animations and given
+  that we delegate the hard math to XNA, it should not be hard to implement either.  

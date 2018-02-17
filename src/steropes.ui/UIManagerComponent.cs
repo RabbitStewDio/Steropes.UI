@@ -1,5 +1,5 @@
 // MIT License
-// Copyright (c) 2011-2016 Elisée Maurer, Sparklin Labs, Creative Patterns
+// Copyright (c) 2011-2016 ElisÃ©e Maurer, Sparklin Labs, Creative Patterns
 // Copyright (c) 2016 Thomas Morgner, Rabbit-StewDio Ltd.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
