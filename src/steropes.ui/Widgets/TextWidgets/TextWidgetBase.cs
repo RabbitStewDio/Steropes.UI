@@ -23,6 +23,7 @@ using Microsoft.Xna.Framework;
 using Steropes.UI.Components;
 using Steropes.UI.Platform;
 using Steropes.UI.Styles;
+using Steropes.UI.Widgets.Container;
 using Steropes.UI.Widgets.Styles;
 using Steropes.UI.Widgets.TextWidgets.Documents;
 using Steropes.UI.Widgets.TextWidgets.Documents.Views;
@@ -38,9 +39,35 @@ namespace Steropes.UI.Widgets.TextWidgets
     {
       textStyles = StyleSystem.StylesFor<TextStyleDefinition>();
 
+      ChildrenChanged += HandleOnChildrenChanged;
+      
       DocumentEditor = editor;
       Content = DocumentEditor.CreateDocumentView(AnchoredRect.CreateTopAnchored());
+
       WrapText = WrapText.Auto;
+    }
+
+    void HandleOnChildrenChanged(object sender, ContainerEventArgs e)
+    {
+      if (e.Index != 0)
+      {
+        return;
+      }
+
+      if (e.RemovedChild is TView cRemoved)
+      {
+        cRemoved.DocumentModified -= OnContentModified;
+      }
+      if (e.AddedChild is TView cAdded)
+      {
+        cAdded.DocumentModified += OnContentModified;
+      }
+    }
+
+
+    void OnContentModified(object sender, TextModificationEventArgs e)
+    {
+      OnPropertyChanged(nameof(Text));
     }
 
     public Alignment Alignment

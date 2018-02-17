@@ -77,6 +77,7 @@ namespace Steropes.UI.Widgets
         }
 
         OnContentUpdated();
+        OnPropertyChanged();
         InvalidateLayout();
       }
     }
@@ -177,12 +178,15 @@ namespace Steropes.UI.Widgets
       set
       {
         var v = value as TContent;
-        if (v == null)
-        {
-          throw new InvalidOperationException();
-        }
-        InternalContent = v;
+        InternalContent = v ?? throw new ArgumentNullException(nameof(value));
       }
+    }
+    
+    protected override void OnContentUpdated()
+    {
+      base.OnContentUpdated();
+      OnPropertyChanged(nameof(Content));
+
     }
   }
 }

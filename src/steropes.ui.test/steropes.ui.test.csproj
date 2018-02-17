@@ -138,6 +138,7 @@
     <Compile Include="UI\Widgets\BoxGroupTests.cs" />
     <Compile Include="UI\Widgets\ButtonTest.cs" />
     <Compile Include="UI\Widgets\CheckBoxTest.cs" />
+    <Compile Include="UI\Widgets\ContentWidgetTest.cs" />
     <Compile Include="UI\Widgets\DockPanelTest.cs" />
     <Compile Include="UI\Widgets\GridTest.cs" />
     <Compile Include="UI\Widgets\GroupTests.cs" />
