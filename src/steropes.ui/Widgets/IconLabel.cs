@@ -45,13 +45,13 @@ namespace Steropes.UI.Widgets
     {
       iconLabelStyle = StyleSystem.StylesFor<IconLabelStyleDefinition>();
 
-      Label = new Label(style) { Padding = new Insets(), Enabled = false };
-      Label.AddNotify(this);
-      RaiseChildrenChanged(null, Label);
-
       Image = new Image(style) { Padding = new Insets(), Enabled = false };
       Image.AddNotify(this);
-      RaiseChildrenChanged(null, Image);
+      RaiseChildAdded(0, Image);
+
+      Label = new Label(style) { Padding = new Insets(), Enabled = false };
+      Label.AddNotify(this);
+      RaiseChildAdded(1, Label);
     }
 
     public Alignment Alignment

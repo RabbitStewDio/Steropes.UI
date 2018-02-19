@@ -113,8 +113,7 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
       chunk.Measure(Size.Auto);
       chunk.Arrange(new Rectangle(10, 20, chunk.DesiredSize.WidthInt, chunk.DesiredSize.HeightInt));
 
-      Rectangle rect;
-      chunk.ModelToView(chunk.EndOffset, out rect).Should().BeTrue();
+      chunk.ModelToView(chunk.EndOffset, out var rect).Should().BeTrue();
       rect.Should().Be(new Rectangle(chunk.LayoutRect.Right, 20, 0, 15));
     }
 
@@ -125,8 +124,7 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
       chunk.Measure(Size.Auto);
       chunk.Arrange(new Rectangle(10, 20, chunk.DesiredSize.WidthInt, chunk.DesiredSize.HeightInt));
 
-      Rectangle rect;
-      chunk.ModelToView(chunk.Offset, out rect).Should().BeTrue();
+      chunk.ModelToView(chunk.Offset, out var rect).Should().BeTrue();
       rect.Should().Be(new Rectangle(10, 20, 11, 15));
     }
 
@@ -137,8 +135,7 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
       chunk.Measure(Size.Auto);
       chunk.Arrange(new Rectangle(10, 20, chunk.DesiredSize.WidthInt, chunk.DesiredSize.HeightInt));
 
-      Rectangle rect;
-      chunk.ModelToView(chunk.EndOffset - 1, out rect).Should().BeTrue();
+      chunk.ModelToView(chunk.EndOffset - 1, out var rect).Should().BeTrue();
       rect.Should().Be(new Rectangle(chunk.LayoutRect.Right - 11, 20, 11, 15));
     }
 
@@ -158,10 +155,8 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
     {
       var chunk = CreateChunk();
       chunk.Measure(Size.Auto);
-      int offset;
-      Bias bias;
       chunk.Arrange(new Rectangle(10, 20, chunk.DesiredSize.WidthInt, chunk.DesiredSize.HeightInt));
-      chunk.ViewToModel(new Point(50, 25), out offset, out bias).Should().Be(true);
+      chunk.ViewToModel(new Point(50, 25), out var offset, out var bias).Should().Be(true);
       offset.Should().Be(3, "Expect to break at 3 (available width: 40, per char-width 11, thus 3 chars fit the space fully)");
       bias.Should().Be(Bias.Forward);
     }
@@ -171,10 +166,8 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
     {
       var chunk = CreateChunk();
       chunk.Measure(Size.Auto);
-      int offset;
-      Bias bias;
       chunk.Arrange(new Rectangle(10, 20, chunk.DesiredSize.WidthInt, chunk.DesiredSize.HeightInt));
-      chunk.ViewToModel(new Point(45, 25), out offset, out bias).Should().Be(true);
+      chunk.ViewToModel(new Point(45, 25), out var offset, out var bias).Should().Be(true);
       offset.Should().Be(3, "Expect to break at 3 (available width: 35, per char-width 11, thus 3 chars fit the space fully)");
       bias.Should().Be(Bias.Backward);
     }
@@ -184,10 +177,8 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
     {
       var chunk = CreateChunk();
       chunk.Measure(Size.Auto);
-      int offset;
-      Bias bias;
       chunk.Arrange(new Rectangle(10, 20, chunk.DesiredSize.WidthInt, chunk.DesiredSize.HeightInt));
-      chunk.ViewToModel(new Point(10, 25), out offset, out bias).Should().Be(true);
+      chunk.ViewToModel(new Point(10, 25), out var offset, out var bias).Should().Be(true);
       offset.Should().Be(0, "Expect to break at 3 (available width: 35, per char-width 11, thus 3 chars fit the space fully)");
       bias.Should().Be(Bias.Backward);
     }
@@ -197,10 +188,8 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
     {
       var chunk = CreateChunk();
       chunk.Measure(Size.Auto);
-      int offset;
-      Bias bias;
       chunk.Arrange(new Rectangle(10, 20, chunk.DesiredSize.WidthInt, chunk.DesiredSize.HeightInt));
-      chunk.ViewToModel(new Point(10 + chunk.DesiredSize.WidthInt - 1, 25), out offset, out bias).Should().Be(true);
+      chunk.ViewToModel(new Point(10 + chunk.DesiredSize.WidthInt - 1, 25), out var offset, out var bias).Should().Be(true);
       offset.Should().Be(chunk.EndOffset - 1);
       bias.Should().Be(Bias.Forward);
     }
@@ -225,8 +214,7 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
       var chunk = CreateChunk();
       chunk.Measure(Size.Auto);
       chunk.Arrange(new Rectangle(10, 20, chunk.DesiredSize.WidthInt, chunk.DesiredSize.HeightInt));
-      int target;
-      chunk.Navigate(-1, Direction.Left, out target).Should().Be(NavigationResult.Invalid);
+      chunk.Navigate(-1, Direction.Left, out var target).Should().Be(NavigationResult.Invalid);
       target.Should().Be(-1);
     }
 
@@ -237,8 +225,7 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
       chunk.Measure(Size.Auto);
       chunk.Arrange(new Rectangle(10, 20, chunk.DesiredSize.WidthInt, chunk.DesiredSize.HeightInt));
 
-      int target;
-      chunk.Navigate(chunk.EndOffset, Direction.Left, out target).Should().Be(NavigationResult.Valid);
+      chunk.Navigate(chunk.EndOffset, Direction.Left, out var target).Should().Be(NavigationResult.Valid);
       target.Should().Be(chunk.EndOffset - 1);
     }
 
@@ -249,8 +236,7 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
       chunk.Measure(Size.Auto);
       chunk.Arrange(new Rectangle(10, 20, chunk.DesiredSize.WidthInt, chunk.DesiredSize.HeightInt));
 
-      int target;
-      chunk.Navigate(chunk.Offset + 1, Direction.Left, out target).Should().Be(NavigationResult.BoundaryChanged);
+      chunk.Navigate(chunk.Offset + 1, Direction.Left, out var target).Should().Be(NavigationResult.BoundaryChanged);
       target.Should().Be(chunk.Offset);
     }
 
@@ -261,8 +247,7 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
       chunk.Measure(Size.Auto);
       chunk.Arrange(new Rectangle(10, 20, chunk.DesiredSize.WidthInt, chunk.DesiredSize.HeightInt));
 
-      int target;
-      chunk.Navigate(chunk.EndOffset + 1, Direction.Left, out target).Should().Be(NavigationResult.Valid);
+      chunk.Navigate(chunk.EndOffset + 1, Direction.Left, out var target).Should().Be(NavigationResult.Valid);
       target.Should().Be(chunk.EndOffset);
     }
 
@@ -272,8 +257,7 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
       var chunk = CreateChunk();
       chunk.Measure(Size.Auto);
       chunk.Arrange(new Rectangle(10, 20, chunk.DesiredSize.WidthInt, chunk.DesiredSize.HeightInt));
-      int target;
-      chunk.Navigate(chunk.EndOffset, Direction.Right, out target).Should().Be(NavigationResult.Invalid);
+      chunk.Navigate(chunk.EndOffset, Direction.Right, out var target).Should().Be(NavigationResult.Invalid);
       target.Should().Be(-1);
     }
 
@@ -283,8 +267,7 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
       var chunk = CreateChunk();
       chunk.Measure(Size.Auto);
       chunk.Arrange(new Rectangle(10, 20, chunk.DesiredSize.WidthInt, chunk.DesiredSize.HeightInt));
-      int target;
-      chunk.Navigate(chunk.Offset, Direction.Right, out target).Should().Be(NavigationResult.Valid);
+      chunk.Navigate(chunk.Offset, Direction.Right, out var target).Should().Be(NavigationResult.Valid);
       target.Should().Be(chunk.Offset + 1);
     }
 
@@ -294,8 +277,7 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
       var chunk = CreateChunk();
       chunk.Measure(Size.Auto);
       chunk.Arrange(new Rectangle(10, 20, chunk.DesiredSize.WidthInt, chunk.DesiredSize.HeightInt));
-      int target;
-      chunk.Navigate(chunk.EndOffset - 1, Direction.Right, out target).Should().Be(NavigationResult.BoundaryChanged);
+      chunk.Navigate(chunk.EndOffset - 1, Direction.Right, out var target).Should().Be(NavigationResult.BoundaryChanged);
       target.Should().Be(chunk.EndOffset);
     }
 
@@ -305,8 +287,7 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
       var chunk = CreateChunk();
       chunk.Measure(Size.Auto);
       chunk.Arrange(new Rectangle(10, 20, chunk.DesiredSize.WidthInt, chunk.DesiredSize.HeightInt));
-      int target;
-      chunk.Navigate(-1, Direction.Right, out target).Should().Be(NavigationResult.Valid);
+      chunk.Navigate(-1, Direction.Right, out var target).Should().Be(NavigationResult.Valid);
       target.Should().Be(chunk.Offset);
     }
 
@@ -379,9 +360,7 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
     public void TextChunkBreakingTestAtNonZeroOffset()
     {
       var chunk = CreateChunk(10);
-      ITextChunkView<PlainTextDocument> first;
-      ITextChunkView<PlainTextDocument> second;
-      chunk.BreakAt(200, out first, out second);
+      chunk.BreakAt(200, out var first, out var second);
       first.Offset.Should().Be(10);
       first.EndOffset.Should().Be(28);
       first.Text.Should().Be("d, Here I am. Can ");
@@ -406,9 +385,7 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
     public void TextChunkBreakingTestAtZero()
     {
       var chunk = CreateChunk();
-      ITextChunkView<PlainTextDocument> first;
-      ITextChunkView<PlainTextDocument> second;
-      chunk.BreakAt(200, out first, out second);
+      chunk.BreakAt(200, out var first, out var second);
       first.Offset.Should().Be(0);
       first.EndOffset.Should().Be(18);
       first.DesiredSize.Width.Should().BeLessOrEqualTo(200);

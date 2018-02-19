@@ -1,5 +1,5 @@
 // MIT License
-// Copyright (c) 2011-2016 Elisée Maurer, Sparklin Labs, Creative Patterns
+// Copyright (c) 2011-2016 ElisÃ©e Maurer, Sparklin Labs, Creative Patterns
 // Copyright (c) 2016 Thomas Morgner, Rabbit-StewDio Ltd.
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -33,12 +33,7 @@ namespace Steropes.UI
     public UIManagerComponent(Game game,
                               IUIManager manager) : base(game)
     {
-      if (manager == null)
-      {
-        throw new ArgumentNullException(nameof(manager));
-      }
-
-      Manager = manager;
+      Manager = manager ?? throw new ArgumentNullException(nameof(manager));
     }
 
     public override void Update(GameTime gameTime)
@@ -53,27 +48,32 @@ namespace Steropes.UI
 
     public static UIManagerComponent Create(Game game, IInputManager inputManager, string rootDirectory = null)
     {
+      rootDirectory = rootDirectory ?? "Content";
+
       var drawingService = new BatchedDrawingService(game);
       var windowService = new GameWindowService(game);
       var cm = new ContentManager(game.Services) { RootDirectory = rootDirectory };
 
       var uiManager = new UIManager(inputManager, drawingService, windowService, cm);
-      return new UIManagerComponent(game, uiManager);
+      uiManager.Start();
+
+      var component = new UIManagerComponent(game, uiManager)
+      {
+        UpdateOrder = 100000,
+        DrawOrder = 100000
+      };
+      return component;
     }
 
-    public static IUIManager CreateAndInit(Game game, IInputManager inputManager, string rootDirectory = null)
+    public static UIManagerComponent CreateAndInit(Game game, IInputManager inputManager, string rootDirectory = null)
     {
-      var uiManagerComponent = UIManagerComponent.Create(game, inputManager, "Content");
-      var inputManagerAsComponent = inputManager as IGameComponent;
-      if (inputManagerAsComponent != null)
+      var uiManagerComponent = Create(game, inputManager, rootDirectory);
+      if (inputManager is IGameComponent inputManagerAsComponent)
       {
         game.Components.Add(inputManagerAsComponent);
       }
       game.Components.Add(uiManagerComponent);
-
-      var uiManager = uiManagerComponent.Manager;
-      uiManager.Start();
-      return uiManager;
+      return uiManagerComponent;
     }
 
   }

@@ -16,13 +16,15 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
+using System;
 using Microsoft.Xna.Framework;
 
 namespace Steropes.UI.Animation
 {
   public class SmoothValue : AnimatedValue
   {
-    public SmoothValue(float start, float end, float duration, float delay, AnimationLoop loop)
+    public SmoothValue(float start, float end, float duration, float delay = 0f, AnimationLoop loop = AnimationLoop.NoLoop)
     {
       Start = start;
       End = end;
@@ -36,15 +38,19 @@ namespace Steropes.UI.Animation
     {
     }
 
-    public SmoothValue(float start, float end, float duration, float delay) : this(start, end, duration, delay, AnimationLoop.NoLoop)
+    public override float CurrentValue
     {
-    }
+      get
+      {
+        if (Math.Abs(Duration) < 0.0005)
+        {
+          return Start;
+        }
 
-    public SmoothValue(float start, float end, float duration) : this(start, end, duration, 0f, AnimationLoop.NoLoop)
-    {
+        var amount = (float) ((Time - Delay) / Duration);
+        return MathHelper.SmoothStep(Start, End, amount);
+      }
     }
-
-    public override float CurrentValue => MathHelper.SmoothStep(Start, End, (float)((Time - Delay) / Duration));
 
     public float End { get; }
 

@@ -36,7 +36,7 @@ namespace Steropes.UI.Components.Window.Events
   /// </summary>
   public class MouseClickDetector : EventFilterBase<MouseEventData>, IComponentEventSource<MouseEventData, IWidget>
   {
-    static readonly List<MouseButton> Buttons = MouseButtonExtensions.GetAll();
+    static readonly List<MouseButton> buttons = MouseButtonExtensions.GetAll();
 
     readonly IComponentEventSource<MouseEventData, IWidget> eventSource;
 
@@ -54,7 +54,7 @@ namespace Steropes.UI.Components.Window.Events
       queue = new EventQueue<MouseEventData>();
       this.eventSource = eventSource;
 
-      lastDownTime = new EnumMap<MouseButton, MouseClickRecord>(Buttons);
+      lastDownTime = new EnumMap<MouseButton, MouseClickRecord>(buttons);
       lastDownTime.Fill(MouseClickRecord.Invalid);
 
       lastComponentSeen = new WeakReference<IWidget>(null);

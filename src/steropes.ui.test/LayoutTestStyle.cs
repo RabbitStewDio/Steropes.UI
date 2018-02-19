@@ -18,6 +18,7 @@
 // SOFTWARE.
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 
 using Microsoft.Xna.Framework;
@@ -43,13 +44,59 @@ namespace Steropes.UI.Test
     public IUIFont SmallFont { get; set; }
   }
 
+  class TestStyleResolver : IStyleResolver
+  {
+    readonly IStyleResolver parent;
+    readonly bool acceptAll;
+
+    public TestStyleResolver(IStyleResolver parent, bool acceptAll)
+    {
+      this.parent = parent ?? throw new ArgumentNullException(nameof(parent));
+      this.acceptAll = acceptAll;
+    }
+
+    public ObservableCollection<IStyleRule> StyleRules
+    {
+      get { return parent.StyleRules; }
+    }
+
+    public void AddRoot(IWidget root)
+    {
+      parent.AddRoot(root);
+    }
+
+    public IResolvedStyle CreateStyleFor(IWidget widget)
+    {
+      return parent.CreateStyleFor(widget);
+    }
+
+    public void RemoveRoot(IWidget root)
+    {
+      parent.RemoveRoot(root);
+    }
+
+    public bool Revalidate()
+    {
+      return parent.Revalidate();
+    }
+
+    public bool IsRegistered(IWidget widget)
+    {
+      if (acceptAll)
+      {
+        return true;
+      }
+      return parent.IsRegistered(widget);
+    }
+  }
+
   public class TestUIStyle : IUIStyle
   {
-    public TestUIStyle(IContentLoader loader, Style style)
+    public TestUIStyle(IContentLoader loader, Style style, bool acceptAll = true)
     {
       Style = style;
       StyleSystem = new StyleSystem(loader);
-      StyleResolver = new StyleResolver(StyleSystem);
+      StyleResolver = new TestStyleResolver(new StyleResolver(StyleSystem), acceptAll);
     }
 
     public Style Style { get; }
@@ -61,11 +108,11 @@ namespace Steropes.UI.Test
 
   public class LayoutTestStyle
   {
-    public static TestUIStyle Create()
+    public static TestUIStyle Create(bool treatAllAsRegistered = true)
     {
       var legacyStyle = CreateStyle();
       var loader = new TestContentLoader(legacyStyle);
-      var style = new TestUIStyle(loader, legacyStyle);
+      var style = new TestUIStyle(loader, legacyStyle, treatAllAsRegistered);
       var styleRules = new StyleLoader().LoadRules(style.StyleSystem);
       var resolver = style.StyleResolver;
       foreach (var r in styleRules)
@@ -78,7 +125,8 @@ namespace Steropes.UI.Test
 
     public static IBoxTexture CreateBoxTexture(string name, int width, int height, Insets border, Insets margin)
     {
-      return new TestUITexture(Math.Max(width, border.Horizontal), Math.Max(height, border.Vertical), border, margin, name);
+      var bounds = new Rectangle(0, 0, Math.Max(width, border.Horizontal), Math.Max(height, border.Vertical));
+      return new TestUITexture(bounds, border, margin, name);
     }
 
     public static IUIFont CreateFont(string name = null, int width = 11, int height = 12, int lineSpacing = 15)
@@ -116,7 +164,8 @@ namespace Steropes.UI.Test
 
     public static IUITexture CreateTexture(string name, int width, int height)
     {
-      return new TestUITexture(width, height, Insets.Zero, Insets.Zero, name);
+      var bounds = new Rectangle(0, 0, width, height);
+      return new TestUITexture(bounds, Insets.Zero, Insets.Zero, name);
     }
 
     static Style CreateStyle()
@@ -148,7 +197,10 @@ namespace Steropes.UI.Test
         fonts.Add(style.LargeFont.Name, style.LargeFont);
         fonts.Add(style.MediumFont.Name, style.MediumFont);
         fonts.Add(style.SmallFont.Name, style.SmallFont);
+        WhitePixel = CreateTexture("WhitePixel", 1, 1);
       }
+
+      public IUITexture WhitePixel { get; }
 
       public string ContextPath => "";
 
@@ -156,8 +208,7 @@ namespace Steropes.UI.Test
 
       public IUIFont LoadFont(string font)
       {
-        IUIFont f;
-        if (fonts.TryGetValue(font, out f))
+        if (fonts.TryGetValue(font, out var f))
         {
           return f;
         }
@@ -287,19 +338,25 @@ namespace Steropes.UI.Test
 
     class TestUITexture : IBoxTexture, IEquatable<TestUITexture>
     {
-      public TestUITexture(int width, int height, Insets cornerArea, Insets margins, string name = null)
+      public TestUITexture(Rectangle bounds, Insets cornerArea, Insets margins, string name = null)
       {
-        Width = width;
-        Height = height;
+        Bounds = bounds;
         CornerArea = cornerArea;
         Margins = margins;
         Name = name;
         Texture = null;
       }
 
+      public Rectangle Bounds { get; }
+
+      public IUITexture Rebase(Texture2D texture, Rectangle bounds, string name)
+      {
+        return new TestUITexture(bounds, CornerArea, Margins, name);
+      }
+
       public Insets CornerArea { get; }
 
-      public int Height { get; }
+      public int Height => Bounds.Height;
 
       public Insets Margins { get; }
 
@@ -307,7 +364,7 @@ namespace Steropes.UI.Test
 
       public Texture2D Texture { get; }
 
-      public int Width { get; }
+      public int Width => Bounds.Width;
 
       public static bool operator ==(TestUITexture left, TestUITexture right)
       {

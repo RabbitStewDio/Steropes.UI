@@ -25,6 +25,7 @@ using Microsoft.Xna.Framework;
 using Steropes.UI.Annotations;
 using Steropes.UI.Platform;
 using Steropes.UI.Util;
+using Steropes.UI.Widgets;
 
 namespace Steropes.UI.Components
 {
@@ -126,6 +127,11 @@ namespace Steropes.UI.Components
         if (propertyChangedSupport == null)
         {
           propertyChangedSupport = new PropertyChangedEventSupport();
+        }
+
+        if (this is Slider)
+        {
+          Console.WriteLine();
         }
         propertyChangedSupport.Event += value;
       }

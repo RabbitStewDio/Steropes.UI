@@ -18,6 +18,7 @@
 // SOFTWARE.
 
 using System;
+using Steropes.UI.Platform;
 using Steropes.UI.Styles.Io;
 using Steropes.UI.Styles.Io.Values;
 
@@ -35,6 +36,12 @@ namespace Steropes.UI.Styles
       }
       this.parent = parent;
       this.ContentLoader = new SubContextContentLoader(parent.ContentLoader, context);
+    }
+
+    public IUITexture WhitePixel
+    {
+      get { return parent.WhitePixel; }
+      set { parent.WhitePixel = value; }
     }
 
     public IContentLoader ContentLoader { get; }

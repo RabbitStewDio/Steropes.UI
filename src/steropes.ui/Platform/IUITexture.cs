@@ -17,13 +17,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System;
-
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Steropes.UI.Platform
 {
   public interface IUITexture
   {
+    Rectangle Bounds { get; }
+
     int Height { get; }
 
     string Name { get; }
@@ -31,22 +33,40 @@ namespace Steropes.UI.Platform
     Texture2D Texture { get; }
 
     int Width { get; }
+
+    IUITexture Rebase(Texture2D texture, Rectangle bounds, string name);
   }
 
   public class UITexture : IUITexture, IEquatable<UITexture>
   {
+    public Rectangle Bounds { get; }
+
     public UITexture(Texture2D texture)
     {
       Texture = texture;
+      Name = Texture?.Name ?? "";
+      Bounds = new Rectangle(0, 0, Texture?.Width ?? 0, Texture?.Height ?? 0);
     }
 
-    public int Height => Texture?.Height ?? 0;
+    public UITexture(Texture2D texture, Rectangle bounds, string name = null)
+    {
+      Texture = texture;
+      Bounds = bounds;
+      Name = name ?? Texture?.Name ?? "";
+    }
 
-    public string Name => Texture?.Name;
+    public int Height => Bounds.Height;
+
+    public string Name { get; }
 
     public Texture2D Texture { get; }
 
-    public int Width => Texture?.Width ?? 0;
+    public int Width => Bounds.Width;
+
+    public virtual IUITexture Rebase(Texture2D texture, Rectangle bounds, string name)
+    {
+      return new UITexture(texture, bounds, name);
+    }
 
     public static bool operator ==(UITexture left, UITexture right)
     {
@@ -68,7 +88,7 @@ namespace Steropes.UI.Platform
       {
         return true;
       }
-      return Equals(Name, other.Name);
+      return Equals(Name, other.Name) && Equals(Bounds, other.Bounds);
     }
 
     public override bool Equals(object obj)
@@ -90,7 +110,10 @@ namespace Steropes.UI.Platform
 
     public override int GetHashCode()
     {
-      return Name?.GetHashCode() ?? 0;
+      unchecked
+      {
+        return (Name?.GetHashCode() ?? 0) ^ (37 * Bounds.GetHashCode());
+      }
     }
   }
 }

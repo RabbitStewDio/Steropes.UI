@@ -25,6 +25,7 @@ using Steropes.UI.Components;
 using Steropes.UI.Input.MouseInput;
 using Steropes.UI.Platform;
 using Steropes.UI.Styles;
+using Steropes.UI.Util;
 using Steropes.UI.Widgets.Styles;
 
 namespace Steropes.UI.Widgets
@@ -39,8 +40,8 @@ namespace Steropes.UI.Widgets
   public class Scrollbar : InternalContentWidget<Widget>
   {
     readonly LerpValue lerpOffset;
-
     readonly ScrollbarStyleDefinition scrollbarStyle;
+    readonly EventSupport<EventArgs> scrollbarPositionChangedSupport;
 
     bool isDragging;
 
@@ -52,6 +53,7 @@ namespace Steropes.UI.Widgets
 
     public Scrollbar(IUIStyle style) : base(style)
     {
+      scrollbarPositionChangedSupport = new EventSupport<EventArgs>();
       scrollbarStyle = StyleSystem.StylesFor<ScrollbarStyleDefinition>();
 
       ScrollUnit = 50 / 120f;
@@ -94,7 +96,17 @@ namespace Steropes.UI.Widgets
       }
     }
 
-    public event EventHandler<EventArgs> ScrollbarPositionChanged;
+    public event EventHandler<EventArgs> ScrollbarPositionChanged
+    {
+      add { scrollbarPositionChangedSupport.Event += value; }
+      remove { scrollbarPositionChangedSupport.Event -= value; }
+    }
+    
+    public EventHandler<EventArgs> OnScrollbarPositionChanged
+    {
+      get { return scrollbarPositionChangedSupport.Handler; }
+      set { scrollbarPositionChangedSupport.Handler = value; }
+    }
 
     public float LerpOffset => lerpOffset.CurrentValue;
 
@@ -208,7 +220,7 @@ namespace Steropes.UI.Widgets
       lerpOffset.Update(elapsedTime);
       if (Math.Abs(LerpOffset - oldValue) > 0.005)
       {
-        ScrollbarPositionChanged?.Invoke(this, new EventArgs());
+        scrollbarPositionChangedSupport.Raise(this, new EventArgs());
         InvalidateLayout();
       }
     }

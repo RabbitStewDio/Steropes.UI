@@ -17,7 +17,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System;
-
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -30,6 +30,8 @@ namespace Steropes.UI.Styles
     string ContextPath { get; }
 
     string FullContextPath { get; }
+
+    IUITexture WhitePixel { get; }
 
     IUIFont LoadFont(string font);
 
@@ -48,7 +50,12 @@ namespace Steropes.UI.Styles
     {
       this.mgr = mgr;
       fontFactory = new FontFactory(mgr, dev);
+
+      WhitePixel = new UITexture(new Texture2D(dev, 1, 1, false, SurfaceFormat.Color));
+      WhitePixel.Texture.SetData(new[] { Color.White });
     }
+
+    public IUITexture WhitePixel { get; }
 
     public string ContextPath => "";
 
@@ -88,6 +95,8 @@ namespace Steropes.UI.Styles
       ContextPath = contextPath;
       this.parent = parent;
     }
+
+    public IUITexture WhitePixel => parent.WhitePixel;
 
     public string ContextPath { get; }
 

@@ -17,7 +17,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System;
-
+using System.ComponentModel;
 using Microsoft.Xna.Framework;
 
 using Steropes.UI.Animation;
@@ -63,7 +63,8 @@ namespace Steropes.UI.Widgets.Container
     {
       splitterBar = new SplitterBar(style);
       splitterBar.AddNotify(this);
-      RaiseChildrenChanged(null, splitterBar);
+      splitterBar.PropertyChanged += OnSplitterBarPropertyChange;
+      RaiseChildAdded(0, splitterBar, null);
 
       collapseAnim = new SmoothValue(0f, 1f, 0.2f);
 
@@ -77,6 +78,15 @@ namespace Steropes.UI.Widgets.Container
       splitterBar.MouseUp += OnMouseUp;
       splitterBar.MouseDown += OnMouseDown;
       splitterBar.MouseClicked += OnMouseClick;
+    }
+
+    void OnSplitterBarPropertyChange(object sender, PropertyChangedEventArgs e)
+    {
+      if (e.PropertyName == nameof(SplitterBar.Collapsed) ||
+          e.PropertyName == nameof(SplitterBar.Collapsable))
+      {
+        OnPropertyChanged(e.PropertyName);
+      }
     }
 
     public bool Collapsable
@@ -135,7 +145,7 @@ namespace Steropes.UI.Widgets.Container
       {
         if (firstPane != null)
         {
-          RaiseChildrenChanged(firstPane, null);
+          RaiseChildRemoved(1, firstPane);
           firstPane.RemoveNotify(this);
         }
 
@@ -144,7 +154,7 @@ namespace Steropes.UI.Widgets.Container
         if (firstPane != null)
         {
           firstPane.AddNotify(this);
-          RaiseChildrenChanged(null, firstPane);
+          RaiseChildAdded(1, firstPane);
         }
       }
     }
@@ -202,7 +212,7 @@ namespace Steropes.UI.Widgets.Container
       {
         if (secondPane != null)
         {
-          RaiseChildrenChanged(secondPane, null);
+          RaiseChildRemoved(2, secondPane);
           secondPane.RemoveNotify(this);
         }
 
@@ -210,7 +220,7 @@ namespace Steropes.UI.Widgets.Container
 
         if (secondPane != null)
         {
-          RaiseChildrenChanged(null, secondPane);
+          RaiseChildAdded(2, secondPane);
           secondPane.AddNotify(this);
         }
       }
@@ -252,7 +262,7 @@ namespace Steropes.UI.Widgets.Container
       }
     }
 
-    bool Collapsed
+    public bool Collapsed
     {
       get
       {
@@ -261,6 +271,16 @@ namespace Steropes.UI.Widgets.Container
       set
       {
         splitterBar.Collapsed = value;
+        if (value)
+        {
+          collapseAnim.Direction = AnimationDirection.Forward;
+          collapseAnim.Time = collapseAnim.Duration;
+        }
+        else
+        {
+          collapseAnim.Direction = AnimationDirection.Backward;
+          collapseAnim.Time = 0;
+        }
       }
     }
 
@@ -298,11 +318,18 @@ namespace Steropes.UI.Widgets.Container
       }
     }
 
-    public void ToggleCollapse()
+    public void ToggleCollapse(bool now = false)
     {
       if (Collapsable)
       {
-        Collapsed = !Collapsed;
+        if (!now)
+        {
+          splitterBar.Collapsed = !splitterBar.Collapsed;
+        }
+        else
+        {
+          Collapsed = !Collapsed;
+        }
       }
     }
 
@@ -320,6 +347,7 @@ namespace Steropes.UI.Widgets.Container
         collapseAnim.Direction = AnimationDirection.Backward;
         collapseAnim.Update(elapsedTime);
       }
+
       if (Math.Abs(collapseValue - collapseAnim.CurrentValue) > 0.0005)
       {
         InvalidateLayout();
@@ -357,18 +385,58 @@ namespace Steropes.UI.Widgets.Container
       return layoutSize;
     }
 
+    protected Rectangle FirstPaneClippingRect()
+    {
+      var rect = FirstPane?.LayoutRect ?? LayoutRect;
+      if (Direction == Direction.Left || Direction == Direction.Right)
+      {
+        // horizontal split
+        rect.Width = splitterBar.LayoutRect.X - rect.X;
+      }
+      else
+      {
+        // vertical split
+        rect.Height = splitterBar.LayoutRect.Y - rect.Y;
+      }
+      return rect;
+    }
+
+    protected Rectangle SecondPaneClippingRect()
+    {
+      var rect = SecondPane?.LayoutRect ?? LayoutRect;
+      if (Direction == Direction.Left || Direction == Direction.Right)
+      {
+        // horizontal split
+        rect.Width = rect.Right - splitterBar.LayoutRect.Right;
+        rect.X = splitterBar.LayoutRect.Right;
+      }
+      else
+      {
+        // vertical split
+        rect.Height = rect.Bottom - splitterBar.LayoutRect.Bottom;
+        rect.Y = splitterBar.LayoutRect.Bottom;
+      }
+
+      return rect;
+    }
+
     protected override void DrawChildren(IBatchedDrawingService drawingService)
     {
       splitterBar.Draw(drawingService);
 
-      if (displayFirstPane)
+      if (displayFirstPane && FirstPane != null)
       {
-        FirstPane?.DrawClipped(drawingService);
+        var clipping = FirstPaneClippingRect();
+        drawingService.PushScissorRectangle(clipping);
+        FirstPane.Draw(drawingService);
+        drawingService.PopScissorRectangle();
       }
 
-      if (displaySecondPane)
+      if (displaySecondPane && SecondPane != null)
       {
-        SecondPane?.DrawClipped(drawingService);
+        drawingService.PushScissorRectangle(SecondPaneClippingRect());
+        SecondPane.Draw(drawingService);
+        drawingService.PopScissorRectangle();
       }
     }
 
@@ -617,7 +685,7 @@ namespace Steropes.UI.Widgets.Container
       args.Consume();
       if (Collapsable && Resizable)
       {
-        Collapsed = !Collapsed;
+        ToggleCollapse();
       }
     }
 

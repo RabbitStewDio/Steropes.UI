@@ -34,7 +34,7 @@ namespace Steropes.UI.Styles.Io.Values
 
     public string TypeId => "Texture";
 
-    public object Parse(IStyleSystem styleSystem, XElement reader)
+    public object Parse(IStyleSystem styleSystem, XElement reader, IStylePropertyContext context)
     {
       var textureElement = reader.ElementLocal("texture");
       var texture = (string) textureElement?.ElementLocal("name");
@@ -42,7 +42,14 @@ namespace Steropes.UI.Styles.Io.Values
       {
         texture = null;
       }
-      return styleSystem.ContentLoader.LoadTexture(texture);
+
+      var contentLoader = styleSystem.ContentLoader;
+      var tp = (string)reader.ElementLocal("texture-packer") ?? "disabled";
+      if (tp == "auto")
+      {
+        return context.ProcessTexture(contentLoader.LoadTexture(texture));
+      }
+      return contentLoader.LoadTexture(texture);
     }
 
     public void Write(IStyleSystem styleSystem, XElement propertyElement, object value)

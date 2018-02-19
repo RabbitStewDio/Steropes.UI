@@ -24,6 +24,6 @@ namespace Steropes.UI.Widgets
 {
   public interface IScrollControl : IWidget
   {
-    void ScrollTo(Rectangle visibleBox);
+    void ScrollTo(Rectangle visibleBox, bool now = false);
   }
 }

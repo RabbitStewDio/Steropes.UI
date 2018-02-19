@@ -17,7 +17,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
@@ -108,11 +107,9 @@ namespace Steropes.UI.Windows.Input.KeyboardInput
       var c = (char)(retval & char.MaxValue);
       if (c == 0)
       {
-        Debug.WriteLine("No translation for " + k);
         return base.ToLocalisedText(k);
       }
 
-      Debug.WriteLine("translation for " + k + " is " + (int)c);
       if (k >= Keys.NumPad0 && k <= Keys.Divide)
       {
         return "KeyPad-" + c;

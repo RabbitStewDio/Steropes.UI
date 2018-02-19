@@ -41,13 +41,17 @@ namespace Steropes.UI.Components.Window
     int ignoreClickFrames;
 
     Rectangle lastLayoutSize;
+    IBatchedDrawingService drawingService;
 
-    public Screen(IInputManager rawInputs, IUIStyle style, IBatchedDrawingService drawingService, IGameWindowService windowService)
+    public Screen(IInputManager rawInputs, 
+                  IUIStyle style, 
+                  IBatchedDrawingService drawingService, 
+                  IGameWindowService windowService)
     {
       actions = new Queue<Action>();
 
-      DrawingService = drawingService;
-      WindowService = windowService;
+      DrawingService = drawingService ?? throw new ArgumentNullException(nameof(drawingService));
+      WindowService = windowService ?? throw new ArgumentNullException(nameof(windowService));
       FocusManager = new ScreenFocusManager(this);
       MouseHoverManager = new MouseHoverManager();
       Root = new RootPane(this, style);
@@ -77,10 +81,21 @@ namespace Steropes.UI.Components.Window
 
     Rectangle Bounds => DrawingService.GraphicsDevice.Viewport.TitleSafeArea;
 
-    IBatchedDrawingService DrawingService { get; }
+    public IBatchedDrawingService DrawingService
+    {
+      get { return drawingService; }
+      set
+      {
+        drawingService = value ?? throw new ArgumentNullException(nameof(value));
+      }
+    }
 
     public void Draw()
     {
+      // re-layout. This is a no-op if there had been no changes since the last
+      // arrange call, but it avoids subtle bugs when UI components get updated
+      // during an earlier operation in another component's Draw call.
+      ArrangeRoot();
       DrawingService.StartDrawing();
       try
       {
@@ -134,6 +149,10 @@ namespace Steropes.UI.Components.Window
     void ArrangeRoot()
     {
       StyleResolver.Revalidate();
+      if (StyleResolver.StyleRules.Count == 0)
+      {
+        throw new InvalidOperationException("The style system contains no style-rules. This will result in errors. Aborting!");
+      }
 
       var screenSpace = Bounds;
       if (lastLayoutSize != screenSpace || Root.LayoutInvalid)
@@ -169,8 +188,7 @@ namespace Steropes.UI.Components.Window
 
       void HandlePopUpClosed(object sender, EventArgs e)
       {
-        var popUp = sender as IPopUp;
-        if (popUp != null)
+        if (sender is IPopUp popUp)
         {
           rootPane.Remove(popUp);
         }

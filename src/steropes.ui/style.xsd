@@ -121,7 +121,14 @@
     <xsd:attribute type="xsd:boolean" name="direct-child" use="optional" default="false"/>
     <xsd:attribute type="xsd:string" name="element" use="required"/>
   </xsd:complexType>
-  
+
+  <xsd:simpleType name="texturePackerAttr">
+    <xsd:restriction base="xsd:string">
+      <xsd:enumeration value="auto"/>
+      <xsd:enumeration value="disabled"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+
   <xsd:complexType mixed="false" name="stylesType">
     <xsd:annotation>
       <xsd:documentation>
@@ -135,11 +142,11 @@
         nesting thus does not change that order.
       </xsd:documentation>
     </xsd:annotation>
-    
     <xsd:choice minOccurs="0" maxOccurs="unbounded">
       <xsd:element name="styles" type="stylesType"/>
       <xsd:element name="style" type="styleType"/>
     </xsd:choice>
+    <xsd:attribute name="texture-packer" type="texturePackerAttr" use="optional" default="disabled"/>
   </xsd:complexType>
 
 

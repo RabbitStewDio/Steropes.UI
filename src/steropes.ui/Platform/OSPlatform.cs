@@ -60,6 +60,13 @@ namespace Steropes.UI.Platform
       {
         OS = OperatingSystem.Unknown;
       }
+
+      // finally some special sauce, hoping that this bit at least is sane.
+      if (OS == OperatingSystem.Unknown && 
+          Environment.OSVersion.Platform == PlatformID.Xbox)
+      {
+        OS = OperatingSystem.XBox;
+      }
     }
 
     public enum OperatingSystem
@@ -70,9 +77,11 @@ namespace Steropes.UI.Platform
 
       Linux,
 
+      XBox,
+
       Unknown
     }
 
-    public static OperatingSystem OS { get; private set; }
+    public static OperatingSystem OS { get; }
   }
 }

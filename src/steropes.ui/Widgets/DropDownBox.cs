@@ -16,14 +16,14 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-
 using Microsoft.Xna.Framework;
-
 using Steropes.UI.Components;
 using Steropes.UI.Components.Window;
+using Steropes.UI.Util;
 using Steropes.UI.Widgets.Container;
 
 namespace Steropes.UI.Widgets
@@ -46,7 +46,7 @@ namespace Steropes.UI.Widgets
   /// </summary>
   /// <typeparam name="T"></typeparam>
   public class DropDownBox<T> : InternalContentWidget<IWidget>
-    where T : class
+    //where T : class
   {
     readonly ContentWidget<IWidget> dropDownButtonContent;
 
@@ -57,63 +57,74 @@ namespace Steropes.UI.Widgets
     bool ignoreClickEventsForThisFrame;
 
     bool isOpen;
+    readonly EventSupport<SelectionEventArgs<T>> selectionChangedSupport;
 
-    public DropDownBox(IUIStyle style, IEnumerable<T> items) : base(style)
+    public DropDownBox(IUIStyle style, IEnumerable<T> items = null) : base(style)
     {
+      selectionChangedSupport = new EventSupport<SelectionEventArgs<T>>();
+
       dropDownButtonContent = new ContentWidget<IWidget>(UIStyle);
 
       dropDownContainer = new ListView<T>(UIStyle) { Tag = "DropDownContainer" };
 
       // UIStyle.Style.DropdownBoxStyle.DropDownListStyle
       dropDownContainer.AddStyleClass(DropDownBox.DropDownBoxListStyleClass);
-      dropDownContainer.AddAll(items);
+      if (items != null)
+      {
+        dropDownContainer.AddAll(items);
+      }
+
       dropDownContainer.SelectionChanged += (s, e) =>
+      {
+        UpdateLabelText();
+        OnPropertyChanged(nameof(SelectedIndex));
+        OnPropertyChanged(nameof(SelectedItem));
+        selectionChangedSupport.Raise(this, new SelectionEventArgs<T>(SelectedIndex, SelectedItem));
+        if (!e.Adjusting)
         {
-          UpdateLabelText();
-          SelectionChanged?.Invoke(this, new SelectionEventArgs<T>(SelectedIndex, SelectedItem));
-          if (!e.Adjusting)
-          {
-            IsOpen = false;
-          }
-        };
+          IsOpen = false;
+        }
+      };
 
       InternalContent = CreateDropDownButton();
     }
 
-    public event EventHandler<SelectionEventArgs<T>> SelectionChanged;
+    public event EventHandler<SelectionEventArgs<T>> SelectionChanged
+    {
+      add { selectionChangedSupport.Event += value; }
+      remove { selectionChangedSupport.Event -= value; }
+    }
+
+    public EventHandler<SelectionEventArgs<T>> OnSelectionChanged
+    {
+      get { return selectionChangedSupport.Handler; }
+      set { selectionChangedSupport.Handler = value; }
+    }
 
     public Func<IUIStyle, T, IListDataItemRenderer> CreateRenderer
     {
-      get
-      {
-        return dropDownContainer.CreateRenderer;
-      }
-      set
-      {
-        dropDownContainer.CreateRenderer = value;
-      }
+      get { return dropDownContainer.CreateRenderer; }
+      set { dropDownContainer.CreateRenderer = value; }
     }
 
     public bool IsOpen
     {
-      get
-      {
-        return isOpen;
-      }
+      get { return isOpen; }
       private set
       {
         isOpen = value;
         if (value)
         {
-          dropDownPopUp = Screen?.PopUpManager?.CreatePopup(new Point(BorderRect.X, BorderRect.Bottom), dropDownContainer);
+          dropDownPopUp =
+            Screen?.PopUpManager?.CreatePopup(new Point(BorderRect.X, BorderRect.Bottom), dropDownContainer);
           if (dropDownPopUp != null)
           {
             dropDownPopUp.Closed += (source, args) =>
-              {
-                dropDownPopUp.Content = null;
-                dropDownPopUp = null;
-                IsOpen = false;
-              };
+            {
+              dropDownPopUp.Content = null;
+              dropDownPopUp = null;
+              IsOpen = false;
+            };
           }
         }
         else
@@ -121,6 +132,7 @@ namespace Steropes.UI.Widgets
           dropDownPopUp?.Close();
           dropDownPopUp = null;
         }
+
         InvalidateLayout();
         OnPropertyChanged();
       }
@@ -128,28 +140,22 @@ namespace Steropes.UI.Widgets
 
     public ObservableCollection<T> Items => dropDownContainer.DataItems;
 
+    public IReadOnlyCollection<T> Data
+    {
+      get { return dropDownContainer.Data; }
+      set { dropDownContainer.Data = value; }
+    }
+
     public int SelectedIndex
     {
-      get
-      {
-        return dropDownContainer.SelectedIndex;
-      }
-      set
-      {
-        dropDownContainer.SelectedIndex = value;
-      }
+      get { return dropDownContainer.SelectedIndex; }
+      set { dropDownContainer.SelectedIndex = value; }
     }
 
     public T SelectedItem
     {
-      get
-      {
-        return dropDownContainer.SelectedItem;
-      }
-      set
-      {
-        dropDownContainer.SelectedItem = value;
-      }
+      get { return dropDownContainer.SelectedItem; }
+      set { dropDownContainer.SelectedItem = value; }
     }
 
     DropDownButton CreateDropDownButton()
@@ -166,18 +172,18 @@ namespace Steropes.UI.Widgets
       dropDownButton.Content = buttonContent;
       dropDownButton.ActionPerformed += ToggleDropDownPopup;
       dropDownButton.MouseDown += (s, e) =>
+      {
+        e.Consume();
+        if (IsOpen)
         {
-          e.Consume();
-          if (IsOpen)
-          {
-            ignoreClickEventsForThisFrame = true;
-          }
-        };
+          ignoreClickEventsForThisFrame = true;
+        }
+      };
       dropDownButton.MouseUp += (s, e) =>
-        {
-          ignoreClickEventsForThisFrame = false;
-          e.Consume();
-        };
+      {
+        ignoreClickEventsForThisFrame = false;
+        e.Consume();
+      };
       return dropDownButton;
     }
 

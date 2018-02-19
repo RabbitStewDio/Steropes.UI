@@ -32,34 +32,36 @@ namespace Steropes.UI.Demo.Demos
     {
       var basicDemoPane = new BasicDemoPane(uiStyle);
 
-      // var tx = content.Load<Texture2D>("Sprites/UI/Panel04");
-      var demoPanel = new ScrollPanel(uiStyle) { VerticalScrollbarMode = ScrollbarMode.None, Content = basicDemoPane };
-      demoPanel.AddStyleClass("DemoPanel");
-
-      var demosBoxGroup = new BoxGroup(uiStyle, Orientation.Vertical, 0)
+      var demoPanel = new ScrollPanel(uiStyle)
       {
-        { CreateDemoButton("Basic", demoPanel, basicDemoPane), true },
-        { CreateDemoButton("Notebook", demoPanel, new NotebookPane(uiStyle)), true },
-        { CreateDemoButton("Text Area", demoPanel, new TextAreaPane(uiStyle)), true },
-        { CreateDemoButton("Custom Viewport", demoPanel, new CustomViewportPane(uiStyle)), true }
-      };
+        VerticalScrollbarMode = ScrollbarMode.None, 
+        Content = basicDemoPane
+      }.DoWith(d => d.AddStyleClass("DemoPanel"));
 
       // Splitter
       return new Splitter(uiStyle, Direction.Left)
       {
         Anchor = AnchoredRect.CreateFull(10),
         Collapsable = true,
-        FirstPane = demosBoxGroup,
+        Collapsed = true,
+        FirstPane = new BoxGroup(uiStyle, Orientation.Vertical, 0)
+        {
+          { CreateDemoButton("Basic", demoPanel, basicDemoPane), true },
+          { CreateDemoButton("Notebook", demoPanel, new NotebookPane(uiStyle)), true },
+          { CreateDemoButton("Text Area", demoPanel, new TextAreaPane(uiStyle)), true },
+          { CreateDemoButton("Custom Viewport", demoPanel, new CustomViewportPane(uiStyle)), true }
+        },
         SecondPane = demoPanel,
         FirstPaneMinSize = 200
       };
     }
 
-    static Button CreateDemoButton(string demoName, ScrollPanel demoPanel, Widget demoPane)
+    static Button CreateDemoButton(string demoName, ScrollPanel demoPanel, IWidget demoPane)
     {
-      var demoPaneButton = new Button(demoPanel.UIStyle, demoName);
-      demoPaneButton.ActionPerformed += (sender, args) => demoPanel.Content = demoPane;
-      return demoPaneButton;
+      return new Button(demoPanel.UIStyle, demoName)
+      {
+        OnActionPerformed = (sender, args) => demoPanel.Content = demoPane
+      };
     }
   }
 }

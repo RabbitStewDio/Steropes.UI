@@ -45,6 +45,13 @@ The Steropes-UI library follows three simple guiding principles:
    Similar to how WPF uses a visual component tree to build complex behaviour out of
    predefined building blocks, most Steropes-UI widgets are assemblies of other widgets
    and primitive textures. 
+
+   Widgets can be assembled using an simple object initializer syntax so that
+   code is both expressive and readable.
+
+   Data can be transfered from your model into the UI via simple (and typesafe) 
+   data bindings. The bindings created here are expressed as code and resilient to 
+   changes and refactoring of your code.
    
    Styling is separate from the compiled code. Steropes-UI uses a CSS inspired style
    system with selectors and style-sheets to define the visual look and feel of widgets.
@@ -98,20 +105,23 @@ user input.
 * Window - A window.
 
 ### Layout Container
-* Group - Arranges child content based on their "AnchorRect" property. Similar to WPF's Canvas control.
-* Grid - Arranges content into rows and columns. Similar to WPF's grid control, but without row-/col-span support.
-* DockPanel - Docks content to the side of the panel. Same as the WPF class with the same name.
-* BoxGroup - Arrange child content horizontally or vertically. Same as the StackPanel in WPF.
+* Group - Arranges child content based on their "AnchorRect" property. Similar to 
+  WPF's Canvas control.
+* LayeredPane - Like a Group, but with explicit rendering/z-order for all widgets.
+* Grid - Arranges content into rows and columns. Similar to WPF's grid control, but 
+  without row-/col-span support.
+* DockPanel - Docks content to the side of the panel. Same as the WPF class with the 
+  same name.
+* BoxGroup - Arrange child content horizontally or vertically. Same as the StackPanel 
+  in WPF.
 
 ## Downloads
 
 Steropes-UI is available on NuGet. 
 
 The NuGet packages are compiled against MonoGame 3.6, but do _not_ contain 
-dependencies for the MonoGame, you will need to add a reference to 
+dependencies for the MonoGame, you will need to add a reference to a version of
 MonoGame 3.6 to your projects in addition to Steropes-UI. 
-
-The code compiles fine against MonoGame 3.5 if needed.
 
 Steropes-UI is split into a platform independend core library that only depends on the
 public Monogame API and a Windows library that contains additional, platform dependent 
@@ -137,43 +147,34 @@ You can find all documentation in the [documentation folder](docs/README.md).
 
 ## Roadmap
 
-I created Steropes-UI to solve my reoccuring pains of writing testable UIs for
-my Monogame related projects. I also suffer from ongoing laziness when styling UIs (especially
-prototypes). Therefore the current state of the library solves these two pain points with 
-the testable architecture and the styling system.
-
 There are a few areas I think that need additional work at a later stage:
 
-### Performance
+* Support scaled UIs. Right now the UI is always rendered at the native resolution.
+  This is OK when the screen size is well known or when the UI should not adapt
+  to different resolutions (for instance while using resizable windows), but 
+  behaves badly when the UI should look the same regardless of the underlying
+  resolution (for instance in full-screen display modes).
 
-* At the moment, the rendering relies on having separate textures and the box-textures must be
- rendered with a texturemode of stretch. This prevents frames from having repeating patterns.
- To fix that, we need a custom shader that properly implements the repeated rendering.
+* Add tree and table widgets for data centric UIs. Hardcore strategy games would 
+  benefit from that.
 
-* Having separate textures means we end up with a large number of draw calls. That is generally
-  a bad thing. GUI textures are small, so we should be able to put all of them into a texture
-  atlas and render subsets of the same texture instead. 
-
-  There are two complementary ways to implement that:
-
-  1) Support texture coordinates in the style descriptions. A variant of that: Support 
-     a parsed texture atlas and resolve textures against that. This should make the affair
-     more usable, as the texture atlas contains readable names for each contained sprite.
-
-  2) Pack textures at runtime. This should be relatively cheap given the small sizes and
-     fairly regular structures involved. This would mean that images can be kept as separate
-     files and wont need a recompile to see changes.
-
-  Bonus points for mapping the referenced spritefonts onto the same sprite-sheet. Under ideal
-  conditions that could bring down the draw call count to 1.
-
-* Add tree and table widgets for data centric UIs. Hardcore strategy games would benefit from that.
+* Add a DesktopPane/ChildWindow API so that it becomes easier to provide resizable
+  floating window widgets.
+  
+* Its funny, but we have no horizontal scroll bar and thus no ability to scroll 
+  content horizontally. That should change. 
 
 * Add a rich-text widget that is suitable for dispaying help texts. 
 
-* Add basic charts (pie, bar, line). Those would also be useful for strategy games. These could be
-  implemented right now using the CustomViewport widget, but having something out of the box would be
-  much nicer.
+* Add basic charts (pie, bar, line). Those would also be useful for strategy games. 
+  These could be implemented right now using the CustomViewport widget, but having 
+  something out of the box would be much nicer.
 
-* Add basic data binding. Thats here because I am way to lazy to manually and repeatedly write mostly
-  similar listener code over and over again just to get data in and out of the UI. 
+* Add Drag and Drop support to the standard widgets. Although the underlying events
+  are already generated, advanced features like reordering list items or inserting
+  and removing items from a list or table via drag-and-drop require support from 
+  the list and table implementations.
+  
+* Add an animation class that uses a Xna.Framework.Curve internally to describe the
+  animation. That should make it easier to model non-regular animations and given
+  that we delegate the hard math to XNA, it should not be hard to implement either.  

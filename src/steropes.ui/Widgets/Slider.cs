@@ -22,6 +22,7 @@ using Microsoft.Xna.Framework;
 
 using Steropes.UI.Components;
 using Steropes.UI.Input.MouseInput;
+using Steropes.UI.Util;
 using Steropes.UI.Widgets.Container;
 
 namespace Steropes.UI.Widgets
@@ -31,21 +32,19 @@ namespace Steropes.UI.Widgets
     public static readonly string SliderHandleStyleClass = "SliderHandle";
 
     readonly Button sliderHandle;
-
     readonly SliderTrack sliderTrack;
+    readonly EventSupport<EventArgs> valueChangedSupport;
 
     bool pressed;
-
     float value;
-
     float maxValue;
-
     float minValue;
-
     float step;
 
-    public Slider(IUIStyle style, float min, float max, float initialValue, float step) : base(style)
+    public Slider(IUIStyle style) : base(style)
     {
+      valueChangedSupport = new EventSupport<EventArgs>();
+
       sliderHandle = new Button(UIStyle);
       sliderHandle.AddStyleClass(SliderHandleStyleClass);
       sliderHandle.Anchor = AnchoredRect.CreateLeftAnchored();
@@ -64,6 +63,14 @@ namespace Steropes.UI.Widgets
       InternalContent = elements;
       Focusable = true;
 
+      MinValue = 0;
+      MaxValue = 10;
+      Step = 1;
+      Value = 0;
+    }
+
+    public Slider(IUIStyle style, float min, float max, float initialValue, float step) : this(style)
+    {
       MinValue = Math.Min(min, max);
       MaxValue = Math.Max(min, max);
       Step = step;
@@ -74,7 +81,17 @@ namespace Steropes.UI.Widgets
       MouseDragged += OnMouseDragged;
     }
 
-    public event EventHandler<EventArgs> ValueChanged;
+    public event EventHandler<EventArgs> ValueChanged
+    {
+      add { valueChangedSupport.Event += value; }
+      remove { valueChangedSupport.Event -= value; }
+    }
+    
+    public EventHandler<EventArgs> OnValueChanged
+    {
+      get { return valueChangedSupport.Handler; }
+      set { valueChangedSupport.Handler = value; }
+    }
 
     public float MaxValue
     {
@@ -135,7 +152,7 @@ namespace Steropes.UI.Widgets
           this.value -= this.value % Math.Abs(Step);
         }
 
-        ValueChanged?.Invoke(this, EventArgs.Empty);
+        valueChangedSupport.Raise(this, EventArgs.Empty);
         OnPropertyChanged();
         InvalidateLayout();
       }

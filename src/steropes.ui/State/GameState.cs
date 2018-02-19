@@ -28,17 +28,16 @@ namespace Steropes.UI.State
     }
 
     // Draw the GameState
-    public abstract void Draw();
+    public abstract void Draw(GameTime elapsedTime);
 
-    public virtual void DrawFadeIn()
+    public virtual void DrawFadeIn(GameTime elapsedTime)
     {
-      Draw();
+      Draw(elapsedTime);
     }
 
-    public virtual void DrawFadeOut()
+    public virtual void DrawFadeOut(GameTime elapsedTime)
     {
-      // Should not be called by a sane StateManager, as UpdateFadeOut unconditionally returns true.
-      Draw();
+      Draw(elapsedTime);
     }
 
     // Start the GameState, called when it becomes the current one

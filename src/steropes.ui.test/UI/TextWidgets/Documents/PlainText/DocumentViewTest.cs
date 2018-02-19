@@ -21,7 +21,7 @@ using FluentAssertions;
 using Microsoft.Xna.Framework;
 
 using NSubstitute;
-
+using NSubstitute.ReturnsExtensions;
 using NUnit.Framework;
 
 using Steropes.UI.Components;
@@ -37,14 +37,19 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
     [Test]
     public void Input_NewLine_BreakAtEnd()
     {
-      var parent = Substitute.For<IWidget>();
+      var parent = StubParent();
+      parent.Parent.Should().BeNull();
 
       var chunk = CreateView("Hello World");
       chunk.AddNotify(parent);
+
+
+      ((object) chunk.Parent).Should().Be(parent);
+
+      
       chunk.Measure(Size.Auto);
       chunk.Arrange(new Rectangle(10, 20, 200, 400));
       chunk.Document.InsertAt(11, '\n');
-
       chunk.ExposedRootView.Count.Should().Be(2);
       chunk.ExposedRootView[0].Offset.Should().Be(0);
       chunk.ExposedRootView[0].EndOffset.Should().Be(12);
@@ -52,10 +57,18 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
       chunk.ExposedRootView[1].EndOffset.Should().Be(12);
     }
 
+    static IWidget StubParent()
+    {
+      var parent = Substitute.For<IWidget>();
+      parent.Parent.ReturnsNull();
+      parent.GetStyleParent().ReturnsNull();
+      return parent;
+    }
+
     [Test]
     public void Input_NewLine_Breaks_Lines()
     {
-      var parent = Substitute.For<IWidget>();
+      var parent = StubParent();
 
       var chunk = CreateView();
       chunk.AddNotify(parent);
@@ -69,7 +82,7 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
     [Test]
     public void Input_NewLine_Triggers_LayoutInvalid()
     {
-      var parent = Substitute.For<IWidget>();
+      var parent = StubParent();
 
       var chunk = CreateView();
       chunk.AddNotify(parent);
@@ -98,10 +111,8 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
     {
       var chunk = CreateView();
       chunk.Measure(Size.Auto);
-      int offset;
-      Bias bias;
       chunk.Arrange(new Rectangle(10, 20, 200, 400));
-      chunk.ViewToModel(new Point(50, 55), out offset, out bias).Should().Be(true);
+      chunk.ViewToModel(new Point(50, 55), out var offset, out var bias).Should().Be(true);
       offset.Should().Be(28);
       bias.Should().Be(Bias.Forward);
     }
@@ -111,10 +122,8 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
     {
       var chunk = CreateView();
       chunk.Measure(Size.Auto);
-      int offset;
-      Bias bias;
       chunk.Arrange(new Rectangle(10, 20, 200, 400));
-      chunk.ViewToModel(new Point(45, 55), out offset, out bias).Should().Be(true);
+      chunk.ViewToModel(new Point(45, 55), out var offset, out var bias).Should().Be(true);
       offset.Should().Be(chunk.ExposedRootView[1][0].Offset + 3); // 3rd char on line 2
       bias.Should().Be(Bias.Backward);
     }
@@ -124,10 +133,8 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
     {
       var chunk = CreateView();
       chunk.Measure(Size.Auto);
-      int offset;
-      Bias bias;
       chunk.Arrange(new Rectangle(10, 20, 200, 400));
-      chunk.ViewToModel(new Point(10, 55), out offset, out bias).Should().Be(true);
+      chunk.ViewToModel(new Point(10, 55), out var offset, out var bias).Should().Be(true);
       offset.Should().Be(chunk.ExposedRootView[1][0].Offset); // todo
       bias.Should().Be(Bias.Backward);
     }
@@ -137,10 +144,8 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
     {
       var chunk = CreateView();
       chunk.Measure(Size.Auto);
-      int offset;
-      Bias bias;
       chunk.Arrange(new Rectangle(10, 20, 200, 400));
-      chunk.ViewToModel(new Point(10 + chunk.DesiredSize.WidthInt - 1, 55), out offset, out bias).Should().Be(true);
+      chunk.ViewToModel(new Point(10 + chunk.DesiredSize.WidthInt - 1, 55), out var offset, out var bias).Should().Be(true);
       offset.Should().Be(chunk.ExposedRootView[1][0].EndOffset);
       bias.Should().Be(Bias.Backward);
     }
@@ -150,10 +155,8 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
     {
       var chunk = CreateView();
       chunk.Measure(Size.Auto);
-      int offset;
-      Bias bias;
       chunk.Arrange(new Rectangle(10, 20, 200, 400));
-      chunk.ViewToModel(new Point(50, 25), out offset, out bias).Should().Be(true);
+      chunk.ViewToModel(new Point(50, 25), out var offset, out var bias).Should().Be(true);
       offset.Should().Be(3, "Expect to break at 3 (available width: 40, per char-width 11, thus 3 chars fit the space fully)");
       bias.Should().Be(Bias.Forward);
     }
@@ -163,10 +166,8 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
     {
       var chunk = CreateView();
       chunk.Measure(Size.Auto);
-      int offset;
-      Bias bias;
       chunk.Arrange(new Rectangle(10, 20, 200, 400));
-      chunk.ViewToModel(new Point(45, 25), out offset, out bias).Should().Be(true);
+      chunk.ViewToModel(new Point(45, 25), out var offset, out var bias).Should().Be(true);
       offset.Should().Be(3, "Expect to break at 3 (available width: 35, per char-width 11, thus 3 chars fit the space fully)");
       bias.Should().Be(Bias.Backward);
     }
@@ -176,10 +177,8 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
     {
       var chunk = CreateView();
       chunk.Measure(Size.Auto);
-      int offset;
-      Bias bias;
       chunk.Arrange(new Rectangle(10, 20, 200, 400));
-      chunk.ViewToModel(new Point(10, 25), out offset, out bias).Should().Be(true);
+      chunk.ViewToModel(new Point(10, 25), out var offset, out var bias).Should().Be(true);
       offset.Should().Be(0, "Expect to break at 3 (available width: 35, per char-width 11, thus 3 chars fit the space fully)");
       bias.Should().Be(Bias.Backward);
     }
@@ -191,18 +190,14 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
       chunk.Arrange(new Rectangle(10, 20, 200, 400));
       var position = new Point(10 + chunk.DesiredSize.WidthInt - 1, 25);
 
-      int offset;
-      Bias bias;
-
-      chunk.ViewToModel(position, out offset, out bias).Should().Be(true);
+      chunk.ViewToModel(position, out var offset, out var bias).Should().Be(true);
       chunk.ExposedRootView[0].LayoutRect.Contains(position).Should().BeTrue();
 
       // padding indicates the margins of the text.
       chunk.ExposedRootView[0].LayoutRect.Width.Should().BeLessThan(200 + 11);
 
       offset.Should().Be(chunk.ExposedRootView[0][0].EndOffset - 1);
-      Rectangle rect;
-      chunk.ModelToView(16, out rect).Should().BeTrue();
+      chunk.ModelToView(16, out var rect).Should().BeTrue();
       rect.Contains(position);
       bias.Should().Be(Bias.Forward);
     }
@@ -225,10 +220,7 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
       chunk.Arrange(new Rectangle(10, 20, 200, 400));
       chunk.ExposedRootView[0].LayoutRect.Width.Should().Be(200);
 
-      int offset;
-      Bias bias;
-
-      chunk.ViewToModel(new Point(chunk.DesiredSize.WidthInt + 10 + 1, 25), out offset, out bias).Should().Be(true);
+      chunk.ViewToModel(new Point(chunk.DesiredSize.WidthInt + 10 + 1, 25), out var offset, out var bias).Should().Be(true);
       offset.Should().Be(chunk.ExposedRootView[0].EndOffset - 1); // trimmed by one, as there are trailing white spaces
       bias.Should().Be(Bias.Backward);
     }
@@ -266,8 +258,7 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
       chunk.Measure(Size.Auto);
       chunk.Arrange(new Rectangle(10, 20, 200, 400));
 
-      int result;
-      chunk.ExposedRootView.Navigate(0, Direction.Down, out result).Should().Be(NavigationResult.Valid);
+      chunk.ExposedRootView.Navigate(0, Direction.Down, out var result).Should().Be(NavigationResult.Valid);
       result.Should().Be(13);
     }
 
@@ -278,8 +269,7 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
       chunk.Measure(Size.Auto);
       chunk.Arrange(new Rectangle(10, 20, 200, 400));
 
-      int result;
-      chunk.ExposedRootView.Navigate(14, Direction.Left, out result).Should().Be(NavigationResult.Valid);
+      chunk.ExposedRootView.Navigate(14, Direction.Left, out var result).Should().Be(NavigationResult.Valid);
       result.Should().Be(13);
     }
 
@@ -290,8 +280,7 @@ namespace Steropes.UI.Test.UI.TextWidgets.Documents.PlainText
       chunk.Measure(Size.Auto);
       chunk.Arrange(new Rectangle(10, 20, 200, 400));
 
-      int result;
-      chunk.ExposedRootView.Navigate(12, Direction.Right, out result).Should().Be(NavigationResult.Valid);
+      chunk.ExposedRootView.Navigate(12, Direction.Right, out var result).Should().Be(NavigationResult.Valid);
       result.Should().Be(13);
     }
 

@@ -22,7 +22,7 @@ using Steropes.UI.Widgets.TextWidgets;
 
 namespace Steropes.UI.Demo.Demos
 {
-  class TextAreaPane : ScrollPanel
+  internal class TextAreaPane : ScrollPanel
   {
     const string LoremIpsum =
       @"Lorem ipsum dolor sit amet, harum torquatos intellegat pri ex, ex everti tritani nusquam mea. Pri euripidis posidonium ne, unum natum movet sea ea. Volumus praesent inciderint in eam. Admodum deseruisse eum id, sint lobortis vis ea.
@@ -37,10 +37,12 @@ Pro in labore tritani. Vel cu fugit oportere, omnium vocent sit ex. An mei consu
 
     public TextAreaPane(IUIStyle style) : base(style)
     {
-      var textArea = new TextArea(UIStyle) { Text = LoremIpsum + "\n\n" + LoremIpsum, Anchor = AnchoredRect.Full };
-
       VerticalScrollbarMode = ScrollbarMode.Always;
-      Content = textArea;
+      Content = new TextArea(UIStyle)
+      {
+        Text = LoremIpsum + "\n\n" + LoremIpsum, 
+        Anchor = AnchoredRect.Full
+      };
     }
   }
 }

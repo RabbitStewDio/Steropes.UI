@@ -20,30 +20,57 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-
+using System.Linq;
 using Steropes.UI.Components;
+using Steropes.UI.Util;
 using Steropes.UI.Widgets.Container;
 
 namespace Steropes.UI.Widgets
 {
   public class RadioButtonSet<T> : InternalContentWidget<BoxGroup>
   {
+    readonly EventSupport<ListSelectionEventArgs> selectionChangedSupport;
     bool itemsUpdating;
 
     int selectedButtonIndex;
 
-    public RadioButtonSet(IUIStyle style) : base(style)
+    public RadioButtonSet(IUIStyle style, IEnumerable<T> items = null) : base(style)
     {
+      selectionChangedSupport = new EventSupport<ListSelectionEventArgs>();
       InternalContent = new BoxGroup(UIStyle) { Orientation = Orientation.Horizontal };
       Renderer = DefaultRenderFunction;
 
       DataItems = new ObservableCollection<T>();
+      if (items != null)
+      {
+        DataItems.AddRange(items);
+      }
       DataItems.CollectionChanged += OnItemsChanged;
     }
 
-    public event EventHandler<ListSelectionEventArgs> SelectionChanged;
+    public event EventHandler<ListSelectionEventArgs> SelectionChanged
+    {
+      add { selectionChangedSupport.Event += value; }
+      remove { selectionChangedSupport.Event -= value; }
+    }
+
+    public EventHandler<ListSelectionEventArgs> OnSelectionChanged
+    {
+      get { return selectionChangedSupport.Handler; }
+      set { selectionChangedSupport.Handler = value; }
+    }
 
     public ObservableCollection<T> DataItems { get; }
+
+    public IReadOnlyList<T> Data
+    {
+      get { return DataItems.ToArray(); }
+      set
+      {
+        DataItems.Clear();
+        DataItems.AddRange(value);
+      }
+    }
 
     public Orientation Orientation
     {
@@ -54,6 +81,7 @@ namespace Steropes.UI.Widgets
       set
       {
         InternalContent.Orientation = value;
+        OnPropertyChanged();
       }
     }
 
@@ -66,6 +94,7 @@ namespace Steropes.UI.Widgets
       set
       {
         InternalContent.Spacing = value;
+        OnPropertyChanged();
       }
     }
 
@@ -84,10 +113,40 @@ namespace Steropes.UI.Widgets
         {
           return;
         }
-        GetButtonAt(selectedButtonIndex).Selected = SelectionState.Unselected;
+        var oldBt = GetButtonAt(selectedButtonIndex);
+        if (oldBt != null)
+        {
+          oldBt.Selected = SelectionState.Unselected;
+        }
+
         selectedButtonIndex = value;
-        GetButtonAt(selectedButtonIndex).Selected = SelectionState.Selected;
-        SelectionChanged?.Invoke(this, new ListSelectionEventArgs(false));
+        var newBt = GetButtonAt(selectedButtonIndex);
+        if (newBt != null)
+        {
+          newBt.Selected = SelectionState.Selected;
+        }
+
+        selectionChangedSupport.Raise(this, new ListSelectionEventArgs(false));
+        OnPropertyChanged(nameof(SelectedIndex));
+        OnPropertyChanged(nameof(SelectedItem));
+      }
+    }
+
+    public T SelectedItem
+    {
+      get
+      {
+        var selection = SelectedIndex;
+        if (selection < 0 || selection >= Data.Count)
+        {
+          return default(T);
+        }
+
+        return Data[selection];
+      }
+      set
+      {
+        SelectedIndex = Data.IndexOf(value);
       }
     }
 

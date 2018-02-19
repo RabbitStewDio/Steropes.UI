@@ -32,7 +32,7 @@ namespace Steropes.UI.Styles.Io.Values
 
     public string TypeId => "int";
 
-    public object Parse(IStyleSystem styleSystem, XElement reader)
+    public object Parse(IStyleSystem styleSystem, XElement reader, IStylePropertyContext context)
     {
       return (int)reader;
     }

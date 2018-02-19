@@ -35,8 +35,7 @@ namespace Steropes.UI.Test
     public Func<object, object> Get(Type t, string property)
     {
       var key = Tuple.Create(t, property);
-      Func<object, object> fn;
-      if (cachedAccessors.TryGetValue(key, out fn))
+      if (cachedAccessors.TryGetValue(key, out var fn))
       {
         return fn;
       }

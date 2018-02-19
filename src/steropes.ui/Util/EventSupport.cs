@@ -16,6 +16,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -33,6 +34,8 @@ namespace Steropes.UI.Util
       creatorThread = Thread.CurrentThread.ManagedThreadId;
     }
 
+    public EventHandler<T> Handler { get; set; }
+
     public event EventHandler<T> Event
     {
       add
@@ -41,39 +44,34 @@ namespace Steropes.UI.Util
         {
           eventHandlers = new List<EventHandler<T>>();
         }
+
         eventHandlers.Add(value);
       }
-      remove
-      {
-        eventHandlers?.Remove(value);
-      }
+      remove { eventHandlers?.Remove(value); }
     }
 
-    public virtual void Raise(object source, T e, Func<T, bool> continuation = null)
+    public virtual void Raise(object source, T e)
     {
       if (creatorThread != Thread.CurrentThread.ManagedThreadId)
       {
         throw new InvalidOperationException("Raise must be called from the UI thread.");
       }
 
+      Handler?.Invoke(source, e);
+
       if (eventHandlers == null)
       {
         return;
       }
-
-      var cont = continuation ?? AcceptAll;
 
       for (var index = 0; index < eventHandlers.Count; index++)
       {
         var eventHandler = eventHandlers[index];
-        if (cont(e))
-        {
-          eventHandler?.Invoke(source, e);
-        }
+        eventHandler?.Invoke(source, e);
       }
     }
 
-    public virtual void RaiseReverse(object source, T e, Func<T, bool> continuation = null)
+    public virtual void RaiseReverse(object source, T e)
     {
       if (creatorThread != Thread.CurrentThread.ManagedThreadId)
       {
@@ -85,21 +83,11 @@ namespace Steropes.UI.Util
         return;
       }
 
-      var cont = continuation ?? AcceptAll;
-
       for (var i = eventHandlers.Count - 1; i >= 0; i--)
       {
         var eventHandler = eventHandlers[i];
-        if (cont(e))
-        {
-          eventHandler?.Invoke(source, e);
-        }
+        eventHandler?.Invoke(source, e);
       }
-    }
-
-    static bool AcceptAll(T dummy)
-    {
-      return true;
     }
   }
 }

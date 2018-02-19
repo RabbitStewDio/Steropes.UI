@@ -46,7 +46,7 @@ namespace Steropes.UI.Styles.Io.Values
 
     public string TypeId => "Insets";
 
-    public object Parse(IStyleSystem styleSystem, XElement reader)
+    public object Parse(IStyleSystem styleSystem, XElement reader, IStylePropertyContext context)
     {
       if (reader == null)
       {

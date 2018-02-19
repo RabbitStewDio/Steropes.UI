@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using Steropes.UI.Components;
+using Steropes.UI.Platform;
 using Steropes.UI.Styles.Io;
 using Steropes.UI.Styles.Io.Values;
 using Steropes.UI.Widgets;
@@ -41,7 +42,10 @@ namespace Steropes.UI.Styles
       this.registeredKeys = new Dictionary<string, IStyleKey>();
       this.instances = new Dictionary<Type, IStyleDefinition>();
       this.serializers = new List<IStylePropertySerializer>();
+      this.WhitePixel = contentLoader.WhitePixel;
     }
+
+    public IUITexture WhitePixel { get; set; }
 
     public IContentLoader ContentLoader { get; }
 

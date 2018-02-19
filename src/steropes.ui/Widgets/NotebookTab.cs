@@ -16,13 +16,13 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 using System;
-
 using Microsoft.Xna.Framework.Input;
-
 using Steropes.UI.Components;
 using Steropes.UI.Input.KeyboardInput;
 using Steropes.UI.Input.MouseInput;
+using Steropes.UI.Util;
 using Steropes.UI.Widgets.Container;
 
 namespace Steropes.UI.Widgets
@@ -40,26 +40,37 @@ namespace Steropes.UI.Widgets
     void Close();
   }
 
-  public class NotebookTab : InternalContentWidget<DockPanel>, INotebookTab
+  public interface INotebookTab<out TWidget, out THeaderWidget> : INotebookTab where TWidget : IWidget
+                                                                               where THeaderWidget : IWidget
+  {
+    new TWidget Content { get; }
+    THeaderWidget HeaderContent { get; }
+  }
+
+  public class NotebookTab<TWidget, THeaderWidget> : InternalContentWidget<DockPanel>,
+                                                     INotebookTab<TWidget, THeaderWidget> where TWidget : IWidget
+                                                                                          where THeaderWidget : class,
+                                                                                          IWidget
   {
     public static readonly string CloseButtonStyleClass = "NotebookTabCloseButton";
 
+    readonly EventSupport<EventArgs> activationRequestedSupport;
+    readonly EventSupport<EventArgs> closeRequestedSupport;
     readonly Button closeButton;
-
     readonly IWidget emptyContent;
 
-    IWidget content;
-
-    IWidget headerContent;
-
+    TWidget content;
+    THeaderWidget headerContent;
     bool pinned;
-
     bool isActive;
 
-    public NotebookTab(IUIStyle style, IWidget headerContent, IWidget content) : base(style)
+    public NotebookTab(IUIStyle style) : base(style)
     {
+      activationRequestedSupport = new EventSupport<EventArgs>();
+      closeRequestedSupport = new EventSupport<EventArgs>();
+
       emptyContent = new Label(UIStyle) { Anchor = AnchoredRect.CreateHorizontallyStretched() };
-      
+
       closeButton = new Button(UIStyle);
       closeButton.AddStyleClass(CloseButtonStyleClass);
       closeButton.Anchor = AnchoredRect.CreateCentered();
@@ -74,21 +85,41 @@ namespace Steropes.UI.Widgets
       MouseClicked += OnMouseClick;
 
       Focusable = true;
+    }
 
+    public NotebookTab(IUIStyle style, THeaderWidget headerContent, TWidget content) : this(style)
+    {
       HeaderContent = headerContent;
       Content = content;
     }
 
-    public event EventHandler<EventArgs> ActivationRequested;
-
-    public event EventHandler<EventArgs> CloseRequested;
-
-    public IWidget Content
+    public event EventHandler<EventArgs> ActivationRequested
     {
-      get
-      {
-        return content;
-      }
+      add { activationRequestedSupport.Event += value; }
+      remove { activationRequestedSupport.Event -= value; }
+    }
+
+    public EventHandler<EventArgs> OnActivationRequested
+    {
+      get { return activationRequestedSupport.Handler; }
+      set { activationRequestedSupport.Handler = value; }
+    }
+
+    public event EventHandler<EventArgs> CloseRequested
+    {
+      add { closeRequestedSupport.Event += value; }
+      remove { closeRequestedSupport.Event -= value; }
+    }
+
+    public EventHandler<EventArgs> OnCloseRequested
+    {
+      get { return closeRequestedSupport.Handler; }
+      set { closeRequestedSupport.Handler = value; }
+    }
+
+    public TWidget Content
+    {
+      get { return content; }
       set
       {
         if (ReferenceEquals(content, value))
@@ -101,12 +132,9 @@ namespace Steropes.UI.Widgets
       }
     }
 
-    public IWidget HeaderContent
+    public THeaderWidget HeaderContent
     {
-      get
-      {
-        return headerContent;
-      }
+      get { return headerContent; }
       set
       {
         if (ReferenceEquals(headerContent, value))
@@ -121,18 +149,21 @@ namespace Steropes.UI.Widgets
       }
     }
 
+    IWidget INotebookTab.Content
+    {
+      get { return Content; }
+    }
+
     public bool IsActive
     {
-      get
-      {
-        return isActive;
-      }
+      get { return isActive; }
       set
       {
         if (value == isActive)
         {
           return;
         }
+
         isActive = value;
         OnPropertyChanged();
         InvalidateLayout();
@@ -141,22 +172,13 @@ namespace Steropes.UI.Widgets
 
     public bool IsClosable
     {
-      get
-      {
-        return !IsPinned;
-      }
-      set
-      {
-        IsPinned = !value;
-      }
+      get { return !IsPinned; }
+      set { IsPinned = !value; }
     }
 
     public bool IsPinned
     {
-      get
-      {
-        return pinned;
-      }
+      get { return pinned; }
       set
       {
         pinned = value;
@@ -170,13 +192,13 @@ namespace Steropes.UI.Widgets
     {
       if (IsClosable)
       {
-        CloseRequested?.Invoke(this, EventArgs.Empty);
+        closeRequestedSupport.Raise(this, EventArgs.Empty);
       }
     }
 
     void ActivateTab()
     {
-      ActivationRequested?.Invoke(this, EventArgs.Empty);
+      activationRequestedSupport.Raise(this, EventArgs.Empty);
     }
 
     void OnCloseButtonOnClicked(object sender, EventArgs e)
@@ -195,15 +217,15 @@ namespace Steropes.UI.Widgets
       {
         case Keys.Space:
         case Keys.Enter:
-          {
-            args.Consume();
-            ActivateTab();
-            break;
-          }
+        {
+          args.Consume();
+          ActivateTab();
+          break;
+        }
         default:
-          {
-            break;
-          }
+        {
+          break;
+        }
       }
     }
 
@@ -215,23 +237,16 @@ namespace Steropes.UI.Widgets
         ActivateTab();
       }
     }
+  }
 
-    /*
-    protected override void DrawWidget(IBatchedDrawingService drawingService)
+  public class NotebookTab : NotebookTab<IWidget, IWidget>
+  {
+    public NotebookTab(IUIStyle style) : base(style)
     {
-      base.DrawWidget(drawingService);
-      drawingService.DrawBox(IsActive ? NotebookStyle.ActiveTab : NotebookStyle.Tab, LayoutRect, Color.White);
-
-      if (Hovered && Screen?.FocusManager?.IsActive == true)
-      {
-        drawingService.DrawBox(UIStyle.Style.ButtonStyle.HoverOverlay, LayoutRect, Color.White);
-      }
-
-      if (Screen?.FocusManager?.IsActive == true && Focused)
-      {
-        drawingService.DrawBox(IsActive ? NotebookStyle.ActiveTabFocus : NotebookStyle.TabFocus, LayoutRect, Color.White);
-      }
     }
-    */
+
+    public NotebookTab(IUIStyle style, IWidget headerContent, IWidget content) : base(style, headerContent, content)
+    {
+    }
   }
 }

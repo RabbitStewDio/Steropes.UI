@@ -17,7 +17,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 using System;
-
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Steropes.UI.Platform
@@ -39,6 +39,21 @@ namespace Steropes.UI.Platform
     {
       CornerArea = cornerArea;
       Margins = margins;
+    }
+
+    public BoxTexture(Texture2D texture, Rectangle bounds, string name, int insets) : this(texture, bounds, name, new Insets(insets), Insets.Zero)
+    {
+    }
+
+    public BoxTexture(Texture2D texture, Rectangle bounds, string name, Insets cornerArea, Insets margins) : base(texture, bounds, name)
+    {
+      CornerArea = cornerArea;
+      Margins = margins;
+    }
+
+    public override IUITexture Rebase(Texture2D texture, Rectangle bounds, string name)
+    {
+      return new BoxTexture(texture, bounds, name, CornerArea, Margins);
     }
 
     public Insets CornerArea { get; }

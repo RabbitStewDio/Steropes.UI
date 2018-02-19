@@ -41,9 +41,11 @@ namespace Steropes.UI.Demo.GameStates
     {
       public string Name { get; }
       public List<IStyleRule> Rules { get; }
+      public IUITexture WhitePixel { get; }
 
-      public StyleDefinition(string name, List<IStyleRule> rules)
+      public StyleDefinition(string name, List<IStyleRule> rules, IUITexture whitePixel)
       {
+        this.WhitePixel = whitePixel;
         Name = name;
         Rules = rules;
       }
@@ -54,6 +56,8 @@ namespace Steropes.UI.Demo.GameStates
       }
     }
 
+    readonly FrameRateCalculator frameRateCalculator;
+
     readonly IInputManager inputManager;
 
     readonly IGameStateManager stateService;
@@ -62,9 +66,14 @@ namespace Steropes.UI.Demo.GameStates
 
     readonly List<StyleDefinition> styles;
 
-    public GameStateMainMenu(Game game, IBatchedDrawingService drawingService, IInputManager inputManager, IGameStateManager stateService, IGameWindowService windowService)
+    public GameStateMainMenu(Game game, 
+                             IBatchedDrawingService drawingService, 
+                             IInputManager inputManager, 
+                             IGameStateManager stateService, 
+                             IGameWindowService windowService)
       : base(drawingService)
     {
+      this.frameRateCalculator = new FrameRateCalculator();
       this.inputManager = inputManager;
       this.stateService = stateService;
       this.windowService = windowService;
@@ -77,11 +86,23 @@ namespace Steropes.UI.Demo.GameStates
 
     IUIManager UIManager { get; set; }
 
-    public override void Draw()
+    public override void Draw(GameTime time)
     {
+      frameRateCalculator.BeginTime();
       Game.GraphicsDevice.Clear(Color.Black);
 
       UIManager.Draw();
+      frameRateCalculator.EndTime();
+    }
+
+    StyleDefinition Load(string context, string filename)
+    {
+      var rules = UIManager.UIStyle.StyleSystem
+        .WithContext(context)
+        .CreateParser(Game.GraphicsDevice)
+        .Read(XDocument.Load(filename));
+
+      return new StyleDefinition("Metro", rules, UIManager.UIStyle.StyleSystem.WhitePixel);
     }
 
     public override void Start()
@@ -91,10 +112,10 @@ namespace Steropes.UI.Demo.GameStates
       UIManager.Start();
 
       styles.Clear();
-      styles.Add(new StyleDefinition("Nuclear Winter", 
-        UIManager.UIStyle.StyleSystem.WithContext("UI/NuclearWinter").CreateParser().Read(XDocument.Load("Content/UI/NuclearWinter/style.xml"))));
-      styles.Add(new StyleDefinition("Metro",
-        UIManager.UIStyle.StyleSystem.WithContext("UI/Metro").CreateParser().Read(XDocument.Load("Content/UI/Metro/style.xml"))));
+      styles.Add(Load("UI/Metro", "Content/UI/Metro/style.xml"));
+      styles.Add(Load("UI/NuclearWinter", "Content/UI/NuclearWinter/style.xml"));
+
+      Select(styles[0]);
 
       UIManager.UIStyle.StyleResolver.StyleRules.Clear();
       UIManager.UIStyle.StyleResolver.StyleRules.AddRange(styles[0].Rules);
@@ -107,7 +128,7 @@ namespace Steropes.UI.Demo.GameStates
 
     Widget CreateContentPane(IUIStyle style)
     {
-      Grid g = new Grid(style);
+      var g = new Grid(style);
       g.ColumnConstraints.Add(LengthConstraint.Percentage(100));
       g.RowConstraints.Add(LengthConstraint.Auto);
       g.RowConstraints.Add(LengthConstraint.Relative(1));
@@ -126,15 +147,21 @@ namespace Steropes.UI.Demo.GameStates
       }
       radioButtons.SelectionChanged += (sender, args) =>
         {
-          StyleDefinition d;
-          if (radioButtons.LookUpSelectedItem(out d))
+          if (radioButtons.LookUpSelectedItem(out var d))
           {
-            uiStyle.StyleResolver.StyleRules.Clear();
-            uiStyle.StyleResolver.StyleRules.AddRange(d.Rules);
+            Select(d);
           }
         };
 
       return new BoxGroup(uiStyle, Orientation.Vertical, 0) { radioButtons };
+    }
+
+    void Select(StyleDefinition d)
+    {
+      UIManager.UIStyle.StyleResolver.StyleRules.Clear();
+      UIManager.UIStyle.StyleResolver.StyleRules.AddRange(d.Rules);
+      UIManager.UIStyle.StyleSystem.WhitePixel = d.WhitePixel;
+      DrawingService.WhitePixel = d.WhitePixel;
     }
 
     public override void Stop()
@@ -147,7 +174,12 @@ namespace Steropes.UI.Demo.GameStates
 
     public override void Update(GameTime elapsedTime)
     {
+      frameRateCalculator.BeginTime();
       UIManager.Update(elapsedTime);
+      frameRateCalculator.EndTime();
+      frameRateCalculator.Update(elapsedTime);
+
+      UIManager.ScreenService.WindowService.Title = frameRateCalculator.ToString();
     }
   }
 }

@@ -16,6 +16,8 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
+using Steropes.UI.Platform;
 using Steropes.UI.Styles.Io;
 using Steropes.UI.Styles.Io.Values;
 
@@ -24,6 +26,8 @@ namespace Steropes.UI.Styles
   public interface IStyleSystem
   {
     IContentLoader ContentLoader { get; }
+
+    IUITexture WhitePixel { get; set; }
 
     void ConfigureStyleSerializer(IStyleSerializerConfiguration parser);
 

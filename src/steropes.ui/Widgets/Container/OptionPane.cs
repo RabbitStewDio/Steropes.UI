@@ -25,12 +25,14 @@ using Steropes.UI.Components;
 using Steropes.UI.Components.Window;
 using Steropes.UI.I18N;
 using Steropes.UI.Platform;
+using Steropes.UI.Util;
 
 namespace Steropes.UI.Widgets.Container
 {
   public class OptionPane<TOptionContent> : InternalContentWidget<DockPanel>
     where TOptionContent : IWidget
   {
+    readonly EventSupport<OptionPaneActionArgs> actionPerformedSupport;
     readonly Grid buttonContainer;
 
     readonly Label dummyContent;
@@ -39,6 +41,7 @@ namespace Steropes.UI.Widgets.Container
 
     public OptionPane(IUIStyle style) : base(style)
     {
+      actionPerformedSupport = new EventSupport<OptionPaneActionArgs>();
       TitleLabel = new Label(UIStyle);
 
       dummyContent = new Label(UIStyle);
@@ -53,7 +56,17 @@ namespace Steropes.UI.Widgets.Container
       InternalContent.Add(dummyContent, DockPanelConstraint.Left);
     }
 
-    public event EventHandler<OptionPaneActionArgs> ActionPerformed;
+    public event EventHandler<OptionPaneActionArgs> ActionPerformed
+    {
+      add { actionPerformedSupport.Event += value; }
+      remove { actionPerformedSupport.Event -= value; }
+    }
+    
+    public EventHandler<OptionPaneActionArgs> OnActionPerformed
+    {
+      get { return actionPerformedSupport.Handler; }
+      set { actionPerformedSupport.Handler = value; }
+    }
 
     public TOptionContent OptionContent
     {
@@ -115,7 +128,7 @@ namespace Steropes.UI.Widgets.Container
 
       var b = new Button(UIStyle);
       b.Content.Label.Text = text;
-      b.ActionPerformed += (s, o) => ActionPerformed?.Invoke(this, new OptionPaneActionArgs(bs));
+      b.ActionPerformed += (s, o) => actionPerformedSupport.Raise(this, new OptionPaneActionArgs(bs));
       buttonContainer.ColumnConstraints.Add(LengthConstraint.Auto);
       buttonContainer.Add(b, new Point(buttonContainer.Count, 0));
     }

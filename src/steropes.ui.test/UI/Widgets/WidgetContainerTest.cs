@@ -16,6 +16,8 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
+using System;
 using FluentAssertions;
 
 using NUnit.Framework;
@@ -39,7 +41,7 @@ namespace Steropes.UI.Test.UI.Widgets
       g[0].Should().BeSameAs(widget);
 
       var enumerator = g.GetEnumerator();
-      enumerator.Current.Should().BeNull();
+      enumerator.Invoking(e => { var x = e.Current; }).Should().Throw<InvalidOperationException>();
       enumerator.MoveNext().Should().BeTrue();
       enumerator.Current.Should().BeSameAs(widget);
       enumerator.MoveNext().Should().BeFalse();

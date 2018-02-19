@@ -38,7 +38,7 @@ namespace Steropes.UI.Styles.Io.Values
 
     public string TypeId => TargetType.Name;
 
-    public object Parse(IStyleSystem styleSystem, XElement reader)
+    public object Parse(IStyleSystem styleSystem, XElement reader, IStylePropertyContext context)
     {
       string value = reader.Value;
       if (string.IsNullOrEmpty(value))

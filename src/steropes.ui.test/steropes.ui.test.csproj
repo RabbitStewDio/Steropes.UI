@@ -25,6 +25,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>7</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -33,6 +34,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>7</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -53,19 +55,11 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FluentAssertions, Version=4.18.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
-      <HintPath>..\packages\FluentAssertions.4.18.0\lib\net45\FluentAssertions.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="FluentAssertions.Core, Version=4.18.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
-      <HintPath>..\packages\FluentAssertions.4.18.0\lib\net45\FluentAssertions.Core.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="FluentAssertions, Version=5.0.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
+      <HintPath>..\packages\FluentAssertions.5.0.0\lib\net45\FluentAssertions.dll</HintPath>
     </Reference>
     <Reference Include="MonoGame.Framework, Version=3.6.0.1625, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\MonoGame.Framework.WindowsDX.3.6.0.1625\lib\net40\MonoGame.Framework.dll</HintPath>
-    </Reference>
-    <Reference Include="MonoGame.Framework.Content.Pipeline">
-      <HintPath>$(MSBuildExtensionsPath)\MonoGame\v3.0\Tools\MonoGame.Framework.Content.Pipeline.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
       <HintPath>..\packages\NLog.4.4.0\lib\net45\NLog.dll</HintPath>
@@ -81,6 +75,9 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.ValueTuple, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.3.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -91,6 +88,19 @@
   <ItemGroup>
     <Compile Include="Animation\AnimatedValueTest.cs" />
     <Compile Include="AssertionHelper.cs" />
+    <Compile Include="Bindings\AutoBindingCreationTest.cs" />
+    <Compile Include="Bindings\BindingAssertions.cs" />
+    <Compile Include="Bindings\BindingExample.cs" />
+    <Compile Include="Bindings\BindingFixtureElement.cs" />
+    <Compile Include="Bindings\BindingMappingTest.cs" />
+    <Compile Include="Bindings\BindingTargetTest.cs" />
+    <Compile Include="Bindings\ChainedBindingCreationTest.cs" />
+    <Compile Include="Bindings\ExplicitBindingCreationTest.cs" />
+    <Compile Include="Bindings\ListBindingCreationTest.cs" />
+    <Compile Include="Bindings\ListBindingSinkTest.cs" />
+    <Compile Include="Bindings\ListBindingTransformationTest.cs" />
+    <Compile Include="Bindings\NColChngEvtArgFix.cs" />
+    <Compile Include="Bindings\WidgetBindingTests.cs" />
     <Compile Include="ExpressionCache.cs" />
     <Compile Include="FunctionRecorder.cs" />
     <Compile Include="LayoutTestStyle.cs" />
@@ -128,12 +138,14 @@
     <Compile Include="UI\Widgets\BoxGroupTests.cs" />
     <Compile Include="UI\Widgets\ButtonTest.cs" />
     <Compile Include="UI\Widgets\CheckBoxTest.cs" />
+    <Compile Include="UI\Widgets\ContentWidgetTest.cs" />
     <Compile Include="UI\Widgets\DockPanelTest.cs" />
     <Compile Include="UI\Widgets\GridTest.cs" />
     <Compile Include="UI\Widgets\GroupTests.cs" />
     <Compile Include="UI\Widgets\IconLabelTest.cs" />
     <Compile Include="UI\Widgets\KeyBoxTest.cs" />
     <Compile Include="UI\Widgets\LabelTest.cs" />
+    <Compile Include="UI\Widgets\ListViewWidgetTest.cs" />
     <Compile Include="UI\Widgets\NotebookTabTest.cs" />
     <Compile Include="UI\Widgets\NotebookTest.cs" />
     <Compile Include="UI\Widgets\ScrollPanelTest.cs" />
@@ -165,10 +177,8 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\MSBuildTasks.1.5.0.214\build\MSBuildTasks.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MSBuildTasks.1.5.0.214\build\MSBuildTasks.targets'))" />
-    <Error Condition="!Exists('..\packages\StyleCop.MSBuild.4.7.55.0\build\StyleCop.MSBuild.Targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\StyleCop.MSBuild.4.7.55.0\build\StyleCop.MSBuild.Targets'))" />
   </Target>
   <Import Project="..\packages\MSBuildTasks.1.5.0.214\build\MSBuildTasks.targets" Condition="Exists('..\packages\MSBuildTasks.1.5.0.214\build\MSBuildTasks.targets')" />
-  <Import Project="..\packages\StyleCop.MSBuild.4.7.55.0\build\StyleCop.MSBuild.Targets" Condition="Exists('..\packages\StyleCop.MSBuild.4.7.55.0\build\StyleCop.MSBuild.Targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

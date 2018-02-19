@@ -31,13 +31,8 @@ namespace Steropes.UI.State
 
     protected GameStateFadeTransition(IBatchedDrawingService drawingService)
     {
-      if (drawingService == null)
-      {
-        throw new ArgumentNullException(nameof(drawingService));
-      }
-
       Transition = new LerpValue(0, 1, TransitionDuration);
-      DrawingService = drawingService;
+      DrawingService = drawingService ?? throw new ArgumentNullException(nameof(drawingService));
     }
 
     public IBatchedDrawingService DrawingService { get; }
@@ -48,14 +43,14 @@ namespace Steropes.UI.State
 
     protected bool Stopping { get; private set; }
 
-    public override void DrawFadeIn()
+    public override void DrawFadeIn(GameTime time)
     {
-      Draw(Transition.CurrentValue);
+      Draw(time, Transition.CurrentValue);
     }
 
-    public override void DrawFadeOut()
+    public override void DrawFadeOut(GameTime time)
     {
-      Draw(Transition.CurrentValue);
+      Draw(time, Transition.CurrentValue);
     }
 
     public override void Start()
@@ -109,9 +104,9 @@ namespace Steropes.UI.State
       return true;
     }
 
-    void Draw(float transitionTime)
+    void Draw(GameTime time, float transitionTime)
     {
-      Draw();
+      Draw(time);
 
       var fadeColor = Color.Black * (1f - transitionTime);
 

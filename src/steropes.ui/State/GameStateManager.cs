@@ -113,22 +113,22 @@ namespace Steropes.UI.State
     {
       if (isExiting)
       {
-        CurrentState?.DrawFadeOut();
+        CurrentState?.DrawFadeOut(time);
       }
       else if (NextState != null)
       {
         if (CurrentState != null)
         {
-          CurrentState.DrawFadeOut();
+          CurrentState.DrawFadeOut(time);
         }
         else
         {
-          NextState.DrawFadeIn();
+          NextState.DrawFadeIn(time);
         }
       }
       else
       {
-        CurrentState?.Draw();
+        CurrentState?.Draw(time);
       }
     }
 
@@ -143,12 +143,7 @@ namespace Steropes.UI.State
     /// <param name="newState"></param>
     public void SwitchState(IGameState newState)
     {
-      if (newState == null)
-      {
-        throw new ArgumentNullException(nameof(newState));
-      }
-
-      NextState = newState;
+      NextState = newState ?? throw new ArgumentNullException(nameof(newState));
 
       if (CurrentState == null)
       {

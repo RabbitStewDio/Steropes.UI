@@ -16,14 +16,13 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
 using Steropes.UI.Util;
 
 namespace Steropes.UI.Platform
@@ -34,13 +33,34 @@ namespace Steropes.UI.Platform
 
     GraphicsDevice GraphicsDevice { get; }
 
-    IUITexture WhitePixelTex { get; }
+    IUITexture WhitePixel { get; set; }
 
-    void Draw(IUITexture texture, Rectangle destinationRectangle, Rectangle? sourceRectangle, Color color, float rotation, Vector2 origin, SpriteEffects effects, float layerDepth);
+    void Draw(IUITexture texture,
+              Rectangle destinationRectangle,
+              Rectangle? sourceRectangle,
+              Color color,
+              float rotation,
+              Vector2 origin,
+              SpriteEffects effects,
+              float layerDepth);
 
-    void DrawBlurredText(IUIFont uiFont, string label, Vector2 position, Color color, float blurRadius, Color blurColor, Vector2 origin = new Vector2(), float scale = 1f);
+    void DrawBlurredText(IUIFont uiFont,
+                         string label,
+                         Vector2 position,
+                         Color color,
+                         float blurRadius,
+                         Color blurColor,
+                         Vector2 origin = new Vector2(),
+                         float scale = 1f);
 
-    void DrawBlurredText(IUIFont uiFont, StringBuilder label, Vector2 position, Color color, float blurRadius, Color blurColor, Vector2 origin = new Vector2(), float scale = 1f);
+    void DrawBlurredText(IUIFont uiFont,
+                         StringBuilder label,
+                         Vector2 position,
+                         Color color,
+                         float blurRadius,
+                         Color blurColor,
+                         Vector2 origin = new Vector2(),
+                         float scale = 1f);
 
     void DrawImage(IUITexture image, Rectangle position, Color tint);
 
@@ -79,13 +99,20 @@ namespace Steropes.UI.Platform
   public class BatchedDrawingService : IBatchedDrawingService
   {
     readonly Stack<Rectangle> scissorRects = new Stack<Rectangle>();
+    readonly UITexture whitePixelTex;
 
-    public BatchedDrawingService(Game game)
+    IUITexture whitePixel;
+
+    public BatchedDrawingService(Game game): this(game.GraphicsDevice)
     {
-      Game = game;
+    }
 
-      WhitePixelTex = new UITexture(new Texture2D(GraphicsDevice, 1, 1, false, SurfaceFormat.Color));
-      WhitePixelTex.Texture.SetData(new[] { Color.White });
+    public BatchedDrawingService(GraphicsDevice graphicsDevice)
+    {
+      GraphicsDevice = graphicsDevice ?? throw new ArgumentNullException(nameof(graphicsDevice));
+
+      whitePixelTex = new UITexture(new Texture2D(GraphicsDevice, 1, 1, false, SurfaceFormat.Color));
+      whitePixelTex.Texture.SetData(new[] { Color.White });
 
       SpriteBatch = new SpriteBatch(GraphicsDevice);
 
@@ -94,43 +121,56 @@ namespace Steropes.UI.Platform
       SpriteMatrix = Matrix.Identity;
     }
 
-    public Rectangle Bounds => GraphicsDevice.Viewport.Bounds;
+    public Rectangle ScissorRectangle
+    {
+      get { return scissorRects.Count > 0 ? scissorRects.Peek() : GraphicsDevice.Viewport.Bounds; }
+    }
 
-    public bool DebugDrawing { get; set; }
-
-    public GraphicsDevice GraphicsDevice => Game.GraphicsDevice;
-
-    public Rectangle ScissorRectangle => this.scissorRects.Count > 0 ? this.scissorRects.Peek() : GraphicsDevice.Viewport.Bounds;
-
-    public Matrix SpriteMatrix { get; protected set; }
-
-    public IUITexture WhitePixelTex { get; protected set; }
+    public Matrix SpriteMatrix { get; }
 
     bool DrawingInProgress { get; set; }
 
-    Game Game { get; }
-
-    RasterizerState ScissorRasterizerState { get; }
+    protected RasterizerState ScissorRasterizerState { get; }
 
     SpriteBatch SpriteBatch { get; }
 
-    public void Draw(
-      IUITexture texture,
-      Rectangle destinationRectangle,
-      Rectangle? sourceRectangle,
-      Color color,
-      float rotation,
-      Vector2 origin,
-      SpriteEffects effects,
-      float layerDepth)
+    public IUITexture WhitePixel
+    {
+      get { return whitePixel ?? whitePixelTex; }
+      set { whitePixel = value; }
+    }
+
+    public Rectangle Bounds
+    {
+      get { return GraphicsDevice.Viewport.Bounds; }
+    }
+
+    public GraphicsDevice GraphicsDevice { get; }
+
+    public void Draw(IUITexture texture,
+                     Rectangle destinationRectangle,
+                     Rectangle? sourceRectangle,
+                     Color color,
+                     float rotation,
+                     Vector2 origin,
+                     SpriteEffects effects,
+                     float layerDepth)
     {
       if (texture.Texture != null)
       {
-        SpriteBatch.Draw(texture.Texture, destinationRectangle, sourceRectangle, color, rotation, origin, effects, layerDepth);
+        SpriteBatch.Draw(texture.Texture, destinationRectangle, sourceRectangle, color, rotation, origin, effects,
+                         layerDepth);
       }
     }
 
-    public void DrawBlurredText(IUIFont uiFont, string label, Vector2 position, Color color, float blurRadius, Color blurColor, Vector2 origin = new Vector2(), float scale = 1f)
+    public void DrawBlurredText(IUIFont uiFont,
+                                string label,
+                                Vector2 position,
+                                Color color,
+                                float blurRadius,
+                                Color blurColor,
+                                Vector2 origin = new Vector2(),
+                                float scale = 1f)
     {
       position.Y -= uiFont.Baseline;
       var font = uiFont.SpriteFont;
@@ -138,16 +178,28 @@ namespace Steropes.UI.Platform
       {
         var effectiveBlurColor = blurColor * 0.1f * (color.A / 255f);
 
-        SpriteBatch.DrawString(font, label, new Vector2(position.X - blurRadius, position.Y - blurRadius), effectiveBlurColor, 0f, origin, scale, SpriteEffects.None, 0f);
-        SpriteBatch.DrawString(font, label, new Vector2(position.X + blurRadius, position.Y - blurRadius), effectiveBlurColor, 0f, origin, scale, SpriteEffects.None, 0f);
-        SpriteBatch.DrawString(font, label, new Vector2(position.X + blurRadius, position.Y + blurRadius), effectiveBlurColor, 0f, origin, scale, SpriteEffects.None, 0f);
-        SpriteBatch.DrawString(font, label, new Vector2(position.X - blurRadius, position.Y + blurRadius), effectiveBlurColor, 0f, origin, scale, SpriteEffects.None, 0f);
+        SpriteBatch.DrawString(font, label, new Vector2(position.X - blurRadius, position.Y - blurRadius),
+                               effectiveBlurColor, 0f, origin, scale, SpriteEffects.None, 0f);
+        SpriteBatch.DrawString(font, label, new Vector2(position.X + blurRadius, position.Y - blurRadius),
+                               effectiveBlurColor, 0f, origin, scale, SpriteEffects.None, 0f);
+        SpriteBatch.DrawString(font, label, new Vector2(position.X + blurRadius, position.Y + blurRadius),
+                               effectiveBlurColor, 0f, origin, scale, SpriteEffects.None, 0f);
+        SpriteBatch.DrawString(font, label, new Vector2(position.X - blurRadius, position.Y + blurRadius),
+                               effectiveBlurColor, 0f, origin, scale, SpriteEffects.None, 0f);
       }
 
-      SpriteBatch.DrawString(font, label, new Vector2(position.X, position.Y), color, 0f, origin, scale, SpriteEffects.None, 0f);
+      SpriteBatch.DrawString(font, label, new Vector2(position.X, position.Y), color, 0f, origin, scale,
+                             SpriteEffects.None, 0f);
     }
 
-    public void DrawBlurredText(IUIFont uiFont, StringBuilder label, Vector2 position, Color color, float blurRadius, Color blurColor, Vector2 origin, float scale)
+    public void DrawBlurredText(IUIFont uiFont,
+                                StringBuilder label,
+                                Vector2 position,
+                                Color color,
+                                float blurRadius,
+                                Color blurColor,
+                                Vector2 origin,
+                                float scale)
     {
       position.Y -= uiFont.Baseline;
       var font = uiFont.SpriteFont;
@@ -155,28 +207,39 @@ namespace Steropes.UI.Platform
       {
         var effectiveBlurColor = blurColor * 0.1f * (color.A / 255f);
 
-        SpriteBatch.DrawString(font, label, new Vector2(position.X - blurRadius, position.Y - blurRadius), effectiveBlurColor, 0f, origin, scale, SpriteEffects.None, 0f);
-        SpriteBatch.DrawString(font, label, new Vector2(position.X + blurRadius, position.Y - blurRadius), effectiveBlurColor, 0f, origin, scale, SpriteEffects.None, 0f);
-        SpriteBatch.DrawString(font, label, new Vector2(position.X + blurRadius, position.Y + blurRadius), effectiveBlurColor, 0f, origin, scale, SpriteEffects.None, 0f);
-        SpriteBatch.DrawString(font, label, new Vector2(position.X - blurRadius, position.Y + blurRadius), effectiveBlurColor, 0f, origin, scale, SpriteEffects.None, 0f);
+        SpriteBatch.DrawString(font, label, new Vector2(position.X - blurRadius, position.Y - blurRadius),
+                               effectiveBlurColor, 0f, origin, scale, SpriteEffects.None, 0f);
+        SpriteBatch.DrawString(font, label, new Vector2(position.X + blurRadius, position.Y - blurRadius),
+                               effectiveBlurColor, 0f, origin, scale, SpriteEffects.None, 0f);
+        SpriteBatch.DrawString(font, label, new Vector2(position.X + blurRadius, position.Y + blurRadius),
+                               effectiveBlurColor, 0f, origin, scale, SpriteEffects.None, 0f);
+        SpriteBatch.DrawString(font, label, new Vector2(position.X - blurRadius, position.Y + blurRadius),
+                               effectiveBlurColor, 0f, origin, scale, SpriteEffects.None, 0f);
       }
 
-      SpriteBatch.DrawString(font, label, new Vector2(position.X, position.Y), color, 0f, origin, scale, SpriteEffects.None, 0f);
+      SpriteBatch.DrawString(font, label, new Vector2(position.X, position.Y), color, 0f, origin, scale,
+                             SpriteEffects.None, 0f);
     }
 
     public void DrawImage(IUITexture image, Rectangle position, Color tint)
     {
       if (image.Texture != null)
       {
-        SpriteBatch.Draw(image.Texture, position, tint);
+        SpriteBatch.Draw(image.Texture, position, image.Bounds, tint);
       }
     }
 
     public void DrawLine(Vector2 from, Vector2 to, Color color, float width = 1f)
     {
-      var angle = (float)Math.Atan2(to.Y - from.Y, to.X - from.X);
-      var length = Vector2.Distance(from, to);
-      SpriteBatch.Draw(WhitePixelTex.Texture, (from + to) / 2f, null, color, angle, new Vector2(0.5f), new Vector2(length + width, width), SpriteEffects.None, 0);
+      var wp = WhitePixel;
+      if (wp?.Texture != null)
+      {
+        var angle = (float)Math.Atan2(to.Y - from.Y, to.X - from.X);
+        var length = Vector2.Distance(from, to);
+
+        SpriteBatch.Draw(wp.Texture, (from + to) / 2f, null, color, angle, new Vector2(0.5f),
+                         new Vector2(length + width, width), SpriteEffects.None, 0);
+      }
     }
 
     public void DrawRect(Rectangle rect, Color color, float width = 1)
@@ -206,11 +269,17 @@ namespace Steropes.UI.Platform
       SpriteBatch.End();
       DrawingInProgress = false;
       ValidateBalancedScissorOperations();
+      EndDrawingOverride();
+    }
+
+    public virtual void EndDrawingOverride()
+    {
+
     }
 
     public void FillRect(Rectangle bounds, Color color)
     {
-      Draw(WhitePixelTex, bounds, color);
+      Draw(WhitePixel, bounds, color);
     }
 
     public bool IsVisible(Rectangle rectangle)
@@ -221,7 +290,7 @@ namespace Steropes.UI.Platform
     public void PopScissorRectangle()
     {
       SuspendBatch();
-      this.scissorRects.Pop();
+      scissorRects.Pop();
       ResumeBatch();
     }
 
@@ -232,29 +301,28 @@ namespace Steropes.UI.Platform
       var parentRect = ScissorRectangle;
 
       var newRect = parentRect.Clip(rect).Clip(GraphicsDevice.Viewport.Bounds);
-
       SuspendBatch();
-      this.scissorRects.Push(newRect);
+      scissorRects.Push(newRect);
       ResumeBatch();
     }
 
     public void ResumeBatch()
     {
-      GraphicsDevice.RasterizerState = ScissorRasterizerState;
 
-      if (this.scissorRects.Count > 0)
+      if (scissorRects.Count > 0)
       {
-        var rect = this.scissorRects.Peek();
-        if (rect.Width > 0 && rect.Height > 0)
-        {
-          GraphicsDevice.ScissorRectangle = rect;
-        }
+        var rect = scissorRects.Peek();
+        GraphicsDevice.ScissorRectangle = rect;
+//        if (rect.Width > 0 && rect.Height > 0)
+//        {
+//          disabled = rect.IsEmpty;
+//        }
 
-        SpriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, ScissorRasterizerState, null, SpriteMatrix);
+        StartSpriteBatch(ScissorRasterizerState);
       }
       else
       {
-        SpriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, SpriteMatrix);
+        StartSpriteBatch();
       }
     }
 
@@ -266,7 +334,12 @@ namespace Steropes.UI.Platform
       }
 
       DrawingInProgress = true;
-      SpriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, SpriteMatrix);
+      StartSpriteBatch();
+    }
+
+    protected virtual void StartSpriteBatch(RasterizerState rs = null)
+    {
+      SpriteBatch.Begin(SpriteSortMode.Deferred, null, SamplerState.PointWrap, null, rs, null, SpriteMatrix);
     }
 
     public SpriteBatch SuspendBatch()
@@ -310,14 +383,14 @@ namespace Steropes.UI.Platform
       var max = new Vector2(rect.Right, rect.Bottom);
       origin = Vector2.Transform(origin, matrix);
       max = Vector2.Transform(max, matrix);
-      var bounds = new Rectangle((int)origin.X, (int)origin.Y, (int)(max.X - origin.X), (int)(max.Y - origin.Y));
+      var bounds = new Rectangle((int) origin.X, (int) origin.Y, (int) (max.X - origin.X), (int) (max.Y - origin.Y));
 
       return bounds;
     }
 
     void ValidateBalancedScissorOperations()
     {
-      Debug.Assert(this.scissorRects.Count == 0, "Unbalanced calls to PushScissorRectangles");
+      Debug.Assert(scissorRects.Count == 0, "Unbalanced calls to PushScissorRectangles");
     }
   }
 }

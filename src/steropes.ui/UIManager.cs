@@ -17,9 +17,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
-
 using Steropes.UI.Components;
 using Steropes.UI.Components.Window;
 using Steropes.UI.Input;
@@ -32,56 +32,93 @@ namespace Steropes.UI
   {
     bool IsActive { get; }
 
-    void Start();
-
-    void Update(GameTime time);
-
-    void Draw();
-
     IUIStyle UIStyle { get; }
 
     IRootPane Root { get; }
 
     IScreenService ScreenService { get; }
+
+    void Start();
+
+    void Update(GameTime time);
+
+    void Draw();
   }
 
   public class UIManager : IUIManager
   {
-    readonly ContentManager contentManager;
-
-    readonly IBatchedDrawingService drawingService;
-
     readonly IInputManager inputManager;
 
     readonly IGameWindowService windowService;
+    IBatchedDrawingService drawingService;
 
-    public UIManager(IInputManager inputManager, IBatchedDrawingService drawingService, IGameWindowService windowService, ContentManager contentManager)
+    public UIManager(IInputManager inputManager,
+                     IBatchedDrawingService drawingService,
+                     IGameWindowService windowService,
+                     ContentManager contentManager)
     {
-      this.inputManager = inputManager;
-      this.drawingService = drawingService;
-      this.windowService = windowService;
-      this.contentManager = contentManager;
+      this.inputManager = inputManager ?? throw new ArgumentNullException(nameof(inputManager));
+      DrawingService = drawingService ?? throw new ArgumentNullException(nameof(drawingService));
+      this.windowService = windowService ?? throw new ArgumentNullException(nameof(windowService));
+
+      var cm = contentManager ?? throw new ArgumentNullException(nameof(contentManager));
+      UIStyle = new UIStyle(new ContentLoader(cm, drawingService.GraphicsDevice));
     }
 
-    public virtual bool IsActive => Screen?.WindowService?.Active ?? false;
+    /// <summary>
+    ///   The drawing service used to render the UI. This contains the sprite-batch that is used
+    ///   for rendering. Redefine this if you need to adjust the rendering settings.
+    /// </summary>
+    public IBatchedDrawingService DrawingService
+    {
+      get
+      {
+        return Screen?.DrawingService ?? drawingService;
+      }
+      set
+      {
+        if (Screen != null)
+        {
+          Screen.DrawingService = value;
+        }
+        else
+        {
+          drawingService = value ?? throw new ArgumentNullException(nameof(value));
+        }
+      }
+    }
 
-    public Screen Screen { get; private set; }
+    Screen Screen { get; set; }
 
-    public IUIStyle UIStyle { get; private set; }
+    public virtual bool IsActive
+    {
+      get { return Screen?.WindowService?.Active ?? false; }
+    }
+
+    public IUIStyle UIStyle { get; }
 
     public void Draw()
     {
       Screen.Draw();
     }
 
-    public IRootPane Root => Screen.Root;
+    public IRootPane Root
+    {
+      get { return Screen.Root; }
+    }
 
-    public IScreenService ScreenService => Screen;
+    public IScreenService ScreenService
+    {
+      get { return Screen; }
+    }
 
     public void Start()
     {
-      UIStyle = new UIStyle(new ContentLoader(contentManager, drawingService.GraphicsDevice));
-      Screen = new Screen(inputManager, UIStyle, drawingService, windowService);
+      if (Screen == null)
+      {
+        var ds = DrawingService;
+        Screen = new Screen(inputManager, UIStyle, ds, windowService);
+      }
     }
 
     public virtual void Update(GameTime time)

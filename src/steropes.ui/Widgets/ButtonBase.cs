@@ -16,17 +16,17 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System;
 
+using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-
 using Steropes.UI.Animation;
 using Steropes.UI.Components;
 using Steropes.UI.Input.KeyboardInput;
 using Steropes.UI.Input.MouseInput;
 using Steropes.UI.Platform;
 using Steropes.UI.Styles;
+using Steropes.UI.Util;
 using Steropes.UI.Widgets.Styles;
 
 namespace Steropes.UI.Widgets
@@ -48,17 +48,18 @@ namespace Steropes.UI.Widgets
   public class ButtonBase<TContent> : ContentWidget<TContent>
     where TContent : class, IWidget
   {
+    readonly EventSupport<EventArgs> actionPerformedSupport;
     readonly ButtonStyleDefinition buttonStyle;
-
     readonly AnimatedValue pressedAnimation;
-
+    readonly EventSupport<EventArgs> selectionChangedSupport;
     bool isPressed;
-
     SelectionState selected;
 
     public ButtonBase(IUIStyle style) : base(style)
     {
       buttonStyle = StyleSystem.StylesFor<ButtonStyleDefinition>();
+      actionPerformedSupport = new EventSupport<EventArgs>();
+      selectionChangedSupport = new EventSupport<EventArgs>();
 
       pressedAnimation = new SmoothValue(1f, 0f, 0.1f);
       pressedAnimation.FinishAnimation();
@@ -74,46 +75,40 @@ namespace Steropes.UI.Widgets
       KeyReleased += OnKeyReleased;
     }
 
-    public event EventHandler ActionPerformed;
-
-    public event EventHandler SelectionChanged;
-
     public Color DownOverlayColor
     {
-      get
-      {
-        return Style.GetValue(buttonStyle.DownOverlayColor);
-      }
-      set
-      {
-        Style.SetValue(buttonStyle.DownOverlayColor, value);
-      }
+      get { return Style.GetValue(buttonStyle.DownOverlayColor); }
+      set { Style.SetValue(buttonStyle.DownOverlayColor, value); }
     }
 
     public IBoxTexture DownOverlayTexture
     {
-      get
-      {
-        return Style.GetValue(buttonStyle.DownOverlay);
-      }
-      set
-      {
-        Style.SetValue(buttonStyle.DownOverlay, value);
-      }
+      get { return Style.GetValue(buttonStyle.DownOverlay); }
+      set { Style.SetValue(buttonStyle.DownOverlay, value); }
+    }
+
+    public EventHandler<EventArgs> OnActionPerformed
+    {
+      get { return actionPerformedSupport.Handler; }
+      set { actionPerformedSupport.Handler = value; }
+    }
+
+    public EventHandler<EventArgs> OnSelectionChanged
+    {
+      get { return selectionChangedSupport.Handler; }
+      set { selectionChangedSupport.Handler = value; }
     }
 
     public bool IsPressed
     {
-      get
-      {
-        return isPressed;
-      }
+      get { return isPressed; }
       set
       {
         if (value == isPressed)
         {
           return;
         }
+
         isPressed = value;
         if (value)
         {
@@ -123,33 +118,47 @@ namespace Steropes.UI.Widgets
         {
           RemovePseudoStyleClass(ButtonPseudoClasses.DownPseudoClass);
         }
+
         OnPropertyChanged();
       }
     }
 
     public SelectionState Selected
     {
-      get
-      {
-        return selected;
-      }
+      get { return selected; }
       set
       {
         if (value == selected)
         {
           return;
         }
+
         selected = value;
         OnPropertyChanged();
-        SelectionChanged?.Invoke(this, EventArgs.Empty);
+        selectionChangedSupport.Raise(this, EventArgs.Empty);
       }
     }
 
-    protected float PressedAnimationValue => pressedAnimation.CurrentValue;
+    protected float PressedAnimationValue
+    {
+      get { return pressedAnimation.CurrentValue; }
+    }
+
+    public event EventHandler<EventArgs> ActionPerformed
+    {
+      add { actionPerformedSupport.Event += value; }
+      remove { actionPerformedSupport.Event -= value; }
+    }
+
+    public event EventHandler<EventArgs> SelectionChanged
+    {
+      add { selectionChangedSupport.Event += value; }
+      remove { selectionChangedSupport.Event -= value; }
+    }
 
     public virtual void Click()
     {
-      ActionPerformed?.Invoke(this, new EventArgs());
+      actionPerformedSupport.Raise(this, new EventArgs());
     }
 
     public override void Update(GameTime elapsedTime)
@@ -204,15 +213,11 @@ namespace Steropes.UI.Widgets
       {
         case Keys.Space:
         case Keys.Enter:
-          {
-            args.Consume();
-            OnActivateDown();
-            break;
-          }
-        default:
-          {
-            break;
-          }
+        {
+          args.Consume();
+          OnActivateDown();
+          break;
+        }
       }
     }
 
@@ -222,16 +227,12 @@ namespace Steropes.UI.Widgets
       {
         case Keys.Space:
         case Keys.Enter:
-          {
-            args.Consume();
-            Click();
-            OnActivateUp();
-            break;
-          }
-        default:
-          {
-            break;
-          }
+        {
+          args.Consume();
+          Click();
+          OnActivateUp();
+          break;
+        }
       }
     }
 
@@ -258,6 +259,7 @@ namespace Steropes.UI.Widgets
       {
         return;
       }
+
       args.Consume();
       OnActivateUp();
     }

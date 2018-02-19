@@ -67,6 +67,7 @@
     <Content Include="ChangeLog.md" />
     <None Include="docs\concepts.md" />
     <Content Include="docs\notes.md" />
+    <Content Include="docs\databinding.md" />
     <None Include="docs\quickstart.md" />
     <None Include="docs\README.md" />
     <None Include="docs\style.md" />

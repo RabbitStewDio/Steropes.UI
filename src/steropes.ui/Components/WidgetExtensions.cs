@@ -29,6 +29,12 @@ namespace Steropes.UI.Components
 {
   public static class WidgetExtensions
   {
+    public static T DoWith<T>(this T t, Action<T> action)
+    {
+      action(t);
+      return t;
+    }
+
     public static Rectangle ArrangeChild(this IWidget w, Rectangle layoutSize)
     {
       Rectangle childRectangle;

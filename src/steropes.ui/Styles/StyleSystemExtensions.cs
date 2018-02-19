@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using System.Xml.Linq;
+using Microsoft.Xna.Framework.Graphics;
 using Steropes.UI.Components;
 using Steropes.UI.Styles.Io.Parser;
 using Steropes.UI.Styles.Io.Writer;
@@ -27,9 +28,9 @@ namespace Steropes.UI.Styles
 {
   public static class StyleSystemExtensions
   {
-    public static IStyleParser CreateParser(this IStyleSystem s)
+    public static IStyleParser CreateParser(this IStyleSystem s, GraphicsDevice graphicsDevice = null)
     {
-      var parser = new StyleParser(s);
+      var parser = new StyleParser(s, graphicsDevice);
       s.ConfigureStyleSerializer(parser);
       return parser;
     }
@@ -50,9 +51,9 @@ namespace Steropes.UI.Styles
       return new SubStyleSystem(s, context);
     }
 
-    public static List<IStyleRule> LoadStyles(this IUIStyle style, string styleFile, string context)
+    public static List<IStyleRule> LoadStyles(this IUIStyle style, string styleFile, string context, GraphicsDevice graphicsDevice = null)
     {
-      return style.StyleSystem.WithContext(context).CreateParser().ReadFile(styleFile);
+      return style.StyleSystem.WithContext(context).CreateParser(graphicsDevice).ReadFile(styleFile);
     }
   }
 }

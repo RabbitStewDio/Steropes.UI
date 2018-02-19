@@ -25,7 +25,7 @@ namespace Steropes.UI.Widgets
 {
   public interface IRadioButtonSetContent : IWidget
   {
-    event EventHandler ActionPerformed;
+    event EventHandler<EventArgs> ActionPerformed;
 
     bool First { get; set; }
 

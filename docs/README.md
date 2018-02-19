@@ -21,7 +21,16 @@ various structs and other structural classes to run correctly. The tests will
 not run with the portable version of MonoGame as that version is bare of any
 implementation code.
 
-The Steropes-UI documentation is split into two easily accessible documents.
+* [Quick start guide](quickstart.md)
+ 
+  This guide provides a quick overview over the UI system and the quickstart
+  project contained here. 
+
+  The ``Steropes.UI.Quickstart`` project contains a lightweight version of the demo
+  project and can be used as a template for new projects and directly copied into 
+  your own project.
+
+The Steropes-UI documentation is split into three easily accessible documents.
   
 * [Concepts guide](concepts.md)
  
@@ -36,7 +45,10 @@ The Steropes-UI documentation is split into two easily accessible documents.
   allow designers to tweak the style without going through a full recompile 
   cycle.
   
+* [Data binding guide](databinding.md)
    
-The ``Steropes.UI.Quickstart`` project contains a lightweight version of the demo
-project and can be used as a template for new projects and directly copied into 
-your own project.
+  The data binding framework is an optional set of classes that simplifies 
+  the task of keeping UI classes and model clases synchronized. The databinding
+  relies on INotifyPropertyChanged events and (ReadOnly)ObservableCollections
+  as data sources.
+

@@ -1,8 +1,8 @@
-using System;
-using System.Text;
-using System.Xml;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Microsoft.Xna.Framework;
-using NUnit.Framework;
+using Steropes.UI.Annotations;
 using Steropes.UI.Styles;
 using Steropes.UI.Widgets;
 using Steropes.UI.Widgets.Container;
@@ -10,10 +10,10 @@ using Steropes.UI.Widgets.Styles;
 
 namespace Steropes.UI.Test.Styles
 {
-  [Category("Styles")]
+  [NUnit.Framework.Category("Styles")]
   public class TestTest
   {
-    void defineDocumentationStyleExample()
+    void DefineDocumentationStyleExample()
     {
       var uiStyle = LayoutTestStyle.Create();
       var b = new StyleBuilder(uiStyle.StyleSystem);
@@ -35,4 +35,6 @@ namespace Steropes.UI.Test.Styles
             .WithValue(textStyles.TextColor, new Color(0xe0, 0xe0, 0xe0)));
     }
   }
+
+
 }

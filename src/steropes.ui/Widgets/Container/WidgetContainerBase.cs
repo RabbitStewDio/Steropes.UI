@@ -16,39 +16,23 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 using System;
 using System.Collections.Generic;
-
 using Microsoft.Xna.Framework;
-
 using Steropes.UI.Components;
 using Steropes.UI.Platform;
 
 namespace Steropes.UI.Widgets.Container
 {
-  public class ContainerEventArgs
-  {
-    public ContainerEventArgs(IWidget removedChild, IWidget addedChild)
-    {
-      RemovedChild = removedChild;
-      AddedChild = addedChild;
-    }
-
-    public IWidget AddedChild { get; }
-
-    public IWidget RemovedChild { get; }
-  }
-
   public abstract class WidgetContainerBase<TConstraint> : Widget
   {
-    readonly List<WidgetAndConstraint> children;
-
-    readonly IReadOnlyList<WidgetAndConstraint> childrenAsReadOnly;
+    readonly List<WidgetAndConstraint<TConstraint>> children;
 
     protected WidgetContainerBase(IUIStyle style) : base(style)
     {
-      children = new List<WidgetAndConstraint>();
-      childrenAsReadOnly = children.AsReadOnly();
+      children = new List<WidgetAndConstraint<TConstraint>>();
+      WidgetsWithConstraints = children.AsReadOnly();
     }
 
     public override int Count => children.Count;
@@ -94,6 +78,7 @@ namespace Steropes.UI.Widgets.Container
                 focusableDescendant = childFocusableWidget;
               }
             }
+
             break;
           case Direction.Down:
             if (firstChild == null || child.BorderRect.Top < firstChild.BorderRect.Top)
@@ -105,6 +90,7 @@ namespace Steropes.UI.Widgets.Container
                 focusableDescendant = childFocusableWidget;
               }
             }
+
             break;
           case Direction.Left:
             if (firstChild == null || child.BorderRect.Right > firstChild.BorderRect.Right)
@@ -116,6 +102,7 @@ namespace Steropes.UI.Widgets.Container
                 focusableDescendant = childFocusableWidget;
               }
             }
+
             break;
           case Direction.Right:
             if (firstChild == null || child.BorderRect.Left < firstChild.BorderRect.Left)
@@ -127,6 +114,7 @@ namespace Steropes.UI.Widgets.Container
                 focusableDescendant = childFocusableWidget;
               }
             }
+
             break;
         }
       }
@@ -148,6 +136,7 @@ namespace Steropes.UI.Widgets.Container
         {
           continue;
         }
+
         if (child.Enabled == false || child.Visibility != Visibility.Visible)
         {
           continue;
@@ -156,7 +145,8 @@ namespace Steropes.UI.Widgets.Container
         switch (direction)
         {
           case Direction.Up:
-            if (child.BorderRect.Bottom <= fixedChild.BorderRect.Center.Y && (nearestSibling == null || child.BorderRect.Bottom > nearestSibling.BorderRect.Bottom))
+            if (child.BorderRect.Bottom <= fixedChild.BorderRect.Center.Y &&
+                (nearestSibling == null || child.BorderRect.Bottom > nearestSibling.BorderRect.Bottom))
             {
               var childFocusableWidget = child.GetFirstFocusableDescendant(direction);
               if (childFocusableWidget != null)
@@ -165,9 +155,11 @@ namespace Steropes.UI.Widgets.Container
                 focusableSibling = childFocusableWidget;
               }
             }
+
             break;
           case Direction.Down:
-            if (child.BorderRect.Top >= fixedChild.BorderRect.Center.Y && (nearestSibling == null || child.BorderRect.Top < nearestSibling.BorderRect.Top))
+            if (child.BorderRect.Top >= fixedChild.BorderRect.Center.Y &&
+                (nearestSibling == null || child.BorderRect.Top < nearestSibling.BorderRect.Top))
             {
               var childFocusableWidget = child.GetFirstFocusableDescendant(direction);
               if (childFocusableWidget != null)
@@ -176,9 +168,11 @@ namespace Steropes.UI.Widgets.Container
                 focusableSibling = childFocusableWidget;
               }
             }
+
             break;
           case Direction.Left:
-            if (child.BorderRect.Right <= fixedChild.BorderRect.Center.X && (nearestSibling == null || child.BorderRect.Right > nearestSibling.BorderRect.Right))
+            if (child.BorderRect.Right <= fixedChild.BorderRect.Center.X &&
+                (nearestSibling == null || child.BorderRect.Right > nearestSibling.BorderRect.Right))
             {
               var childFocusableWidget = child.GetFirstFocusableDescendant(direction);
               if (childFocusableWidget != null)
@@ -187,9 +181,11 @@ namespace Steropes.UI.Widgets.Container
                 focusableSibling = childFocusableWidget;
               }
             }
+
             break;
           case Direction.Right:
-            if (child.BorderRect.Left >= fixedChild.BorderRect.Center.X && (nearestSibling == null || child.BorderRect.Left < nearestSibling.BorderRect.Left))
+            if (child.BorderRect.Left >= fixedChild.BorderRect.Center.X &&
+                (nearestSibling == null || child.BorderRect.Left < nearestSibling.BorderRect.Left))
             {
               var childFocusableWidget = child.GetFirstFocusableDescendant(direction);
               if (childFocusableWidget != null)
@@ -198,6 +194,7 @@ namespace Steropes.UI.Widgets.Container
                 focusableSibling = childFocusableWidget;
               }
             }
+
             break;
         }
       }
@@ -233,10 +230,11 @@ namespace Steropes.UI.Widgets.Container
         throw new ArgumentException();
       }
 
-      children.Insert(index, new WidgetAndConstraint(w, constraint));
+      var item = new WidgetAndConstraint<TConstraint>(w, constraint);
+      children.Insert(index, item);
       w.AddNotify(this);
       OnChildAdded(w, index, constraint);
-      RaiseChildrenChanged(null, w);
+      RaiseChildAdded(index, w, constraint);
       InvalidateLayout();
     }
 
@@ -258,6 +256,7 @@ namespace Steropes.UI.Widgets.Container
       {
         throw new ArgumentException();
       }
+
       return children[idx].Constraint;
     }
 
@@ -268,6 +267,7 @@ namespace Steropes.UI.Widgets.Container
       {
         throw new ArgumentException();
       }
+
       return children[idx].Constraint;
     }
 
@@ -285,31 +285,54 @@ namespace Steropes.UI.Widgets.Container
       w.Widget.RemoveNotify(this);
       children.RemoveAt(index);
       OnChildRemoved(w.Widget, index, w.Constraint);
-      RaiseChildrenChanged(w.Widget, null);
+      RaiseChildRemoved(index, w.Widget, w.Constraint);
       InvalidateLayout();
     }
 
-    protected IReadOnlyList<WidgetAndConstraint> WidgetsWithConstraints()
+    public IReadOnlyList<WidgetAndConstraint<TConstraint>> WidgetsWithConstraints { get; }
+  }
+
+  public struct WidgetAndConstraint<TConstraint> : IEquatable<WidgetAndConstraint<TConstraint>>
+  {
+    public IWidget Widget { get; }
+
+    public TConstraint Constraint { get; }
+
+    public WidgetAndConstraint(IWidget widget, TConstraint constraint = default(TConstraint))
     {
-      return childrenAsReadOnly;
+      Widget = widget;
+      Constraint = constraint;
     }
 
-    protected struct WidgetAndConstraint
+    public override string ToString()
     {
-      public IWidget Widget { get; }
+      return $"(Constraint: {Constraint}, Widget: {Widget})";
+    }
 
-      public TConstraint Constraint { get; }
+    public bool Equals(WidgetAndConstraint<TConstraint> other)
+    {
+      return Equals(Widget, other.Widget);
+    }
 
-      public WidgetAndConstraint(IWidget widget, TConstraint constraint)
-      {
-        Widget = widget;
-        Constraint = constraint;
-      }
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      return obj is WidgetAndConstraint<TConstraint> && Equals((WidgetAndConstraint<TConstraint>) obj);
+    }
 
-      public override string ToString()
-      {
-        return $"(Constraint: {Constraint}, Widget: {Widget})";
-      }
+    public override int GetHashCode()
+    {
+      return (Widget != null ? Widget.GetHashCode() : 0);
+    }
+
+    public static bool operator ==(WidgetAndConstraint<TConstraint> left, WidgetAndConstraint<TConstraint> right)
+    {
+      return left.Equals(right);
+    }
+
+    public static bool operator !=(WidgetAndConstraint<TConstraint> left, WidgetAndConstraint<TConstraint> right)
+    {
+      return !left.Equals(right);
     }
   }
 }

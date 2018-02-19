@@ -170,6 +170,14 @@ namespace Steropes.UI.Components
     void RemoveNotify(IWidget parent);
 
     void ValidateStyle();
+
+    /// <summary>
+    ///  Style resolver helper method. Iterate the structural tree of this widget and visit all nodes 
+    ///  that have this widget as direct parent. Include both standard children and tooltips and other
+    ///  nodes that may participate in style resolving, measurements or arrange operations.
+    /// </summary>
+    /// <param name="action"></param>
+    void VisitStructuralChildren(Action<IWidget> action);
   }
 
   public static class WidgetPseudoClasses
@@ -935,7 +943,7 @@ namespace Steropes.UI.Components
         tooltip?.RemoveNotify(this);
         tooltip = value;
         tooltip?.AddNotify(this);
-        RaiseChildrenChanged(old, tooltip);
+        RaiseChildrenChanged(-1, old, null, tooltip, null);
         OnPropertyChanged();
       }
     }
@@ -1020,6 +1028,14 @@ namespace Steropes.UI.Components
         throw new InvalidOperationException();
       }
       Parent = parent;
+    }
+
+    /// <summary>
+    ///  A DSL helper to allow a more fluent assembly of GUIs similar to the ScalaFX DSL.
+    /// </summary>
+    public Action<Widget> WithInitializer
+    {
+      set { value?.Invoke(this); }
     }
 
     public void AddPseudoStyleClass(string styleClass)
@@ -1306,9 +1322,14 @@ namespace Steropes.UI.Components
       return 0;
     }
 
-    public virtual IEnumerator<IWidget> GetEnumerator()
+    public WidgetEnumerator GetEnumerator()
     {
       return new WidgetEnumerator(this);
+    }
+
+    IEnumerator<IWidget> IEnumerable<IWidget>.GetEnumerator()
+    {
+      return GetEnumerator();
     }
 
     public virtual IWidget GetFirstFocusableDescendant(Direction direction)
@@ -1375,15 +1396,13 @@ namespace Steropes.UI.Components
     public void ShowTooltip(string text)
     {
       var t = Tooltip;
-      if (t is Tooltip<Label>)
+      if (t is Tooltip<Label> tooltipLabel)
       {
-        var label = (Tooltip<Label>)t;
-        label.Content.Text = text;
+        tooltipLabel.Content.Text = text;
       }
-      else if (t is Tooltip<IconLabel>)
+      else if (t is Tooltip<IconLabel> tooltipIconLabel)
       {
-        var label = (Tooltip<IconLabel>)t;
-        label.Content.Text = text;
+        tooltipIconLabel.Content.Text = text;
       }
       else
       {
@@ -1405,6 +1424,10 @@ namespace Steropes.UI.Components
 
     public sealed override void ValidateStyle()
     {
+      if (!RegisteredInStyleSystem)
+      {
+        throw new InvalidOperationException("A widget cannot be arranged if it is not registered in the style system.");
+      }
       UIStyle.StyleResolver.Revalidate();
     }
 
@@ -1512,9 +1535,19 @@ namespace Steropes.UI.Components
       GetSibling(direction, this)?.GetFirstFocusableDescendant(direction)?.RequestFocus();
     }
 
-    protected void RaiseChildrenChanged(IWidget oldWidget, IWidget newWidget)
+    protected void RaiseChildAdded(int index, IWidget widget, object constraints = null)
     {
-      childrenChangedSupport?.Raise(this, new ContainerEventArgs(oldWidget, newWidget));
+      RaiseChildrenChanged(index, null, null, widget, constraints);
+    }
+
+    protected void RaiseChildRemoved(int index, IWidget widget, object constraints = null)
+    {
+      RaiseChildrenChanged(index, widget, constraints, null, null);
+    }
+
+    protected void RaiseChildrenChanged(int index, IWidget oldWidget, object oldConstraints, IWidget newWidget, object newConstraints)
+    {
+      childrenChangedSupport?.Raise(this, new ContainerEventArgs(index, oldWidget, oldConstraints, newWidget, newConstraints));
     }
 
     void OnGamePadButtonDown(object source, GamePadEventArgs args)
@@ -1674,7 +1707,7 @@ namespace Steropes.UI.Components
       }
     }
 
-    struct WidgetEnumerator : IEnumerator<IWidget>
+    public struct WidgetEnumerator : IEnumerator<IWidget>
     {
       readonly IWidget widget;
 
@@ -1682,7 +1715,7 @@ namespace Steropes.UI.Components
 
       IWidget current;
 
-      public WidgetEnumerator(IWidget widget) : this()
+      internal WidgetEnumerator(IWidget widget) : this()
       {
         this.widget = widget;
         index = -1;
@@ -1720,11 +1753,30 @@ namespace Steropes.UI.Components
         {
           if (index < 0 || index >= widget.Count)
           {
-            return null;
+            throw new InvalidOperationException();
           }
           return current;
         }
       }
+    }
+
+    public virtual void VisitStructuralChildren(Action<IWidget> action)
+    {
+      for (var i = 0; i < this.Count; i++)
+      {
+        var widget = this[i];
+        action(widget);
+      }
+
+      if (Tooltip != null)
+      {
+        action(Tooltip);
+      }
+    }
+
+    public bool RegisteredInStyleSystem
+    {
+      get { return UIStyle.StyleResolver.IsRegistered(this); }
     }
   }
 }

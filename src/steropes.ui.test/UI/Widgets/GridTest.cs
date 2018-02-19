@@ -123,6 +123,20 @@ namespace Steropes.UI.Test.UI.Widgets
         g[0].LayoutRect.Should().Be(new Rectangle(10, 20, 100, 100));
         g[1].LayoutRect.Should().Be(new Rectangle(110, 120, 200, 200));
       }
-    }
+
+      [Test]
+      public void TestGridSpacing()
+      {
+        var g = new Grid(LayoutTestStyle.Create());
+        g.Spacing = 10;
+        g.AddChildAt(LayoutTestWidget.FixedSize(100, 100), 0, 0);
+        g.AddChildAt(LayoutTestWidget.FixedSize(200, 200), 1, 1);
+        g.AddChildAt(LayoutTestWidget.FixedSize(200, 200), 1, 2);
+
+        g.Measure(Size.Auto);
+        g.Arrange(new Rectangle(10, 20, g.DesiredSize.WidthInt, g.DesiredSize.HeightInt));
+        g.LayoutRect.Size.Should().Be(new Point(g.DesiredSize.WidthInt, g.DesiredSize.HeightInt));
+      }
+  }
   }
 }

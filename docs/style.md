@@ -595,10 +595,6 @@ with the GameTime struct.
 
 #### Tooltips
 
-* **tooltip-delay** (float, inherited) 
-* **tooltip-display-time** (float, inherited) 
-* **tooltip-position** (enum TooltipPositionModel, inherited)
-
 All widgets have built-in support for displaying tooltips. A tooltip
 should be a lightweight component. Tooltips do not receive input events
 and are rendered on a separate layer and do not affect the layout of the
@@ -612,11 +608,15 @@ and will be displayed for the given amount of display-time. The
 values speciifying seconds and fractional seconds. Use ``0.5`` for 500ms,
 ``1.0`` for 1 second and so on. 
 
-The ``tooltip-position`` style defines how the tooltip is positioned.
-``tooltip-position`` can be either ``Fixed`` or ``FollowMouse``.
-Tooltips are arranged based on the Anchor property of the tooltip Widget.
-If the style is ``FollowMouse`` mouse-events will modify the anchor to
-set the absolute position of the Tooltip 
+* **tooltip-delay** (float, inherited) 
+* **tooltip-display-time** (float, inherited) 
+* **tooltip-position** (enum TooltipPositionModel, inherited)
+
+  The ``tooltip-position`` style defines how the tooltip is positioned.
+  ``tooltip-position`` can be either ``Fixed`` or ``FollowMouse``.
+  Tooltips are arranged based on the Anchor property of the tooltip Widget.
+  If the style is ``FollowMouse`` mouse-events will modify the anchor to
+  set the absolute position of the Tooltip 
 
 ### Button Styles
 
@@ -630,23 +630,23 @@ along with a label to control the selection state.
 * **down-overlay-texture** (Steropes.UI.Platform.IBoxTexture)
 * **down-overlay-color** (Microsoft.Xna.Framework.Color)
 
-Buttons extend the normal widget rendering sequence with an additional
-render layer to indicate the "down" state of an button. A button is 
-down when a key or mouse-button has been pressed but not yet released.
-The button's action will be fired when the button is released.   
+  Buttons extend the normal widget rendering sequence with an additional
+  render layer to indicate the "down" state of an button. A button is 
+  down when a key or mouse-button has been pressed but not yet released.
+  The button's action will be fired when the button is released.   
  
 ### Image styles
 
 * **texture** (Steropes.UI.Platform.IUITexture)
 * **texture-color** (Microsoft.Xna.Framework.Color)
-* **texture-scale** (bool)
+* **texture-scale** (ScaleMode)
 
-An image displays the content of a texture. The scale property defines 
-how the texture is rendered:
+  An image displays the content of a texture. The scale property defines 
+  how the texture is rendered:
 
-* None - The image is centered into the Widgets bounding box.
-* KeepAspectRatio - the image is scaled with an uniform scale factor.
-* Scale - the image is stretched across the box to fill the complete space.
+  * None - The image is centered into the Widgets bounding box.
+  * KeepAspectRatio - the image is scaled with an uniform scale factor.
+  * Scale - the image is stretched across the box to fill the complete space.
 
 ### IconLabel styles
 
@@ -654,9 +654,9 @@ An icon-label combines an image with text.
 
 * **icon-text-gap** (int)
 
-Use the icon-text-gap property
-to control the spacing between image and text. The image and text can be
-formatted separately as "Image" and "Label" child elements.
+  Use the icon-text-gap property
+  to control the spacing between image and text. The image and text can be
+  formatted separately as "Image" and "Label" child elements.
 
 ### Notebook styles
 
@@ -666,9 +666,9 @@ aspects of a GUI into separate panes.
 * **notebook-tab-overlap-x** (int)
 * **notebook-tab-overlap-y** (int)
 
-Depending on the frame-texture used, you may want to let tab-buttons
-overlap slightly. In that case, use ``notebook-tab-overlap-x`` or
-``notebook-tab-overlap-x`` to define the offset.  
+  Depending on the frame-texture used, you may want to let tab-buttons
+  overlap slightly. In that case, use ``notebook-tab-overlap-x`` or
+  ``notebook-tab-overlap-x`` to define the offset.  
 
 ### Scrollbar styles
 
@@ -678,25 +678,25 @@ scrolling.
 
 * **scrollbar-mode** (Steropes.UI.Widgets.ScrollbarMode)
 
-This property controls how a scrollbar appears. If ``scrollbar-mode`` 
-is set to none, the scroll-panel will try to fit all content into whatever
-space is available without assuming that that area can be expanded.
+  This property controls how a scrollbar appears. If ``scrollbar-mode`` 
+  is set to none, the scroll-panel will try to fit all content into whatever
+  space is available without assuming that that area can be expanded.
 
-Possible values are:
-* None 
+  Possible values are:
+  * None 
 
-  disable scrolling and hide the scrollbar.
+    disable scrolling and hide the scrollbar.
   
-* Auto 
+  * Auto 
 
-  allow scrolling and show the scrollbar if the content is larger than
-  the available visible space.
+    allow scrolling and show the scrollbar if the content is larger than
+    the available visible space.
 
-* Always
+  * Always
 
-  show the scrollbar regardless whether the displayed content requires
-  scrolling. This can help with jumpy UIs where the scrollbar's appearance 
-  or disappearnce causes noticable visual changes to the final layout.
+    show the scrollbar regardless whether the displayed content requires
+    scrolling. This can help with jumpy UIs where the scrollbar's appearance 
+    or disappearnce causes noticable visual changes to the final layout.
 
 ### Text styles
 
@@ -707,22 +707,22 @@ in your GUI and all child widgets then will share the same text styling.
 
 * **font** (Steropes.UI.Platform.IUIFont, inherited)
 
-Defines the font, text color and alignment of the text. A UI-font is a thin
-wrapper around Monogames sprite-font class to allow GUIs to be unit-testable.
-As Sprite-Fonts encode both the font-face (how the font looks) and the font-size
-(how tall each character is) there is no point in separating font-size or style
-from the font-face in this library.
+  Defines the font, text color and alignment of the text. A UI-font is a thin
+  wrapper around Monogames sprite-font class to allow GUIs to be unit-testable.
+  As Sprite-Fonts encode both the font-face (how the font looks) and the font-size
+  (how tall each character is) there is no point in separating font-size or style
+  from the font-face in this library.
 
-To define a bold or italic version of any font you have to define a separate 
-sprite font.    
+  To define a bold or italic version of any font you have to define a separate 
+  sprite font.    
    
-Text components will fail if no font is defined, with Sprite-Fonts there is no 
-notion of built-in fonts in the system.
+  Text components will fail if no font is defined, with Sprite-Fonts there is no 
+  notion of built-in fonts in the system.
    
 * **text-color** (Microsoft.Xna.Framework.Color, inherited)
 
-Defines the text-color of the font. If not defined, the main color of the 
-Widget or its parent is used.
+  Defines the text-color of the font. If not defined, the main color of the 
+  Widget or its parent is used.
 
 * **text-alignment** (Steropes.UI.Components.Alignment, inherited)
 
@@ -755,57 +755,57 @@ Defines how text is aligned. Possible values are:
 * **outline-color** (Microsoft.Xna.Framework.Color, inherited)
 * **outline-size** (int, inherited)
 
-When an font outline is defined, the text will be rendered several times using 
-outline-size as offset. When using the same color as the main text-color,
-this yields a bold-effect without having to explicitly provide a bold font.
-When using a different color, the rendered text receives a glow effect.
+  When an font outline is defined, the text will be rendered several times using 
+  outline-size as offset. When using the same color as the main text-color,
+  this yields a bold-effect without having to explicitly provide a bold font.
+  When using a different color, the rendered text receives a glow effect.
 
-No extra rendering is done if the outline-size is zero or negative.
+  No extra rendering is done if the outline-size is zero or negative.
 
 * **wrap-text** (Steropes.UI.Widgets.TextWidgets.WrapText, inherited)
 
-Controls whether and how long lines of text are broken into lines. 
+  Controls whether and how long lines of text are broken into lines. 
 
-* Auto
+  * Auto
 
-  Long lines of text will be broken at the end of the available space
-  and when the renderer encounters a linebreak.
+    Long lines of text will be broken at the end of the available space
+    and when the renderer encounters a linebreak.
   
-* Manual
+  * Manual
 
-  Text is only broken into multiple lines when a linebreak is encountered
-  in the text.
+    Text is only broken into multiple lines when a linebreak is encountered
+    in the text.
  
-* None
+  * None
 
-  The text is never broken into lines and all line-breaking is disabled.
+    The text is never broken into lines and all line-breaking is disabled.
 
 * **underline** (bool, inherited)
 * **strike-through** (bool, inherited)
 
-Defines whether underline or strikethrough text decorations are added to
-the rendered text.
+  Defines whether underline or strikethrough text decorations are added to
+  the rendered text.
 
 * **caret-width** (int, inherited)
 
-Defines the width of the caret when rendering editable text widgets. The
-caret is attached as a child-widget to the text element. This allows you
-to match the caret width to the size and intent of the text widget.
+  Defines the width of the caret when rendering editable text widgets. The
+  caret is attached as a child-widget to the text element. This allows you
+  to match the caret width to the size and intent of the text widget.
 
 * **caret-blinking** (bool, inherited)
 
-Defines whether the carred is blinking.
+  Defines whether the carred is blinking.
 
 * **caret-blinkrate** (float, inherited)
 
-Defines the blink-rate of the caret.
+  Defines the blink-rate of the caret.
 
 * **selection-color** (Microsoft.Xna.Framework.Color, inherited)
 
-Defines the selection color. This color will be used as background on the 
-selected text.
+  Defines the selection color. This color will be used as background on the 
+  selected text.
 
-* **ListView** styles
+### **ListView** styles
 
 These properties only applies to the ListView Widget. A list-view can be used
 as standalone Widget and is used to render the drop-down in a DropDown widget.
@@ -813,15 +813,15 @@ as standalone Widget and is used to render the drop-down in a DropDown widget.
 * **min-height** (int)
 * **max-height** (int) 
 
-Defines the maximum and minimum size of a list view. This is mainly useful
-for drop-down buttons where the list view is rendered in its own pop-up.
+  Defines the maximum and minimum size of a list view. This is mainly useful
+  for drop-down buttons where the list view is rendered in its own pop-up.
 
 * **max-lines-visible** (int) 
 * **uniform-item-height** (bool) 
 
-Defines whether all items in the list-box should be rendered at the same 
-height and how many items should be shown at most. The ``max-lines-visible``
-setting further restricts the computed maximum height in addition to the
-value defined in ``max-height``.
+  Defines whether all items in the list-box should be rendered at the same 
+  height and how many items should be shown at most. The ``max-lines-visible``
+  setting further restricts the computed maximum height in addition to the
+  value defined in ``max-height``.
 
 

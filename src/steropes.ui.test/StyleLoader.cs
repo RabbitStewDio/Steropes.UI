@@ -238,13 +238,18 @@ namespace Steropes.UI.Test
       return new List<IStyleRule>
                {
                  b.CreateRule(
-                   b.SelectForType("ListView").WithDirectChild(b.SelectForType("Panel")),
-                   b.CreateStyle().WithBox(widgetStyles.FrameTexture, "UI/ListView/ListFrame", new Insets(10)).WithValue(widgetStyles.Padding, new Insets(10))),
+                   b.SelectForType("ListView").WithDirectChild(b.SelectForType("ScrollPanel")),
+                   b.CreateStyle()
+                     .WithBox(widgetStyles.FrameTexture, "UI/ListView/ListFrame", new Insets(10))
+                     .WithValue(widgetStyles.Padding, new Insets(10))),
                  b.CreateRule(
                    b.SelectForType<ListDataItemRenderer>(),
-                   b.CreateStyle().WithBox(widgetStyles.FrameTexture, "UI/ListView/ListRowFrame", new Insets(10)).WithValue(widgetStyles.Padding, new Insets(10))),
+                   b.CreateStyle()
+                     .WithBox(widgetStyles.FrameTexture, "UI/ListView/ListRowFrame", new Insets(10))
+                     .WithValue(widgetStyles.Padding, new Insets(10))),
                  b.CreateRule(
-                   b.SelectForType<ListDataItemRenderer>().WithCondition(StyleBuilderExtensions.HasAttribute(nameof(IListDataItemRenderer.Selected), true)),
+                   b.SelectForType<ListDataItemRenderer>()
+                     .WithCondition(StyleBuilderExtensions.HasAttribute(nameof(IListDataItemRenderer.Selected), true)),
                    b.CreateStyle()
                      .WithBox(widgetStyles.FrameTexture, "UI/ListView/ListRowFrameSelected", new Insets(10))
                      .WithValue(widgetStyles.Padding, new Insets(10))),

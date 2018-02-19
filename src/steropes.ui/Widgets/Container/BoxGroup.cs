@@ -295,7 +295,7 @@ namespace Steropes.UI.Widgets.Container
     int CountVisibleDynamicHeightChildren()
     {
       var count = 0;
-      var wc = WidgetsWithConstraints();
+      var wc = WidgetsWithConstraints;
       for (var i = 0; i < wc.Count; i++)
       {
         var c = wc[i];

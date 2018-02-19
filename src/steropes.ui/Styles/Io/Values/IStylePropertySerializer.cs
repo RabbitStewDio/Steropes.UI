@@ -27,7 +27,7 @@ namespace Steropes.UI.Styles.Io.Values
 
     string TypeId { get; }
 
-    object Parse(IStyleSystem styleSystem, XElement reader);
+    object Parse(IStyleSystem styleSystem, XElement reader, IStylePropertyContext context);
 
     void Write(IStyleSystem styleSystem, XElement propertyElement, object value);
   }

@@ -16,14 +16,14 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-
 using Microsoft.Xna.Framework;
-
 using Steropes.UI.Components;
+using Steropes.UI.Util;
 
 namespace Steropes.UI.Widgets.Container
 {
@@ -41,6 +41,7 @@ namespace Steropes.UI.Widgets.Container
     int[] rowHeights;
 
     int? rows;
+    int spacing;
 
     // ----------------------------------------------------------------------
     public Grid(IUIStyle style) : base(style)
@@ -55,11 +56,80 @@ namespace Steropes.UI.Widgets.Container
 
     public ObservableCollection<LengthConstraint> ColumnConstraints { get; }
 
+    public IReadOnlyCollection<LengthConstraint> Columns
+    {
+      get { return ColumnConstraints.ToArray(); }
+      set
+      {
+        ColumnConstraints.Clear();
+        ColumnConstraints.AddRange(value);
+      }
+    }
+
     public ObservableCollection<LengthConstraint> RowConstraints { get; }
 
-    public int Spacing { get; set; }
+    public IReadOnlyCollection<LengthConstraint> Rows
+    {
+      get { return RowConstraints.ToArray(); }
+      set
+      {
+        RowConstraints.Clear();
+        RowConstraints.AddRange(value);
+      }
+    }
 
-    int Columns
+    /// <summary>
+    ///  DSL helper property. 
+    /// </summary>
+    public IWidget[][] Children
+    {
+      set
+      {
+        Clear();
+        if (value == null)
+        {
+          return;
+        }
+
+        var rows = value.Length;
+        for (int rowIdx = 0; rowIdx < rows; rowIdx += 1)
+        {
+          var colArray = value[rowIdx];
+          if (colArray == null)
+          {
+            continue;
+          }
+
+          var cols = colArray.Length;
+          for (int colIdx = 0; colIdx < cols; colIdx += 1)
+          {
+            var widget = colArray[colIdx];
+            if (widget != null)
+            {
+              Add(widget, new Point(colIdx, rowIdx));
+            }
+          }
+        }
+      }
+    }
+
+    public int Spacing
+    {
+      get { return spacing; }
+      set
+      {
+        if (value == spacing)
+        {
+          return;
+        }
+
+        spacing = value;
+        OnPropertyChanged();
+        InvalidateLayout();
+      }
+    }
+
+    int ColumnCount
     {
       get
       {
@@ -67,17 +137,19 @@ namespace Steropes.UI.Widgets.Container
         {
           return columns.Value;
         }
+
         if (widgetsPerPosition.Count == 0)
         {
           return 0;
         }
+
         var cols = widgetsPerPosition.Keys.Max(e => e.X) + 1;
         columns = cols;
         return cols;
       }
     }
 
-    int Rows
+    int RowCount
     {
       get
       {
@@ -85,10 +157,12 @@ namespace Steropes.UI.Widgets.Container
         {
           return rows.Value;
         }
+
         if (widgetsPerPosition.Count == 0)
         {
           return 0;
         }
+
         var rowsCalc = widgetsPerPosition.Keys.Max(e => e.Y) + 1;
         rows = rowsCalc;
         return rowsCalc;
@@ -106,9 +180,9 @@ namespace Steropes.UI.Widgets.Container
       switch (direction)
       {
         case Direction.Left:
-          for (var colIndex = Columns - 1; colIndex >= 0; colIndex--)
+          for (var colIndex = ColumnCount - 1; colIndex >= 0; colIndex--)
           {
-            for (var rowIndex = 0; rowIndex < Rows; rowIndex++)
+            for (var rowIndex = 0; rowIndex < RowCount; rowIndex++)
             {
               var widget = LookupForFocusing(rowIndex, colIndex);
               var focusableWidget = widget?.GetFirstFocusableDescendant(direction);
@@ -118,11 +192,12 @@ namespace Steropes.UI.Widgets.Container
               }
             }
           }
+
           break;
         case Direction.Right:
-          for (var colIndex = 0; colIndex < Columns; colIndex++)
+          for (var colIndex = 0; colIndex < ColumnCount; colIndex++)
           {
-            for (var rowIndex = 0; rowIndex < Rows; rowIndex++)
+            for (var rowIndex = 0; rowIndex < RowCount; rowIndex++)
             {
               var widget = LookupForFocusing(rowIndex, colIndex);
               var focusableWidget = widget?.GetFirstFocusableDescendant(direction);
@@ -132,11 +207,12 @@ namespace Steropes.UI.Widgets.Container
               }
             }
           }
+
           break;
         case Direction.Up:
-          for (var rowIndex = Rows - 1; rowIndex >= 0; rowIndex--)
+          for (var rowIndex = RowCount - 1; rowIndex >= 0; rowIndex--)
           {
-            for (var colIndex = 0; colIndex < Columns; colIndex++)
+            for (var colIndex = 0; colIndex < ColumnCount; colIndex++)
             {
               var widget = LookupForFocusing(rowIndex, colIndex);
               var focusableWidget = widget?.GetFirstFocusableDescendant(direction);
@@ -146,11 +222,12 @@ namespace Steropes.UI.Widgets.Container
               }
             }
           }
+
           break;
         case Direction.Down:
-          for (var rowIndex = 0; rowIndex < Rows; rowIndex++)
+          for (var rowIndex = 0; rowIndex < RowCount; rowIndex++)
           {
-            for (var colIndex = 0; colIndex < Columns; colIndex++)
+            for (var colIndex = 0; colIndex < ColumnCount; colIndex++)
             {
               var widget = LookupForFocusing(rowIndex, colIndex);
               var focusableWidget = widget?.GetFirstFocusableDescendant(direction);
@@ -160,6 +237,7 @@ namespace Steropes.UI.Widgets.Container
               }
             }
           }
+
           break;
       }
 
@@ -188,13 +266,15 @@ namespace Steropes.UI.Widgets.Container
             {
               return base.GetSibling(direction, sourceWidget);
             }
+
             tileChild = LookupForFocusing(childLocation.Y, childLocation.X - offset);
             break;
           case Direction.Right:
-            if (childLocation.X + offset >= Columns)
+            if (childLocation.X + offset >= ColumnCount)
             {
               return base.GetSibling(direction, sourceWidget);
             }
+
             tileChild = LookupForFocusing(childLocation.Y, childLocation.X + offset);
             break;
           case Direction.Up:
@@ -202,40 +282,49 @@ namespace Steropes.UI.Widgets.Container
             {
               return base.GetSibling(direction, sourceWidget);
             }
+
             tileChild = LookupForFocusing(childLocation.Y - offset, childLocation.X);
             break;
           case Direction.Down:
-            if (childLocation.Y + offset >= Rows)
+            if (childLocation.Y + offset >= RowCount)
             {
               return base.GetSibling(direction, sourceWidget);
             }
+
             tileChild = LookupForFocusing(childLocation.Y + offset, childLocation.X);
             break;
         }
-      }
-      while (tileChild == null);
+      } while (tileChild == null);
 
       return tileChild;
     }
 
     protected override Rectangle ArrangeOverride(Rectangle layoutSize)
     {
+      if (layoutSize.Width != DesiredSize.WidthInt ||
+          layoutSize.Height != DesiredSize.HeightInt)
+      {
+        MeasureOverride(new Size(layoutSize.Width, layoutSize.Height));
+      }
+
       var colStarts = RunningSum(columnWidths, layoutSize.X, Spacing);
       var rowStarts = RunningSum(rowHeights, layoutSize.Y, Spacing);
 
       var maxX = 0;
       var maxY = 0;
-      var widgetsAndConstraints = WidgetsWithConstraints();
+      var widgetsAndConstraints = WidgetsWithConstraints;
       for (var index = 0; index < widgetsAndConstraints.Count; index++)
       {
         var pair = widgetsAndConstraints[index];
         var widget = pair.Widget;
         var location = pair.Constraint;
-        var rect = new Rectangle(colStarts[location.X], rowStarts[location.Y], columnWidths[location.X], rowHeights[location.Y]);
+        var rect = new Rectangle(colStarts[location.X], rowStarts[location.Y], columnWidths[location.X],
+                                 rowHeights[location.Y]);
         widget.Arrange(rect);
         maxX = Math.Max(rect.Right, maxX);
         maxY = Math.Max(rect.Bottom, maxY);
       }
+
       maxX = Math.Max(0, maxX - layoutSize.X);
       maxY = Math.Max(0, maxY - layoutSize.Y);
       return new Rectangle(layoutSize.X, layoutSize.Y, maxX, maxY);
@@ -246,7 +335,7 @@ namespace Steropes.UI.Widgets.Container
       columnWidths = ComputeSpaceConstraints(ColumnConstraints, availableSize.Width, false, columnWidths);
       rowHeights = ComputeSpaceConstraints(RowConstraints, availableSize.Height, true, rowHeights);
 
-      var widgetsAndConstraints = WidgetsWithConstraints();
+      var widgetsAndConstraints = WidgetsWithConstraints;
       for (var index = 0; index < widgetsAndConstraints.Count; index++)
       {
         var pair = widgetsAndConstraints[index];
@@ -256,7 +345,9 @@ namespace Steropes.UI.Widgets.Container
         widget.Measure(size);
       }
 
-      return new Size(columnWidths.Sum(), rowHeights.Sum());
+      var effectiveSpacingX = Math.Max(columnWidths.Length - 1, 0) * Spacing;
+      var effectiveSpacingY = Math.Max(rowHeights.Length - 1, 0) * Spacing;
+      return new Size(columnWidths.Sum() + effectiveSpacingX, rowHeights.Sum() + effectiveSpacingY);
     }
 
     protected override void OnChildAdded(IWidget child, int index, Point constraint)
@@ -276,18 +367,21 @@ namespace Steropes.UI.Widgets.Container
       var row = constraint.Y;
       var column = constraint.X;
 
-      if (row >= Rows)
+      if (row >= RowCount)
       {
         rows = null;
       }
-      if (column >= Columns)
+
+      if (column >= ColumnCount)
       {
         columns = null;
       }
+
       while (RowConstraints.Count <= row)
       {
         RowConstraints.Add(LengthConstraint.Auto);
       }
+
       while (ColumnConstraints.Count <= column)
       {
         ColumnConstraints.Add(LengthConstraint.Auto);
@@ -304,6 +398,7 @@ namespace Steropes.UI.Widgets.Container
         {
           widgetsPerPosition.Remove(constraint);
         }
+
         rows = null;
         columns = null;
       }
@@ -317,7 +412,10 @@ namespace Steropes.UI.Widgets.Container
     /// <param name="rows"></param>
     /// <param name="availableRowHeights"></param>
     /// <returns></returns>
-    int[] ComputeSpaceConstraints(IReadOnlyList<LengthConstraint> constraints, float availableSpace, bool rows, int[] availableRowHeights)
+    int[] ComputeSpaceConstraints(IReadOnlyList<LengthConstraint> constraints,
+                                  float availableSpace,
+                                  bool rows,
+                                  int[] availableRowHeights)
     {
       float usedHeight = 0;
       var treatRelativeAsAuto = float.IsInfinity(availableSpace);
@@ -343,7 +441,7 @@ namespace Steropes.UI.Widgets.Container
         var rc = constraints[rowIndex];
         if (rc.Unit == LengthConstraint.UnitType.Absolute)
         {
-          availableRowHeights[rowIndex] = (int)rc.Value;
+          availableRowHeights[rowIndex] = (int) rc.Value;
           usedHeight = rc.Value;
         }
         else if (rc.Unit == LengthConstraint.UnitType.Auto || treatRelativeAsAuto)
@@ -353,13 +451,13 @@ namespace Steropes.UI.Widgets.Container
           if (rows)
           {
             var s = MeasureAutoSize(p => p.Y == rowIndexTmp);
-            availableRowHeights[rowIndex] = (int)s.Height;
+            availableRowHeights[rowIndex] = (int) s.Height;
             usedHeight = s.Height;
           }
           else
           {
             var s = MeasureAutoSize(p => p.X == rowIndexTmp);
-            availableRowHeights[rowIndex] = (int)s.Width;
+            availableRowHeights[rowIndex] = (int) s.Width;
             usedHeight = s.Width;
           }
         }
@@ -392,10 +490,11 @@ namespace Steropes.UI.Widgets.Container
           else
           {
             var pct = rc.Value / relativeSizes;
-            availableRowHeights[rowIndex] = (int)(pct * extraSpace);
+            availableRowHeights[rowIndex] = (int) (pct * extraSpace);
           }
         }
       }
+
       return availableRowHeights;
     }
 
@@ -412,9 +511,11 @@ namespace Steropes.UI.Widgets.Container
           {
             continue;
           }
+
           return widget;
         }
       }
+
       return null;
     }
 
@@ -423,7 +524,7 @@ namespace Steropes.UI.Widgets.Container
       var usedSize = new Size();
       var size = new Size(float.PositiveInfinity, float.PositiveInfinity);
 
-      var widgetsWithConstraints = WidgetsWithConstraints();
+      var widgetsWithConstraints = WidgetsWithConstraints;
       for (var index = 0; index < widgetsWithConstraints.Count; index++)
       {
         var pair = widgetsWithConstraints[index];
@@ -431,6 +532,7 @@ namespace Steropes.UI.Widgets.Container
         {
           continue;
         }
+
         var widget = pair.Widget;
         widget.Measure(size);
         usedSize.Width = Math.Max(usedSize.Width, widget.DesiredSize.Width);
@@ -450,6 +552,7 @@ namespace Steropes.UI.Widgets.Container
         sum += array[i];
         sum += padding;
       }
+
       return colStarts;
     }
   }

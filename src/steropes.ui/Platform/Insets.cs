@@ -100,6 +100,11 @@ namespace Steropes.UI.Platform
     {
       return new Insets(left.Top + right.Top, left.Left + right.Left, left.Bottom + right.Bottom, left.Right + right.Right);
     }
+
+    public override string ToString()
+    {
+      return $"{nameof(Top)}: {Top}, {nameof(Right)}: {Right}, {nameof(Bottom)}: {Bottom}, {nameof(Left)}: {Left}";
+    }
   }
 
   public static class BoxExtensions

@@ -16,12 +16,16 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System.Collections.Generic;
-using System.Globalization;
 
+using System;
+using System.ComponentModel;
+using System.Globalization;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
-
+using Steropes.UI.Annotations;
+using Steropes.UI.Bindings;
 using Steropes.UI.Components;
 using Steropes.UI.Components.Window;
 using Steropes.UI.Input;
@@ -32,116 +36,157 @@ using Steropes.UI.Widgets.TextWidgets;
 
 namespace Steropes.UI.Demo.Demos
 {
-  class BasicDemoPane : ScrollPanel
+  internal enum Flavor
   {
+    Chocolate,
+
+    Vanilla,
+
+    Cheese,
+
+    Chilli,
+
+    Strawberry,
+
+    Honey,
+
+    Lemon,
+
+    Raspberry
+  }
+
+  internal class BasicDemoPane : ScrollPanel
+  {
+    readonly BasicDemoModel model;
+
     public BasicDemoPane(IUIStyle style) : base(style)
     {
-      var gridGroup = new Grid(UIStyle);
-      gridGroup.ColumnConstraints.Add(LengthConstraint.Auto);
-      gridGroup.ColumnConstraints.Add(LengthConstraint.Relative(1));
-      gridGroup.ColumnConstraints.Add(LengthConstraint.Relative(1));
+      model = new BasicDemoModel();
 
-      var rowIndex = 0;
-
-      gridGroup.AddChildAt(new Label(UIStyle, "PasswordBox"), 0, rowIndex);
-      gridGroup.AddChildAt(CreatePasswordBox(), 1, rowIndex);
-
-      rowIndex++;
-      gridGroup.AddChildAt(new Label(UIStyle, "Text-Box"), 0, rowIndex);
-      gridGroup.AddChildAt(CreateTextBox(), 1, rowIndex);
-
-      rowIndex++;
-      gridGroup.AddChildAt(new Label(UIStyle, "DropDownBox"), 0, rowIndex);
-      gridGroup.AddChildAt(CreateDropBox(), 1, rowIndex);
-
-      rowIndex++;
-
-      gridGroup.AddChildAt(new Label(UIStyle, "RadioButtonSet"), 0, rowIndex);
-      gridGroup.AddChildAt(CreateRadioButtonSet(), 1, rowIndex);
-
-      rowIndex++;
-
-      gridGroup.AddChildAt(new Label(UIStyle, "Slider"), 0, rowIndex);
-      gridGroup.AddChildAt(CreateSlider(), 1, rowIndex);
-
-      rowIndex++;
-
-      gridGroup.AddChildAt(new Label(UIStyle, "Button"), 0, rowIndex);
-      gridGroup.AddChildAt(CreateButton(), 1, rowIndex);
-
-      rowIndex++;
-
-      gridGroup.AddChildAt(new Label(UIStyle, "CheckBox"), 0, rowIndex);
-      gridGroup.AddChildAt(CreateCheckBox(), 1, rowIndex);
-
-      rowIndex++;
-
-      gridGroup.AddChildAt(new Label(UIStyle, "KeyBox"), 0, rowIndex);
-      gridGroup.AddChildAt(CreateKeyBox(), 1, rowIndex);
-
-      rowIndex++;
-
-      gridGroup.AddChildAt(new Label(UIStyle, "Spinner"), 0, rowIndex);
-      gridGroup.AddChildAt(CreateSpinner(), 1, rowIndex);
-
-      rowIndex++;
-
-      gridGroup.AddChildAt(new Label(UIStyle, "ProgressBar"), 0, rowIndex);
-      gridGroup.AddChildAt(CreateProgressBar(), 1, rowIndex);
-
-      rowIndex++;
-
-      gridGroup.AddChildAt(new Label(UIStyle, "ListBox"), 0, rowIndex);
-      gridGroup.AddChildAt(CreateListView(), 1, rowIndex);
-
-      Content = gridGroup;
-    }
-
-    enum Flavor
-    {
-      Chocolate,
-
-      Vanilla,
-
-      Cheese
+      Content = new Grid(UIStyle)
+      {
+        Spacing = 5,
+        Columns = new[]
+        {
+          LengthConstraint.Auto,
+          LengthConstraint.Relative(1),
+          LengthConstraint.Relative(1)
+        },
+        Children = new[]
+        {
+          new[]
+          {
+            new Label(UIStyle, "PasswordBox"),
+            CreatePasswordBox()
+          },
+          new[]
+          {
+            new Label(UIStyle, "Text-Box"),
+            CreateTextBox()
+          },
+          new[]
+          {
+            new Label(UIStyle, "DropDown-Box"),
+            CreateDropBox()
+          },
+          new[]
+          {
+            new Label(UIStyle, "RadioButtonSet"),
+            CreateRadioButtonSet()
+          },
+          new[]
+          {
+            new Label(UIStyle, "Slider"),
+            CreateSlider()
+          },
+          new[]
+          {
+            new Label(UIStyle, "Button"),
+            CreateButton()
+          },
+          new[]
+          {
+            new Label(UIStyle, "Checkbox"),
+            CreateCheckBox()
+          },
+          new[]
+          {
+            new Label(UIStyle, "Keybox"),
+            CreateKeyBox()
+          },
+          new[]
+          {
+            new Label(UIStyle, "Spinner"),
+            CreateSpinner()
+          },
+          new[]
+          {
+            new Label(UIStyle, "Progressbar"),
+            CreateProgressBar()
+          },
+          new[]
+          {
+            new Label(UIStyle, "ListBox"),
+            CreateListView()
+          }
+        }
+      };
     }
 
     IWidget CreateButton()
     {
-      var button = new Button(UIStyle, "Get Ice Cream!");
       IPopUp popup = null;
-      button.ActionPerformed += (sender, args) =>
+      var button = new Button(UIStyle, "Get Ice Cream!")
+      {
+        OnActionPerformed = (s, a) =>
         {
           popup?.Close();
-          popup = Screen?.PopUpManager?.ShowConfirmDialog(new Point(600, 250), UIStyle, "Oh noes!", "It melted already. Sorry.");
-        };
+          popup = Screen?.PopUpManager?.ShowConfirmDialog(new Point(600, 250), UIStyle, "Oh noes!",
+                                                          "It melted already. Sorry.");
+        }
+      };
       return button;
     }
 
     IWidget CreateCheckBox()
     {
-      return new CheckBox(UIStyle) { Text = "Click here" };
+      return new CheckBox(UIStyle)
+      {
+        Text = "Add Extra Chocolate Flakes"
+      }.DoWith(c =>
+      {
+        model.BindingFor(m => m.ExtraFlakes)
+          .Map(SelectionState.Selected, SelectionState.Unselected)
+          .BindTo((b) => c.Selected = b);
+        c.BindingFor(cb => cb.Selected)
+          .EqualTo(SelectionState.Selected)
+          .BindTo(b => model.ExtraFlakes = b);
+      });
     }
 
     IWidget CreateDropBox()
     {
-      var items = new List<DropDownItem<Flavor>>();
-      items.Add(new DropDownItem<Flavor>("Chocolate", Flavor.Chocolate));
-      items.Add(new DropDownItem<Flavor>("Vanilla", Flavor.Vanilla));
-      items.Add(new DropDownItem<Flavor>("Cheese", Flavor.Cheese));
-      items.Add(new DropDownItem<Flavor>("Cheese 1", Flavor.Cheese));
-      items.Add(new DropDownItem<Flavor>("Cheese 2", Flavor.Cheese));
-      items.Add(new DropDownItem<Flavor>("Cheese 3", Flavor.Cheese));
-      items.Add(new DropDownItem<Flavor>("Cheese 4", Flavor.Cheese));
-      items.Add(new DropDownItem<Flavor>("Cheese 5", Flavor.Cheese));
-      items.Add(new DropDownItem<Flavor>("Cheese 6", Flavor.Cheese));
-      items.Add(new DropDownItem<Flavor>("Cheese 7", Flavor.Cheese));
-      items.Add(new DropDownItem<Flavor>("Cheese 8", Flavor.Cheese));
-      items.Add(new DropDownItem<Flavor>("Cheese 9", Flavor.Cheese));
-
-      var dropDownBox = new DropDownBox<DropDownItem<Flavor>>(UIStyle, items);
-      dropDownBox.SelectedIndex = 0;
-      return dropDownBox;
+      return new DropDownBox<Flavor>(UIStyle)
+      {
+        SelectedIndex = 0,
+        Data = new[]
+        {
+          Flavor.Chocolate,
+          Flavor.Vanilla,
+          Flavor.Cheese,
+          Flavor.Chilli,
+          Flavor.Strawberry,
+          Flavor.Honey,
+          Flavor.Lemon,
+          Flavor.Raspberry
+        }
+      }.DoWith(db =>
+      {
+        model.BindingFor(m => m.Flavor)
+          .BindTo((b) => db.SelectedItem = b);
+        db.BindingFor(cb => cb.SelectedItem)
+          .BindTo(b => model.Flavor = b);
+      });
     }
 
     IWidget CreateKeyBox()
@@ -151,15 +196,23 @@ namespace Steropes.UI.Demo.Demos
 
     IWidget CreateListView()
     {
-      var list = new ListView<string>(UIStyle);
-      list.DataItems.Add("One");
-      list.DataItems.Add("Two");
-      list.DataItems.Add("Three");
-      list.DataItems.Add("Four");
-      list.DataItems.Add("Five");
-      list.DataItems.Add("Five A");
-      list.DataItems.Add("Five B");
-      return list;
+      return new ListView<string>(UIStyle)
+      {
+        Data = new[]
+        {
+          "One",
+          "Two",
+          "Three",
+          "Four",
+          "Five",
+          "Six",
+          "Seven"
+        }
+      }.DoWith(lv =>
+      {
+        model.BindingFor(m => m.Count).Subtract(1).BindTo(v => lv.SelectedIndex = v);
+        lv.BindingFor(l => l.SelectedIndex).Add(1).BindTo(m => model.Count = m);
+      });
     }
 
     IWidget CreatePasswordBox()
@@ -169,27 +222,45 @@ namespace Steropes.UI.Demo.Demos
 
     IWidget CreateProgressBar()
     {
-      var progressBar = new ProgressBar(UIStyle) { Min = 0, Max = 400, Value = 200 };
-      return progressBar;
+      return new ProgressBar(UIStyle) { Min = 0, Max = 400, Value = 200 };
     }
 
     IWidget CreateRadioButtonSet()
     {
-      var items = new List<DropDownItem<Flavor>>();
-      items.Add(new DropDownItem<Flavor>("Chocolate", Flavor.Chocolate));
-      items.Add(new DropDownItem<Flavor>("Vanilla", Flavor.Vanilla));
-      items.Add(new DropDownItem<Flavor>("Cheese", Flavor.Cheese));
-
-      var dropDownBox = new RadioButtonSet<DropDownItem<Flavor>>(UIStyle);
-      dropDownBox.AddAll(items);
-      dropDownBox.SelectedIndex = 0;
-      return dropDownBox;
+      return new RadioButtonSet<DropDownItem<Flavor>>(UIStyle)
+      {
+        Data = new[]
+        {
+          new DropDownItem<Flavor>("Chocolate", Flavor.Chocolate),
+          new DropDownItem<Flavor>("Vanilla", Flavor.Vanilla),
+          new DropDownItem<Flavor>("Cheese", Flavor.Cheese),
+          new DropDownItem<Flavor>("Chilli", Flavor.Chilli),
+          new DropDownItem<Flavor>("Strawberry", Flavor.Strawberry),
+          new DropDownItem<Flavor>("Honey", Flavor.Honey),
+          new DropDownItem<Flavor>("Lemon", Flavor.Lemon),
+          new DropDownItem<Flavor>("Raspberry", Flavor.Raspberry)
+        },
+        SelectedIndex = 0
+      }.DoWith(db =>
+      {
+        model.BindingFor(m => m.Flavor).Map(b => db.DataItems.FirstOrDefault(f => f.Tag == b)).BindTo(b => db.SelectedItem = b);
+        db.BindingFor(cb => cb.SelectedItem).Map(d => d.Tag).BindTo(b => model.Flavor = b);
+      });
     }
 
     IWidget CreateSlider()
     {
-      var slider = new Slider(UIStyle, 1, 5, 1, 1);
-      slider.ValueChanged += (sender, args) => slider.ShowTooltip(slider.Value.ToString(CultureInfo.CurrentCulture));
+      var slider = new Slider(UIStyle)
+      {
+        MinValue = 1,
+        MaxValue = 7,
+        Step = 1,
+        Value = 1
+      };
+      slider.OnValueChanged = (sender, args) => slider.ShowTooltip(slider.Value.ToString(CultureInfo.CurrentCulture));
+      
+      model.BindingFor(m => m.Count).BindTo(v => slider.Value = v);
+      slider.BindingFor(s => s.Value).Map(f => (int) f).BindTo(v => model.Count = v);
       return slider;
     }
 
@@ -201,6 +272,75 @@ namespace Steropes.UI.Demo.Demos
     IWidget CreateTextBox()
     {
       return new TextField(UIStyle) { Text = "  Hello World! " };
+    }
+  }
+
+  internal class BasicDemoModel : INotifyPropertyChanged
+  {
+    int count;
+    bool extraFlakes;
+    Flavor flavor;
+
+    public BasicDemoModel()
+    {
+      count = 2;
+      flavor = Flavor.Chocolate;
+    }
+
+    public bool ExtraFlakes
+    {
+      get { return extraFlakes; }
+      set
+      {
+        if (value == extraFlakes)
+        {
+          return;
+        }
+
+        extraFlakes = value;
+        OnPropertyChanged();
+        Console.WriteLine("Extra Flakes changed to " + value);
+      }
+    }
+
+    public Flavor Flavor
+    {
+      get { return flavor; }
+      set
+      {
+        if (value == flavor)
+        {
+          return;
+        }
+
+        flavor = value;
+        OnPropertyChanged();
+        Console.WriteLine("Flavour changed to " + value);
+      }
+    }
+
+    public int Count
+    {
+      get { return count; }
+      set
+      {
+        if (value == count)
+        {
+          return;
+        }
+
+        count = value;
+        OnPropertyChanged();
+        Console.WriteLine("Count changed to " + value);
+      }
+    }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    [NotifyPropertyChangedInvocator]
+    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    {
+      PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
   }
 }

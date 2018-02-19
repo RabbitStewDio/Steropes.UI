@@ -16,17 +16,19 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
+using System.ComponentModel;
 using FluentAssertions;
 
 using Microsoft.Xna.Framework;
 
 using NUnit.Framework;
-
+using Steropes.UI.Test.Bindings;
 using Steropes.UI.Widgets.TextWidgets;
 
 namespace Steropes.UI.Test.UI.TextWidgets
 {
-  [Category("Text Widgets")]
+  [NUnit.Framework.Category("Text Widgets")]
   public class TextAreaTest
   {
     [Test]
@@ -43,6 +45,34 @@ namespace Steropes.UI.Test.UI.TextWidgets
 
       ta.LayoutRect.Should().Be(new Rectangle(10, 20, 300, 100));
       ta.Content.LayoutRect.Should().Be(new Rectangle(51, 40, 239, 15));
+    }
+
+    [Test]
+    public void TextProperty_ChangeNotification()
+    {
+      var style = LayoutTestStyle.Create();
+      var widget = new TextArea(style);
+
+      using (var monitoredBinding = widget.Monitor<INotifyPropertyChanged>())
+      {
+        widget.Text = "Hello";
+
+        monitoredBinding.Should().RaisePropertyChange(widget, nameof(widget.Text));
+      }
+    }
+
+    [Test]
+    public void TextProperty_ChangeNotification_Via_Document()
+    {
+      var style = LayoutTestStyle.Create();
+      var widget = new TextArea(style);
+
+      using (var monitoredBinding = widget.Monitor<INotifyPropertyChanged>())
+      {
+        widget.Content.Document.InsertAt(0, "Hello World");
+
+        monitoredBinding.Should().RaisePropertyChange(widget, nameof(widget.Text));
+      }
     }
   }
 }
