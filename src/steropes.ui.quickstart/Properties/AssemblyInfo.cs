@@ -32,7 +32,7 @@ using System.Reflection;
 //
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
-// [assembly: AssemblyVersion("3.0.0.0")]
-[assembly: AssemblyVersion("3.0.0.0")]
-[assembly: AssemblyFileVersion("3.0.0.0")]
-[assembly: AssemblyInformationalVersion("3.0.0-beta.1+39.Branch.release-2.0.0.Sha.1faeb60000423e542875ea5012a968877c7d3005")]
+// [assembly: AssemblyVersion("2.0.0.0")]
+[assembly: AssemblyVersion("2.0.0.0")]
+[assembly: AssemblyFileVersion("2.0.1.0")]
+[assembly: AssemblyInformationalVersion("2.0.1-unstable.0+Branch.develop.Sha.3b6d1ea07f4b04b06148253380645d1f64a62519")]
