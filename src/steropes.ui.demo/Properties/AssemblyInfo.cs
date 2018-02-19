@@ -25,7 +25,7 @@ using System.Reflection;
 //      Revision
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
-// [assembly: AssemblyVersion("3.0.0.0")]
-[assembly: AssemblyVersion("3.0.0.0")]
-[assembly: AssemblyFileVersion("3.0.0.0")]
-[assembly: AssemblyInformationalVersion("3.0.0-beta.1+39.Branch.release-2.0.0.Sha.1faeb60000423e542875ea5012a968877c7d3005")]
+// [assembly: AssemblyVersion("2.0.0.0")]
+[assembly: AssemblyVersion("2.0.0.0")]
+[assembly: AssemblyFileVersion("2.0.0.0")]
+[assembly: AssemblyInformationalVersion("2.0.0+48.Branch.master.Sha.13f0648520007c3ce0156d9bfad167d333958319")]
