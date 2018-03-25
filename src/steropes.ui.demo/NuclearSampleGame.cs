@@ -22,6 +22,7 @@ using Steropes.UI.Demo.GameStates;
 using Steropes.UI.Input;
 using Steropes.UI.Platform;
 using Steropes.UI.State;
+using Steropes.UI.Util;
 using Steropes.UI.Windows.UI.Window;
 
 namespace Steropes.UI.Demo
@@ -55,7 +56,7 @@ namespace Steropes.UI.Demo
       stateManager.States["Intro"] = new GameStateIntro(this, drawingService, stateManager, "Main");
       var windowService = new WindowsGameWindowService(this);
       
-      // This requires Monogame-DirectX. Remove this line when on DesktopGL or Linux etc.. 
+      // This requires Monogame-DirectX (it will be a no-op on DesktopGL). 
       windowService.MouseCursorService = new WinFormsMouseCursorService(this);
       stateManager.States["Main"] = new GameStateMainMenu(this, drawingService, inputManager, stateManager, windowService);
       stateManager.SwitchState(stateManager.States["Main"]);
@@ -63,6 +64,8 @@ namespace Steropes.UI.Demo
       Components.Add(inputManager);
       Components.Add(stateManager);
       Components.Add(new DebugOverlayRenderer(this));
+
+      this.CenterOnScreen();
     }
   }
 }
