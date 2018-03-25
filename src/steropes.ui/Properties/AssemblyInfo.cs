@@ -29,5 +29,5 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("2.0.0.0")]
 [assembly: AssemblyVersion("2.0.0.0")]
-[assembly: AssemblyFileVersion("2.0.0.0")]
-[assembly: AssemblyInformationalVersion("2.0.0+48.Branch.master.Sha.13f0648520007c3ce0156d9bfad167d333958319")]
+[assembly: AssemblyFileVersion("2.0.1.0")]
+[assembly: AssemblyInformationalVersion("2.0.1-beta.1+0.Branch.release-2.0.1.Sha.78711cdadb0d725610cdcae15822c77bf7396a0b")]

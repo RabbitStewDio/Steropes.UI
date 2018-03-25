@@ -60,6 +60,8 @@ namespace Steropes.UI.Demo
       styleSystem.StyleResolver.StyleRules.AddRange(styles);
 
       uiManager.Root.Content = WidgetDemo.CreateRootPanel(styleSystem);
+
+      this.CenterOnScreen();
     }
 
     protected override void Update(GameTime gameTime)

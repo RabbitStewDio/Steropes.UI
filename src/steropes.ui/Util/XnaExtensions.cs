@@ -57,5 +57,12 @@ namespace Steropes.UI.Util
       var y = Math.Min(r1.Top, r2.Top);
       return new Rectangle(x, y, Math.Max(r1.Right, r2.Right) - x, Math.Max(r1.Bottom, r2.Bottom) - y);
     }
+
+    public static void CenterOnScreen(this Game game)
+    {
+      var size = game.Window.ClientBounds.Size;
+      var dm = game.GraphicsDevice.Adapter.CurrentDisplayMode;
+      game.Window.Position = new Point((dm.Width - size.X) / 2, (dm.Height - size.Y) / 2);
+    }
   }
 }
