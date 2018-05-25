@@ -1,5 +1,32 @@
 ﻿# Changelog
 
+2018-05-25 - 2.1.0
+
+    [API] Grid container now honor the Anchor property of all its child widgets.
+          This allows you to set a preferred size and alignment on the widgets
+          without having to wrap them into a GroupBox element.
+
+    [API] Consolidated the tracing code into two tracing targets. 
+          "Steropes.UI.Input" records all input events. If this source is 
+          enabled at the 'Verbose' level, the system will automatically add the
+          tracers as input filters.
+          "Steropes.UI.Style" records all style related events.
+
+    [API] A new IInputState component in the IScreenService allows you to track
+          the current mouse position and input flags globally. 
+
+    [API] Mouse and Touch inputs can now be transformed using an Affine-Transform
+          matrix. That allows you to scale, translate and rotate the inputs before
+          they are processed by the widgets. Use it in combination with transforms
+          on the SpriteBatch in the BatchedDrawingService to scale the UI.
+
+    [API] Group and BoxGroup now have a write-only 'Children' property to support
+          declaring child widgets in the fluent API.
+
+    [API] The ProgressBar can now change rendering direction from Left-To-Right to 
+          Right-To-Left and can request a minimum size based on the value range
+          covered.
+
 2018-02-18 - 2.0.0
 
     [API] The project is now built with C# 7 features to reduce some clutter in
