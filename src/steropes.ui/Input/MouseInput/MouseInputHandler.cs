@@ -16,9 +16,9 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 using System;
 using System.Collections.Generic;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
@@ -26,7 +26,7 @@ namespace Steropes.UI.Input.MouseInput
 {
   public class MouseInputHandler : BasicGameComponent
   {
-    static readonly List<MouseButton> Buttons = MouseButtonExtensions.GetAll();
+    static readonly List<MouseButton> buttons = MouseButtonExtensions.GetAll();
 
     readonly IEventSink<MouseEventData> eventSink;
 
@@ -41,10 +41,30 @@ namespace Steropes.UI.Input.MouseInput
     bool initialized;
 
     MouseState previousState;
+    Matrix transform;
+    bool hasTransform;
 
     public MouseInputHandler(IEventSink<MouseEventData> eventSink)
     {
-      this.eventSink = eventSink;
+      this.eventSink = eventSink ?? throw new ArgumentNullException(nameof(eventSink));
+      this.transform = Matrix.Identity;
+    }
+
+    public Matrix Transform
+    {
+      get { return transform; }
+      set
+      {
+        transform = value;
+        hasTransform = transform != Matrix.Identity;
+      }
+    }
+
+    MouseState TransformState(MouseState input)
+    {
+      var p = Vector2.Transform(input.Position.ToVector2(), transform);
+      return new MouseState((int) p.X, (int) p.Y, input.ScrollWheelValue, 
+                            input.LeftButton, input.MiddleButton, input.RightButton, input.XButton1, input.XButton2);
     }
 
     public override void Update(GameTime gameTime)
@@ -53,7 +73,14 @@ namespace Steropes.UI.Input.MouseInput
       currentTime = gameTime.TotalGameTime;
       currentFlags = InputFlagsHelper.Create(Keyboard.GetState(), currentState);
       previousState = currentState;
-      currentState = Mouse.GetState();
+      if (hasTransform)
+      {
+        currentState = TransformState(Mouse.GetState());
+      }
+      else
+      {
+        currentState = Mouse.GetState();
+      }
 
       // collect some valid state, so on the _next_ update call we can detect changes and process events.
       if (!initialized)
@@ -62,9 +89,9 @@ namespace Steropes.UI.Input.MouseInput
         return;
       }
 
-      for (var index = 0; index < Buttons.Count; index++)
+      for (var index = 0; index < buttons.Count; index++)
       {
-        var button = Buttons[index];
+        var button = buttons[index];
         CheckButtonPressed(button);
         CheckButtonReleased(button);
       }

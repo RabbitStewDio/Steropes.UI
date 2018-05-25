@@ -24,6 +24,8 @@ namespace Steropes.UI.Components.Window
 {
   public interface IScreenService
   {
+    IInputState InputState { get; }
+
     IFocusManager FocusManager { get; }
 
     IMouseHoverManager MouseHoverManager { get; }

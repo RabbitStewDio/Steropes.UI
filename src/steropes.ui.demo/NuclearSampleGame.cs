@@ -53,11 +53,10 @@ namespace Steropes.UI.Demo
 
       // Game states; skipping intro state for debugging purposes ..
       var stateManager = new NamedGameStateManager(this);
-      stateManager.States["Intro"] = new GameStateIntro(this, drawingService, stateManager, "Main");
       var windowService = new WindowsGameWindowService(this);
-      
-      // This requires Monogame-DirectX (it will be a no-op on DesktopGL). 
       windowService.MouseCursorService = new WinFormsMouseCursorService(this);
+      
+      //stateManager.States["Intro"] = new GameStateIntro(this, drawingService, stateManager, "Main");
       stateManager.States["Main"] = new GameStateMainMenu(this, drawingService, inputManager, stateManager, windowService);
       stateManager.SwitchState(stateManager.States["Main"]);
 

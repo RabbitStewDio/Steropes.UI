@@ -27,9 +27,15 @@ namespace Steropes.UI.Input.MouseInput
   {
     MouseEventData eventData;
 
+    [Obsolete]
     public MouseEventArgs(object source, MouseEventData data)
     {
       Source = source;
+      eventData = data;
+    }
+
+    public MouseEventArgs(MouseEventData data)
+    {
       eventData = data;
     }
 
@@ -51,6 +57,7 @@ namespace Steropes.UI.Input.MouseInput
 
     public int ScrollWheelValue => eventData.ScrollWheelValue;
 
+    [Obsolete]
     public object Source { get; }
 
     public override TimeSpan Time => eventData.Time;
@@ -62,7 +69,9 @@ namespace Steropes.UI.Input.MouseInput
 
     public MouseEventArgs Derive(MouseEventType type)
     {
+#pragma warning disable 612
       return new MouseEventArgs(Source, eventData.ConvertInto(type, ClickCount));
+#pragma warning restore 612
     }
 
     public void Reuse(MouseEventData data)
@@ -134,8 +143,8 @@ namespace Steropes.UI.Input.MouseInput
 
     public override string ToString()
     {
-      return
-        $"MouseEventData={{EventType: {EventType}, Flags: {Flags}, Time: {Time}, Frame: {Frame}, Button: {Button}, ClickCount: {ClickCount}, Position: {Position}, ScrollWheelValue: {ScrollWheelValue}, ScrollWheelDelta: {ScrollWheelDelta}}}";
+      return string.Format("(EventType: {0}, Position: {1}, Flags: {2}, Button: {3}, ClickCount: {4}, ScrollWheelValue: {5}, ScrollWheelDelta: {6}, Time: {7}, Frame: {8})", 
+                           EventType, Position, Flags, Button, ClickCount, ScrollWheelValue, ScrollWheelDelta, Time, Frame);
     }
   }
 }

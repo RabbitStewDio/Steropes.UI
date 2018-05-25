@@ -1,14 +1,18 @@
 ﻿// MIT License
+//
 // Copyright (c) 2011-2016 Elisée Maurer, Sparklin Labs, Creative Patterns
-// Copyright (c) 2016 Thomas Morgner, Rabbit-StewDio Ltd.
+// Copyright (c) 2016-2018 Thomas Morgner, Rabbit-StewDio Ltd.
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
+//
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -27,9 +31,15 @@ namespace Steropes.UI.Input.GamePadInput
   {
     GamePadEventData eventData;
 
+    [Obsolete]
     public GamePadEventArgs(object source, GamePadEventData eventData)
     {
       Source = source;
+      this.eventData = eventData;
+    }
+
+    public GamePadEventArgs(GamePadEventData eventData)
+    {
       this.eventData = eventData;
     }
 
@@ -43,6 +53,7 @@ namespace Steropes.UI.Input.GamePadInput
 
     public override int Frame => eventData.Frame;
 
+    [Obsolete]
     public object Source { get; }
 
     public Vector2 ThumbstickState => eventData.ThumbstickState;
@@ -88,6 +99,12 @@ namespace Steropes.UI.Input.GamePadInput
       Button = button;
       TriggerState = 0;
       ThumbstickState = thumbStickState;
+    }
+
+    public override string ToString()
+    {
+      return string.Format("(EventType: {0}, ThumbstickState: {1}, TriggerState: {2}, Button: {3}, Flags: {4}, Time: {5}, Frame: {6}, Source: {7})", 
+                           EventType, ThumbstickState, TriggerState, Button, Flags, Time, Frame);
     }
   }
 }

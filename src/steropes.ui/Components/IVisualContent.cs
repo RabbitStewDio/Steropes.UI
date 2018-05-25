@@ -129,10 +129,6 @@ namespace Steropes.UI.Components
           propertyChangedSupport = new PropertyChangedEventSupport();
         }
 
-        if (this is Slider)
-        {
-          Console.WriteLine();
-        }
         propertyChangedSupport.Event += value;
       }
       remove
@@ -147,9 +143,9 @@ namespace Steropes.UI.Components
 
     public Rectangle BorderRect => borderRect;
 
-    public Rectangle ContentRect { get; set; }
+    public Rectangle ContentRect { get; private set; }
 
-    public Size DesiredSize { get; protected set; }
+    public Size DesiredSize { get; private set; }
 
     public bool LayoutInvalid
     {
@@ -185,7 +181,7 @@ namespace Steropes.UI.Components
         }
         return layoutRect;
       }
-      protected set
+      private set
       {
         layoutRect = value;
         borderRect = value.ReduceRectBy(Margin);
@@ -227,7 +223,7 @@ namespace Steropes.UI.Components
       }
     }
 
-    protected bool IsArranging { get; set; }
+    protected bool IsArranging { get; private set; }
 
     public static bool IsValidSize(float f)
     {

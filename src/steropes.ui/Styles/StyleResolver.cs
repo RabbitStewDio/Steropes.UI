@@ -23,8 +23,8 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using Steropes.UI.Components;
+using Steropes.UI.Platform;
 using Steropes.UI.Styles.Watcher;
-using Steropes.UI.Util;
 using Steropes.UI.Widgets.Container;
 
 namespace Steropes.UI.Styles
@@ -65,7 +65,7 @@ namespace Steropes.UI.Styles
     readonly Comparison<IStyleRule> styleRuleSortOrder = StyleRule.StyleRuleSortOrder;
 
     readonly IStyleSystem styleSystem;
-    readonly TraceSource tracer = TracingUtil.Create<StyleResolver>();
+    readonly TraceSource tracer = TracingUtil.StyleTracing;
 
     public StyleResolver(IStyleSystem styleSystem)
     {

@@ -39,19 +39,23 @@ namespace Steropes.UI.Input
     IEventSource<MouseEventData> MouseSource { get; }
 
     IEventSource<TouchEventData> TouchSource { get; }
+
+    /// <summary>
+    ///  Use this transformation if you need to scale or translate the raw mouse or touch input
+    ///  in case your screen is zoomed or offset.
+    /// </summary>
+    Matrix Transform { get; set; }
   }
 
   public class InputManager : GameComponent, IInputManager
   {
     readonly List<IUpdateable> components;
-
     readonly EventQueue<GamePadEventData> gamePadEvents;
-
     readonly EventQueue<KeyEventData> keyEvents;
-
     readonly EventQueue<MouseEventData> mouseEvents;
-
     readonly EventQueue<TouchEventData> touchEvents;
+    readonly MouseInputHandler mouseInput;
+    readonly TouchInputHandler touchInput;
 
     public InputManager(Game game) : base(game)
     {
@@ -60,13 +64,28 @@ namespace Steropes.UI.Input
       touchEvents = new EventQueue<TouchEventData>();
       gamePadEvents = new EventQueue<GamePadEventData>();
 
+      mouseInput = new MouseInputHandler(mouseEvents);
+      touchInput = new TouchInputHandler(touchEvents);
       components = new List<IUpdateable>
                      {
                        new KeyboardComponent(keyEvents, game.Window),
-                       new MouseInputHandler(mouseEvents),
-                       new TouchInputHandler(touchEvents),
+                       mouseInput,
+                       touchInput,
                        new GamePadComponent(gamePadEvents)
                      };
+    }
+
+    public Matrix Transform
+    {
+      get
+      {
+        return touchInput.Transform;
+      }
+      set
+      {
+        touchInput.Transform = value;
+        mouseInput.Transform = value;
+      }
     }
 
     public IEventSource<GamePadEventData> GamePadSource => gamePadEvents;

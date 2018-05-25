@@ -20,63 +20,20 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System;
-using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics;
+using Steropes.UI.Components;
+using Steropes.UI.Platform;
 
 namespace Steropes.UI.Input
 {
-  public abstract class InputEventArgs : EventArgs
+  public class TracingEventSink<T>: IComponentEventSink<T> where T : struct
   {
-    bool consumed;
-
-    protected InputEventArgs()
+    public void PushEvent(T data, IWidget target)
     {
-      consumed = false;
-    }
-
-    public bool Consumed
-    {
-      get
+      if (TracingUtil.InputTracing.Switch.ShouldTrace(TraceEventType.Verbose))
       {
-        return consumed;
+        TracingUtil.InputTracing.TraceEvent(TraceEventType.Verbose, 0, "Widget: {0}, Event: {1}", target, data);
       }
-      set
-      {
-        if (value)
-        {
-          consumed = true;
-        }
-      }
-    }
-
-    public abstract InputFlags Flags { get; }
-
-    public abstract int Frame { get; }
-
-    public abstract TimeSpan Time { get; }
-
-    public void Consume()
-    {
-      Consumed = true;
-    }
-
-    protected void Reset()
-    {
-      consumed = false;
-    }
-  }
-
-  [SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1402:FileMayOnlyContainASingleClass", Justification = "Generic and non generic class pair.")]
-  public abstract class InputEventArgs<TEventType, TEventData> : InputEventArgs
-    where TEventType : struct where TEventData : struct
-  {
-    public abstract TEventData EventData { get; }
-
-    public abstract TEventType EventType { get; }
-
-    public override string ToString()
-    {
-      return $"({nameof(EventType)}: {EventType}, {nameof(EventData)}: {EventData})";
     }
   }
 }

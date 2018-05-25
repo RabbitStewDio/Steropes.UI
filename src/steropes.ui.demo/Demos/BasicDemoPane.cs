@@ -222,7 +222,13 @@ namespace Steropes.UI.Demo.Demos
 
     IWidget CreateProgressBar()
     {
-      return new ProgressBar(UIStyle) { Min = 0, Max = 400, Value = 200 };
+      return new ProgressBar(UIStyle)
+      {
+        Min = 0, 
+        Max = 400, 
+        Value = 250,
+        Direction = ProgressBarDirection.LeftToRight
+      };
     }
 
     IWidget CreateRadioButtonSet()

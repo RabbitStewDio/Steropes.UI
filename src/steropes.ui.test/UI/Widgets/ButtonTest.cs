@@ -103,7 +103,7 @@ namespace Steropes.UI.Test.UI.Widgets
       group.Add(textField);
       group.KeyPressed += (s, e) => keyPressedReceived = true;
 
-      var eventData = new KeyEventArgs(this, new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Left));
+      var eventData = new KeyEventArgs(new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Left));
       textField.DispatchEvent(eventData);
 
       keyPressedReceived.Should().Be(false);
@@ -121,7 +121,7 @@ namespace Steropes.UI.Test.UI.Widgets
       group.Add(textField);
       group.KeyRepeated += (s, e) => keyPressedReceived = true;
 
-      var eventData = new KeyEventArgs(this, new KeyEventData(KeyEventType.KeyRepeat, TimeSpan.Zero, 0, InputFlags.None, Keys.Left));
+      var eventData = new KeyEventArgs(new KeyEventData(KeyEventType.KeyRepeat, TimeSpan.Zero, 0, InputFlags.None, Keys.Left));
       textField.DispatchEvent(eventData);
 
       keyPressedReceived.Should().Be(false);

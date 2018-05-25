@@ -1,14 +1,18 @@
 ﻿// MIT License
+//
 // Copyright (c) 2011-2016 Elisée Maurer, Sparklin Labs, Creative Patterns
-// Copyright (c) 2016 Thomas Morgner, Rabbit-StewDio Ltd.
+// Copyright (c) 2016-2018 Thomas Morgner, Rabbit-StewDio Ltd.
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
+//
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -18,8 +22,6 @@
 // SOFTWARE.
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
@@ -28,7 +30,7 @@ namespace Steropes.UI.Input.KeyboardInput
 {
   public class KeyboardComponent : BasicGameComponent
   {
-    static readonly List<Keys> EnumerableKeys = Enum.GetValues(typeof(Keys)).Cast<Keys>().ToList();
+    static readonly Keys[] enumerableKeys = (Keys[]) Enum.GetValues(typeof(Keys));
 
     readonly IEventSink<KeyEventData> eventSink;
 
@@ -83,19 +85,19 @@ namespace Steropes.UI.Input.KeyboardInput
 
     void RaiseEvents()
     {
-      for (var i = 0; i < EnumerableKeys.Count; i++)
+      for (var i = 0; i < enumerableKeys.Length; i++)
       {
-        var key = EnumerableKeys[i];
+        var key = enumerableKeys[i];
         if (currentState.IsKeyDown(key) && previousState.IsKeyUp(key))
         {
-          Debug.WriteLine("Raise Pressed event for " + key);
-          eventSink.PushEvent(new KeyEventData(KeyEventType.KeyPressed, currentTime, frame, currentFlags, key));
+          var keyEventData = new KeyEventData(KeyEventType.KeyPressed, currentTime, frame, currentFlags, key);
+          eventSink.PushEvent(keyEventData);
         }
 
         if (currentState.IsKeyUp(key) && previousState.IsKeyDown(key))
         {
-          Debug.WriteLine("Raise Released event for " + key);
-          eventSink.PushEvent(new KeyEventData(KeyEventType.KeyReleased, currentTime, frame, currentFlags, key));
+          var keyEventData = new KeyEventData(KeyEventType.KeyReleased, currentTime, frame, currentFlags, key);
+          eventSink.PushEvent(keyEventData);
         }
       }
     }
@@ -108,8 +110,8 @@ namespace Steropes.UI.Input.KeyboardInput
         return;
       }
 
-      Debug.WriteLine("Raise typed event for " + (int)args.Character);
-      typedCharacters.Enqueue(new KeyEventData(KeyEventType.KeyTyped, currentTime, frame, currentFlags, args.Character));
+      var keyEventData = new KeyEventData(KeyEventType.KeyTyped, currentTime, frame, currentFlags, args.Character);
+      typedCharacters.Enqueue(keyEventData);
     }
   }
 }

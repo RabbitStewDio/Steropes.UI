@@ -149,12 +149,6 @@ You can find all documentation in the [documentation folder](docs/README.md).
 
 There are a few areas I think that need additional work at a later stage:
 
-* Support scaled UIs. Right now the UI is always rendered at the native resolution.
-  This is OK when the screen size is well known or when the UI should not adapt
-  to different resolutions (for instance while using resizable windows), but 
-  behaves badly when the UI should look the same regardless of the underlying
-  resolution (for instance in full-screen display modes).
-
 * Add tree and table widgets for data centric UIs. Hardcore strategy games would 
   benefit from that.
 

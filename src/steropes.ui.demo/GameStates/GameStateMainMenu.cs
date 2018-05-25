@@ -102,7 +102,7 @@ namespace Steropes.UI.Demo.GameStates
         .CreateParser(Game.GraphicsDevice)
         .Read(XDocument.Load(filename));
 
-      return new StyleDefinition("Metro", rules, UIManager.UIStyle.StyleSystem.WhitePixel);
+      return new StyleDefinition(context, rules, UIManager.UIStyle.StyleSystem.WhitePixel);
     }
 
     public override void Start()
