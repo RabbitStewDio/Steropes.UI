@@ -103,7 +103,7 @@ namespace Steropes.UI.Test.UI.TextWidgets
       eb.Text = "Hello World";
       eb.Caret.SelectionStartOffset.Should().Be(11);
       eb.Caret.SelectionEndOffset.Should().Be(11);
-      eb.DispatchEvent(new KeyEventArgs(eb, new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Back)));
+      eb.DispatchEvent(new KeyEventArgs(new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Back)));
       eb.Text.Should().Be("Hello Worl");
       eb.Caret.SelectionStartOffset.Should().Be(10);
       eb.Caret.SelectionEndOffset.Should().Be(10);
@@ -115,7 +115,7 @@ namespace Steropes.UI.Test.UI.TextWidgets
       var eb = new TextField(LayoutTestStyle.Create());
       eb.Text = "Hello World";
       eb.Caret.MoveTo(5);
-      eb.DispatchEvent(new KeyEventArgs(eb, new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Back)));
+      eb.DispatchEvent(new KeyEventArgs(new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Back)));
       eb.Text.Should().Be("Hell World");
       eb.Caret.SelectionStartOffset.Should().Be(4);
       eb.Caret.SelectionEndOffset.Should().Be(4);
@@ -173,7 +173,7 @@ namespace Steropes.UI.Test.UI.TextWidgets
       eb.Text = "Hello World";
       eb.Caret.SelectionStartOffset.Should().Be(11);
       eb.Caret.SelectionEndOffset.Should().Be(11);
-      eb.DispatchEvent(new KeyEventArgs(eb, new KeyEventData(KeyEventType.KeyTyped, TimeSpan.Zero, 0, InputFlags.None, 'a')));
+      eb.DispatchEvent(new KeyEventArgs(new KeyEventData(KeyEventType.KeyTyped, TimeSpan.Zero, 0, InputFlags.None, 'a')));
       eb.Text.Should().Be("Hello Worlda");
       eb.Caret.SelectionStartOffset.Should().Be(12);
       eb.Caret.SelectionEndOffset.Should().Be(12);
@@ -189,7 +189,7 @@ namespace Steropes.UI.Test.UI.TextWidgets
       textField.Padding = new Insets();
       textField.Text = "Hello World";
 
-      textField.DispatchEvent(new KeyEventArgs(textField, new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Delete)));
+      textField.DispatchEvent(new KeyEventArgs(new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Delete)));
       textField.Caret.SelectionEndOffset.Should().Be(11);
       textField.Text.Should().Be("Hello World");
     }
@@ -200,7 +200,7 @@ namespace Steropes.UI.Test.UI.TextWidgets
       var eb = new TextField(LayoutTestStyle.Create());
       eb.Text = "Hello World";
       eb.Caret.MoveTo(6);
-      eb.DispatchEvent(new KeyEventArgs(eb, new KeyEventData(KeyEventType.KeyTyped, TimeSpan.Zero, 0, InputFlags.None, 'a')));
+      eb.DispatchEvent(new KeyEventArgs(new KeyEventData(KeyEventType.KeyTyped, TimeSpan.Zero, 0, InputFlags.None, 'a')));
       eb.Text.Should().Be("Hello aWorld");
       eb.Caret.SelectionStartOffset.Should().Be(7);
       eb.Caret.SelectionEndOffset.Should().Be(7);
@@ -218,11 +218,11 @@ namespace Steropes.UI.Test.UI.TextWidgets
       textField.Caret.SelectionEndOffset.Should().Be(11);
       textField.Measure(Size.Auto);
 
-      textField.DispatchEvent(new KeyEventArgs(textField, new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Left)));
+      textField.DispatchEvent(new KeyEventArgs(new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Left)));
       textField.Caret.SelectionEndOffset.Should().Be(10);
-      textField.DispatchEvent(new KeyEventArgs(textField, new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Left)));
+      textField.DispatchEvent(new KeyEventArgs(new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Left)));
       textField.Caret.SelectionEndOffset.Should().Be(9);
-      textField.DispatchEvent(new KeyEventArgs(textField, new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Back)));
+      textField.DispatchEvent(new KeyEventArgs(new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Back)));
       textField.Caret.SelectionEndOffset.Should().Be(8);
       textField.Text.Should().Be("Hello Wold");
     }
@@ -239,11 +239,11 @@ namespace Steropes.UI.Test.UI.TextWidgets
       textField.Caret.SelectionEndOffset.Should().Be(11);
       textField.Measure(Size.Auto);
 
-      textField.DispatchEvent(new KeyEventArgs(textField, new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Left)));
+      textField.DispatchEvent(new KeyEventArgs(new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Left)));
       textField.Caret.SelectionEndOffset.Should().Be(10);
-      textField.DispatchEvent(new KeyEventArgs(textField, new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Left)));
+      textField.DispatchEvent(new KeyEventArgs(new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Left)));
       textField.Caret.SelectionEndOffset.Should().Be(9);
-      textField.DispatchEvent(new KeyEventArgs(textField, new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Delete)));
+      textField.DispatchEvent(new KeyEventArgs(new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Delete)));
       textField.Caret.SelectionEndOffset.Should().Be(9);
       textField.Text.Should().Be("Hello Word");
     }
@@ -259,7 +259,7 @@ namespace Steropes.UI.Test.UI.TextWidgets
       eb.Caret.SelectionStartOffset.Should().Be(6);
       eb.Caret.SelectionEndOffset.Should().Be(8);
 
-      eb.DispatchEvent(new KeyEventArgs(eb, new KeyEventData(KeyEventType.KeyTyped, TimeSpan.Zero, 0, InputFlags.None, 'a')));
+      eb.DispatchEvent(new KeyEventArgs(new KeyEventData(KeyEventType.KeyTyped, TimeSpan.Zero, 0, InputFlags.None, 'a')));
       eb.Text.Should().Be("Hello arld");
       eb.Caret.SelectionStartOffset.Should().Be(7);
       eb.Caret.SelectionEndOffset.Should().Be(7);
@@ -287,7 +287,7 @@ namespace Steropes.UI.Test.UI.TextWidgets
       eb.Caret.SelectionEndOffset.Should().Be(11);
       eb.Arrange(new Rectangle(10, 20, 100, 40));
 
-      eb.DispatchEvent(new KeyEventArgs(eb, new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Back)));
+      eb.DispatchEvent(new KeyEventArgs(new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Back)));
       eb.Text.Should().Be("Hello Worl");
 
       eb.Arrange(new Rectangle(10, 20, 100, 40));
@@ -308,9 +308,9 @@ namespace Steropes.UI.Test.UI.TextWidgets
       textField.Caret.SelectionEndOffset.Should().Be(11);
       textField.Arrange(new Rectangle(10, 20, 100, 40));
 
-      textField.DispatchEvent(new KeyEventArgs(textField, new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Left)));
-      textField.DispatchEvent(new KeyEventArgs(textField, new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Left)));
-      textField.DispatchEvent(new KeyEventArgs(textField, new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Back)));
+      textField.DispatchEvent(new KeyEventArgs(new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Left)));
+      textField.DispatchEvent(new KeyEventArgs(new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Left)));
+      textField.DispatchEvent(new KeyEventArgs(new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Back)));
       textField.Text.Should().Be("Hello Wold");
 
       textField.Arrange(new Rectangle(10, 20, 100, 40));
@@ -331,9 +331,9 @@ namespace Steropes.UI.Test.UI.TextWidgets
       textField.Caret.SelectionEndOffset.Should().Be(11);
       textField.Arrange(new Rectangle(10, 20, 100, 40));
 
-      textField.DispatchEvent(new KeyEventArgs(textField, new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Left)));
-      textField.DispatchEvent(new KeyEventArgs(textField, new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Left)));
-      textField.DispatchEvent(new KeyEventArgs(textField, new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Delete)));
+      textField.DispatchEvent(new KeyEventArgs(new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Left)));
+      textField.DispatchEvent(new KeyEventArgs(new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Left)));
+      textField.DispatchEvent(new KeyEventArgs(new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Delete)));
       textField.Text.Should().Be("Hello Word");
 
       textField.Arrange(new Rectangle(10, 20, 100, 40));
@@ -356,7 +356,7 @@ namespace Steropes.UI.Test.UI.TextWidgets
       textField.Caret.MoveTo(1); // after 'H'
       style.StyleResolver.AddRoot(textField);
 
-      var eventData = new KeyEventArgs(this, new KeyEventData(KeyEventType.KeyTyped, TimeSpan.Zero, 0, InputFlags.None, '\b'));
+      var eventData = new KeyEventArgs(new KeyEventData(KeyEventType.KeyTyped, TimeSpan.Zero, 0, InputFlags.None, '\b'));
       textField.DispatchEvent(eventData);
       textField.Text.Should().Be("Hello");
       eventData.Consumed.Should().Be(true);
@@ -371,7 +371,7 @@ namespace Steropes.UI.Test.UI.TextWidgets
       textField.Caret.MoveTo(1); // after 'H'
       style.StyleResolver.AddRoot(textField);
 
-      var eventData = new KeyEventArgs(this, new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Back));
+      var eventData = new KeyEventArgs(new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Back));
       textField.DispatchEvent(eventData);
       textField.Text.Should().Be("ello");
       eventData.Consumed.Should().Be(true);
@@ -386,7 +386,7 @@ namespace Steropes.UI.Test.UI.TextWidgets
       textField.Caret.MoveTo(1); // after 'H'
       style.StyleResolver.AddRoot(textField);
 
-      var eventData = new KeyEventArgs(this, new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Left));
+      var eventData = new KeyEventArgs(new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Left));
       textField.DispatchEvent(eventData);
       textField.Caret.SelectionEndOffset.Should().Be(0);
       textField.Caret.SelectionStartOffset.Should().Be(0);
@@ -405,7 +405,7 @@ namespace Steropes.UI.Test.UI.TextWidgets
       group.Add(textField);
       group.KeyPressed += (s, e) => keyPressedReceived = true;
 
-      var eventData = new KeyEventArgs(this, new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Left));
+      var eventData = new KeyEventArgs(new KeyEventData(KeyEventType.KeyPressed, TimeSpan.Zero, 0, InputFlags.None, Keys.Left));
       textField.DispatchEvent(eventData);
 
       keyPressedReceived.Should().Be(false);

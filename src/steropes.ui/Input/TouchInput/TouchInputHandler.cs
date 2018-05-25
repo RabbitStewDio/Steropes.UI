@@ -1,4 +1,5 @@
 ﻿// MIT License
+//
 // Copyright (c) 2011-2016 Elisée Maurer, Sparklin Labs, Creative Patterns
 // Copyright (c) 2016-2018 Thomas Morgner, Rabbit-StewDio Ltd.
 //

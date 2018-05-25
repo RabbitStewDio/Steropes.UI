@@ -26,9 +26,16 @@ namespace Steropes.UI.Input.KeyboardInput
   {
     readonly KeyEventData eventData;
 
+    [Obsolete]
     public KeyEventArgs(object source, KeyEventData eventData)
     {
       Source = source;
+      this.eventData = eventData;
+    }
+
+    public KeyEventArgs(KeyEventData eventData)
+    {
+      Source = null;
       this.eventData = eventData;
     }
 
@@ -44,6 +51,7 @@ namespace Steropes.UI.Input.KeyboardInput
 
     public Keys Key => eventData.Key;
 
+    [Obsolete]
     public object Source { get; }
 
     public override TimeSpan Time => eventData.Time;
@@ -86,6 +94,16 @@ namespace Steropes.UI.Input.KeyboardInput
     public KeyEventData WithLocalisedKey(Keys k)
     {
       return new KeyEventData(EventType, Time, Frame, Flags, k);
+    }
+
+    public override string ToString()
+    {
+      if (Key == Keys.None)
+      {
+        return $"{nameof(EventType)}: {EventType}, {nameof(Time)}: {Time}, {nameof(Frame)}: {Frame}, {nameof(Flags)}: {Flags}, {nameof(Character)}: {Character}";
+      }
+
+      return $"{nameof(EventType)}: {EventType}, {nameof(Time)}: {Time}, {nameof(Frame)}: {Frame}, {nameof(Flags)}: {Flags}, {nameof(Key)}: {Key}";
     }
   }
 }

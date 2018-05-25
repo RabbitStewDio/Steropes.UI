@@ -1,14 +1,18 @@
 ﻿// MIT License
+//
 // Copyright (c) 2011-2016 Elisée Maurer, Sparklin Labs, Creative Patterns
-// Copyright (c) 2016 Thomas Morgner, Rabbit-StewDio Ltd.
+// Copyright (c) 2016-2018 Thomas Morgner, Rabbit-StewDio Ltd.
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
+//
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -42,6 +46,8 @@ namespace Steropes.UI.Input.TouchInput
 
     public int Frame { get; }
 
+    public bool IsTouchLocation => payload.IsTouchLocation;
+
     public TouchEventData(TimeSpan time, int frame, InputFlags flags, TouchEventType eventType, TouchLocation touchLocation)
     {
       Time = time;
@@ -58,6 +64,11 @@ namespace Steropes.UI.Input.TouchInput
       Flags = flags;
       EventType = eventType;
       payload = new GestureOrTouchLocation(gesture);
+    }
+
+    public override string ToString()
+    {
+      return $"{nameof(EventType)}: {EventType}, {nameof(Position)}: {Position}, Data: {payload}, {nameof(Flags)}: {Flags}, {nameof(Time)}: {Time}, {nameof(Frame)}: {Frame}";
     }
 
     [StructLayout(LayoutKind.Explicit)]
@@ -110,6 +121,16 @@ namespace Steropes.UI.Input.TouchInput
           }
           throw new InvalidOperationException();
         }
+      }
+
+      public override string ToString()
+      {
+        if (touchLocation)
+        {
+          return $"({nameof(Touch)}: {Touch})";
+        }
+
+        return $"({nameof(Gesture)}: {Gesture})";
       }
     }
   }

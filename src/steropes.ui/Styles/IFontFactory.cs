@@ -23,7 +23,6 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Steropes.UI.Platform;
-using Steropes.UI.Util;
 
 namespace Steropes.UI.Styles
 {
@@ -48,7 +47,7 @@ namespace Steropes.UI.Styles
     {
       this.contentManager = contentManager;
       this.graphicsDevice = graphicsDevice;
-      this.tracer = TracingUtil.Create<FontFactory>();
+      this.tracer = TracingUtil.StyleTracing;
     }
 
     public IUIFont LoadFont(string name)
@@ -118,12 +117,12 @@ namespace Steropes.UI.Styles
       if (line <= 0)
       {
         tracer.TraceEvent(TraceEventType.Information, 0,
-                          "Unable to find base line for {0}, assuming 75% of font height ({1}) = {2}",
+                          "[FontFactory] Unable to find base line for {0}, assuming 75% of font height ({1}) = {2}",
                           name, height, font.LineSpacing * 0.75);
         return height * 0.75f;
       }
-      tracer.TraceEvent(TraceEventType.Information, 0, 
-                        "Found base line for {0}, using font height ({1}) = {2}", name, height, line);
+      tracer.TraceEvent(TraceEventType.Verbose, 0, 
+                        "[FontFactory] Found base line for {0}, using font height ({1}) = {2}", name, height, line);
       return line;
     }
 

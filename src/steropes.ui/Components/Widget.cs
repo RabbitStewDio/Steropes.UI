@@ -1149,12 +1149,16 @@ namespace Steropes.UI.Components
             {
               UpdateHovered(eventData);
               mouseEnteredSupport.RaiseReverse(this, eventData);
+              // Enter and exit events do not bubble up the widget chain.
+              eventData.Consume();
               break;
             }
           case MouseEventType.Exited:
             {
               mouseExitedSupport.RaiseReverse(this, eventData);
               UpdateHovered(eventData);
+              // Enter and exit events do not bubble up the widget chain.
+              eventData.Consume();
               break;
             }
           default:
@@ -1684,18 +1688,15 @@ namespace Steropes.UI.Components
 
     void UpdateHovered(MouseEventArgs args)
     {
-      if (ReferenceEquals(args.Source, this))
+      if (args.EventType == MouseEventType.Entered)
       {
-        Hovered = args.EventType == MouseEventType.Entered;
+        Hovered = true;
       }
       else
       {
-        // indirect change. 
-        if (args.EventType == MouseEventType.Entered != Hovered)
-        {
-          Hovered = LastValidLayout().Contains(args.Position);
-        }
+        Hovered = false;
       }
+
     }
 
     void UpdateWindowCursor()

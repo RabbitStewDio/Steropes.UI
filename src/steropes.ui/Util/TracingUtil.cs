@@ -3,6 +3,7 @@ using System.Diagnostics;
 
 namespace Steropes.UI.Util
 {
+  [Obsolete]
   public static class TracingUtil
   {
     public static TraceSource Create<T>()

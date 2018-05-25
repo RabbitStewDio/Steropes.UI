@@ -21,13 +21,15 @@
 // SOFTWARE.
 using System;
 using System.Collections.Generic;
-
+using System.Diagnostics;
 using Microsoft.Xna.Framework;
 
 using Steropes.UI.Components.Window.Events;
 using Steropes.UI.Input;
+using Steropes.UI.Input.GamePadInput;
 using Steropes.UI.Input.KeyboardInput;
 using Steropes.UI.Input.MouseInput;
+using Steropes.UI.Input.TouchInput;
 using Steropes.UI.Platform;
 using Steropes.UI.Styles;
 using Steropes.UI.Widgets.Container;
@@ -71,6 +73,14 @@ namespace Steropes.UI.Components.Window
       eventHandler.AddMousePostProcessor(new PopupClosingEventProcessor(Root));
       eventHandler.AddMousePostProcessor(inputState);
       eventHandler.AddKeyPostProcessor(inputState);
+
+      if (TracingUtil.InputTracing.Switch.ShouldTrace(TraceEventType.Verbose))
+      {
+        eventHandler.AddKeyPreProcessor(new TracingEventSink<KeyEventData>());
+        eventHandler.AddMousePreProcessor(new TracingEventSink<MouseEventData>());
+        eventHandler.AddTouchPreProcessor(new TracingEventSink<TouchEventData>());
+        eventHandler.AddGamePadPreProcessor(new TracingEventSink<GamePadEventData>());
+      }
     }
 
     public IInputState InputState => inputState;

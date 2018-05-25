@@ -78,6 +78,26 @@ namespace Steropes.UI.Components.Window.Events
       touchInputs = ConfigureTouchInput(rawInputs.TouchSource);
     }
 
+    public void AddGamePadPostProcessor(IComponentEventSink<GamePadEventData> filter)
+    {
+      gamePadPostProcessors.Add(filter);
+    }
+
+    public void AddGamePadPreProcessor(IComponentEventSink<GamePadEventData> filter)
+    {
+      gamePadPreProcessors.Add(filter);
+    }
+
+    public void AddTouchPostProcessor(IComponentEventSink<TouchEventData> filter)
+    {
+      touchPostProcessors.Add(filter);
+    }
+
+    public void AddTouchPreProcessor(IComponentEventSink<TouchEventData> filter)
+    {
+      touchPreProcessors.Add(filter);
+    }
+
     public void AddKeyPostProcessor(IComponentEventSink<KeyEventData> filter)
     {
       keyPostProcessors.Add(filter);
@@ -149,7 +169,7 @@ namespace Steropes.UI.Components.Window.Events
         Process(gamePadPreProcessors, data, target);
         if (target != null)
         {
-          var args = new GamePadEventArgs(target, data);
+          var args = new GamePadEventArgs(data);
           target.DispatchEvent(args);
         }
 
@@ -166,7 +186,7 @@ namespace Steropes.UI.Components.Window.Events
         Process(keyPreProcessors, data, target);
         if (target != null)
         {
-          var args = new KeyEventArgs(target, data);
+          var args = new KeyEventArgs(data);
           target.DispatchEvent(args);
         }
 
