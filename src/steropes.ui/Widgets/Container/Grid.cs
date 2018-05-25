@@ -320,7 +320,9 @@ namespace Steropes.UI.Widgets.Container
         var location = pair.Constraint;
         var rect = new Rectangle(colStarts[location.X], rowStarts[location.Y], columnWidths[location.X],
                                  rowHeights[location.Y]);
-        widget.Arrange(rect);
+        var widgetLayout = widget.ArrangeChild(rect);
+        widget.Arrange(widgetLayout);
+
         maxX = Math.Max(rect.Right, maxX);
         maxY = Math.Max(rect.Bottom, maxY);
       }
@@ -342,7 +344,7 @@ namespace Steropes.UI.Widgets.Container
         var widget = pair.Widget;
         var location = pair.Constraint;
         var size = new Size(columnWidths[location.X], rowHeights[location.Y]);
-        widget.Measure(size);
+        widget.MeasureAsAnchoredChild(size);
       }
 
       var effectiveSpacingX = Math.Max(columnWidths.Length - 1, 0) * Spacing;
@@ -450,13 +452,13 @@ namespace Steropes.UI.Widgets.Container
           var rowIndexTmp = rowIndex;
           if (rows)
           {
-            var s = MeasureAutoSize(p => p.Y == rowIndexTmp);
+            var s = MeasureAutoSizeRow(rowIndexTmp);
             availableRowHeights[rowIndex] = (int) s.Height;
             usedHeight = s.Height;
           }
           else
           {
-            var s = MeasureAutoSize(p => p.X == rowIndexTmp);
+            var s = MeasureAutoSizeCol(rowIndexTmp);
             availableRowHeights[rowIndex] = (int) s.Width;
             usedHeight = s.Width;
           }
@@ -519,7 +521,7 @@ namespace Steropes.UI.Widgets.Container
       return null;
     }
 
-    Size MeasureAutoSize(Func<Point, bool> selector)
+    Size MeasureAutoSizeRow(int row)
     {
       var usedSize = new Size();
       var size = new Size(float.PositiveInfinity, float.PositiveInfinity);
@@ -528,13 +530,36 @@ namespace Steropes.UI.Widgets.Container
       for (var index = 0; index < widgetsWithConstraints.Count; index++)
       {
         var pair = widgetsWithConstraints[index];
-        if (!selector(pair.Constraint))
+        if (pair.Constraint.Y != row)
         {
           continue;
         }
 
         var widget = pair.Widget;
-        widget.Measure(size);
+        widget.MeasureAsAnchoredChild(size);
+        usedSize.Width = Math.Max(usedSize.Width, widget.DesiredSize.Width);
+        usedSize.Height = Math.Max(usedSize.Height, widget.DesiredSize.Height);
+      }
+
+      return usedSize;
+    }
+
+    Size MeasureAutoSizeCol(int col)
+    {
+      var usedSize = new Size();
+      var size = new Size(float.PositiveInfinity, float.PositiveInfinity);
+
+      var widgetsWithConstraints = WidgetsWithConstraints;
+      for (var index = 0; index < widgetsWithConstraints.Count; index++)
+      {
+        var pair = widgetsWithConstraints[index];
+        if (pair.Constraint.X != col)
+        {
+          continue;
+        }
+
+        var widget = pair.Widget;
+        widget.MeasureAsAnchoredChild(size);
         usedSize.Width = Math.Max(usedSize.Width, widget.DesiredSize.Width);
         usedSize.Height = Math.Max(usedSize.Height, widget.DesiredSize.Height);
       }

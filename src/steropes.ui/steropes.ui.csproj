@@ -143,6 +143,7 @@
     <Compile Include="Bindings\TypeSafePropertyBinding.cs" />
     <Compile Include="Bindings\WidgetBinding.cs" />
     <Compile Include="Components\Window\FrameRateCalculator.cs" />
+    <Compile Include="Components\Window\IInputState.cs" />
     <Compile Include="Components\Window\IMouseCursorService.cs" />
     <Compile Include="Components\Window\IRootPane.cs" />
     <Compile Include="I18N\Common.Designer.cs">

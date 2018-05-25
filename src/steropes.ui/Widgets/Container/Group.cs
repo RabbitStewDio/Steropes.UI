@@ -34,6 +34,31 @@ namespace Steropes.UI.Widgets.Container
     {
     }
 
+    /// <summary>
+    ///  DSL helper property. 
+    /// </summary>
+    public IWidget[] Children
+    {
+      set
+      {
+        Clear();
+        if (value == null)
+        {
+          return;
+        }
+
+        var rows = value.Length;
+        for (int rowIdx = 0; rowIdx < rows; rowIdx += 1)
+        {
+          var widget = value[rowIdx];
+          if (widget != null)
+          {
+            Add(widget);
+          }
+        }
+      }
+    }
+
     protected override Rectangle ArrangeOverride(Rectangle layoutSize)
     {
       for (var i = 0; i < this.Count; i++)

@@ -1,14 +1,17 @@
 ﻿// MIT License
 // Copyright (c) 2011-2016 Elisée Maurer, Sparklin Labs, Creative Patterns
-// Copyright (c) 2016 Thomas Morgner, Rabbit-StewDio Ltd.
+// Copyright (c) 2016-2018 Thomas Morgner, Rabbit-StewDio Ltd.
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
+//
 // The above copyright notice and this permission notice shall be included in all
 // copies or substantial portions of the Software.
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -23,6 +26,8 @@ using Microsoft.Xna.Framework;
 
 using Steropes.UI.Components.Window.Events;
 using Steropes.UI.Input;
+using Steropes.UI.Input.KeyboardInput;
+using Steropes.UI.Input.MouseInput;
 using Steropes.UI.Platform;
 using Steropes.UI.Styles;
 using Steropes.UI.Widgets.Container;
@@ -42,6 +47,7 @@ namespace Steropes.UI.Components.Window
 
     Rectangle lastLayoutSize;
     IBatchedDrawingService drawingService;
+    readonly InputStateImpl inputState;
 
     public Screen(IInputManager rawInputs, 
                   IUIStyle style, 
@@ -59,9 +65,15 @@ namespace Steropes.UI.Components.Window
 
       PopUpManager = new PopupManager(Root);
 
+      inputState = new InputStateImpl();
+
       eventHandler = new ScreenEventHandling(this, Root, rawInputs);
       eventHandler.AddMousePostProcessor(new PopupClosingEventProcessor(Root));
+      eventHandler.AddMousePostProcessor(inputState);
+      eventHandler.AddKeyPostProcessor(inputState);
     }
+
+    public IInputState InputState => inputState;
 
     public IFocusManager FocusManager { get; }
 
@@ -120,13 +132,14 @@ namespace Steropes.UI.Components.Window
     public void Update(GameTime elapsedTime)
     {
       Time = elapsedTime;
-
+      
       if (ignoreClickFrames > 0)
       {
         ignoreClickFrames -= 1;
       }
       else
       {
+        inputState.Reset();
         eventHandler.ProcessEvents(elapsedTime);
       }
 
@@ -160,6 +173,31 @@ namespace Steropes.UI.Components.Window
         Root.InvalidateLayout();
         Root.Arrange(screenSpace);
         lastLayoutSize = screenSpace;
+      }
+    }
+
+    class InputStateImpl : IInputState, IComponentEventSink<MouseEventData>, IComponentEventSink<KeyEventData>
+    {
+      Point oldPosition;
+
+      public Point MousePosition { get; private set; }
+      public Point MousePositionChange => MousePosition - oldPosition;
+      public InputFlags InputFlags { get; private set; }
+
+      public void Reset()
+      {
+        oldPosition = MousePosition;
+      }
+
+      public void PushEvent(MouseEventData data, IWidget target)
+      {
+        MousePosition = data.Position;
+        InputFlags = data.Flags;
+      }
+
+      public void PushEvent(KeyEventData data, IWidget target)
+      {
+        InputFlags = data.Flags;
       }
     }
 

@@ -19,6 +19,7 @@
 using System;
 
 using Microsoft.Xna.Framework;
+using Steropes.UI.Components;
 
 namespace Steropes.UI.Platform
 {
@@ -64,6 +65,8 @@ namespace Steropes.UI.Platform
     {
       return Top == other.Top && Right == other.Right && Bottom == other.Bottom && Left == other.Left;
     }
+
+    public Size Size => new Size(Horizontal, Vertical);
 
     public override bool Equals(object obj)
     {
