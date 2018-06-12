@@ -67,6 +67,18 @@ namespace Steropes.UI.Widgets
       }
     }
 
+    public double AnimationDuration
+    {
+      get
+      {
+        return lerpValue.Duration;
+      }
+      set
+      {
+        lerpValue.Duration = value;
+      }
+    }
+
     public float Max
     {
       get
@@ -136,6 +148,10 @@ namespace Steropes.UI.Widgets
       }
       set
       {
+        if (value.Equals(lerpValue.End))
+          return;
+
+        lerpValue.Start = lerpValue.End;
         lerpValue.End = value;
         if (!lerpValue.IsRunning)
         {
@@ -144,7 +160,13 @@ namespace Steropes.UI.Widgets
       }
     }
 
+    [Obsolete]
     public void SetValue(int newValue, bool now = false)
+    {
+      SetValue((float) newValue, now);
+    }
+
+    public void SetValue(float newValue, bool now = false)
     {
       lerpValue.End = newValue;
       if (now)
