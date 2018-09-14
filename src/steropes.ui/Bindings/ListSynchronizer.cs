@@ -42,7 +42,7 @@ namespace Steropes.UI.Bindings
     {
       for (var idx = 0; idx < count; idx += 1)
       {
-        TargetAsList[idx + start] = SourceList[idx];
+        TargetAsList[idx + start] = SourceList[idx + start];
       }
     }
 
