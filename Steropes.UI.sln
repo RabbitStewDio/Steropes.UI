@@ -13,7 +13,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Steropes.UI.Windows", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Steropes.UI.Tests", "tests\Steropes.UI.Tests\Steropes.UI.Tests.csproj", "{AED18F41-A438-4E85-A7F2-13ED92B2F9AD}"
 EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Content", "Content.shproj", "{59F35FD0-785B-4D6E-B706-8890C6933E63}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build-Automation", "Build-Automation", "{274781EA-4EA8-4AF5-B271-874B9DF89655}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "build-automation\_build", "build-automation\build\_build.csproj", "{1DECB7AA-A94B-422C-84AF-E2AF250A9C93}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_release", "build-automation\release\_release.csproj", "{3A84DBEB-A08F-473C-9A4E-561D982B2960}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,6 +32,12 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1DECB7AA-A94B-422C-84AF-E2AF250A9C93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DECB7AA-A94B-422C-84AF-E2AF250A9C93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DECB7AA-A94B-422C-84AF-E2AF250A9C93}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1DECB7AA-A94B-422C-84AF-E2AF250A9C93}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1DECB7AA-A94B-422C-84AF-E2AF250A9C93}.Release|x64.ActiveCfg = Release|Any CPU
+		{1DECB7AA-A94B-422C-84AF-E2AF250A9C93}.Release|x86.ActiveCfg = Release|Any CPU
 		{BAD60C34-2554-4488-9821-26EFCD01E86C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BAD60C34-2554-4488-9821-26EFCD01E86C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BAD60C34-2554-4488-9821-26EFCD01E86C}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -88,5 +98,15 @@ Global
 		{AED18F41-A438-4E85-A7F2-13ED92B2F9AD}.Release|x64.Build.0 = Release|Any CPU
 		{AED18F41-A438-4E85-A7F2-13ED92B2F9AD}.Release|x86.ActiveCfg = Release|Any CPU
 		{AED18F41-A438-4E85-A7F2-13ED92B2F9AD}.Release|x86.Build.0 = Release|Any CPU
+		{3A84DBEB-A08F-473C-9A4E-561D982B2960}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A84DBEB-A08F-473C-9A4E-561D982B2960}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A84DBEB-A08F-473C-9A4E-561D982B2960}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3A84DBEB-A08F-473C-9A4E-561D982B2960}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3A84DBEB-A08F-473C-9A4E-561D982B2960}.Release|x64.ActiveCfg = Release|Any CPU
+		{3A84DBEB-A08F-473C-9A4E-561D982B2960}.Release|x86.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{1DECB7AA-A94B-422C-84AF-E2AF250A9C93} = {274781EA-4EA8-4AF5-B271-874B9DF89655}
+		{3A84DBEB-A08F-473C-9A4E-561D982B2960} = {274781EA-4EA8-4AF5-B271-874B9DF89655}
 	EndGlobalSection
 EndGlobal

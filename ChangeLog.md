@@ -1,6 +1,8 @@
 ﻿# Changelog
 
-2018-05-25 - 2.1.0
+Test
+
+## 2018-05-25 - 2.1.0
 
     [API] Grid container now honor the Anchor property of all its child widgets.
           This allows you to set a preferred size and alignment on the widgets
@@ -27,7 +29,7 @@
           Right-To-Left and can request a minimum size based on the value range
           covered.
 
-2018-02-18 - 2.0.0
+## 2018-02-18 - 2.0.0
 
     [API] The project is now built with C# 7 features to reduce some clutter in
           the code. 
@@ -112,7 +114,7 @@
           takes all loaded textures and transparently combines them into a single 
           texture atlas at runtime to reduce the number of draw calls issued.  
 
-2017-10-16 - 1.1.0
+## 2017-10-16 - 1.1.0
 
     [Bug] Non-consumed KeyEvents were passed on to parent components, which made it 
           ugly to limit event handling to just one component without adding a lot
@@ -140,7 +142,7 @@
     [API] Added AnchoredRect#CreateSizeConstraint(width, height) to make it clearer
           to see the intent of the AnchoredRect use on some widget container childs.
 
-2017-05-28 - 1.0.0
+## 2017-05-28 - 1.0.0
 
     Initial release
 
