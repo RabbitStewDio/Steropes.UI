@@ -1,0 +1,48 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <BaseOutputPath>$(MSBuildThisFileDirectory)/output/$(MSBuildProjectName)/bin</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)/output/$(MSBuildProjectName)/obj</BaseIntermediateOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <NoWarn>1701;1702;1591</NoWarn>
+    <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS</DefineConstants>
+    <DebugSymbols>True</DebugSymbols>
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <Description>Steropes-UI is a lightweight UI framework built on top of Monogame. The library supports flexible CSS inspired styling of complex UIs and enables unit-tests for UI including input processing and rendering using mockable interfaces.</Description>
+    <Authors>Thomas Morgner</Authors>
+    <Copyright>Copyright $([System.DateTime]::Now.Year) RabbitStewDio Ltd.</Copyright>
+    <PackageTags>MonoGame UI</PackageTags>
+    <PackageProjectUrl>https://www.rabbit-stew-dio.com/projects/steropes-ui/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/rabbitstewdio/Steropes.UI</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)/LICENSE.txt" Pack="true" PackagePath=""/>
+  </ItemGroup>
+  
+  <PropertyGroup Condition="$(TargetFramework.StartsWith('netstandard')) OR $(TargetFramework.StartsWith('netcoreapp'))">
+    <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(IsPackable)' == 'True'">
+    <DocumentationFile>$(BaseOutputPath)\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <DefineConstants>$(DefineConstants);RELEASE</DefineConstants>
+    <Optimize>True</Optimize>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+  </PropertyGroup>
+  
+</Project>

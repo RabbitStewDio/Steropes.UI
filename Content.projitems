@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>A0260612-9C67-42E3-9844-3FA8E46B9A8D</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Content</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)build.cake" />
+    <Content Include="$(MSBuildThisFileDirectory)BUILD.md" />
+    <Content Include="$(MSBuildThisFileDirectory)build.ps1" />
+    <Content Include="$(MSBuildThisFileDirectory)build.sh" />
+    <Content Include="$(MSBuildThisFileDirectory)ChangeLog.md" />
+    <Content Include="$(MSBuildThisFileDirectory)docs\concepts.md" />
+    <Content Include="$(MSBuildThisFileDirectory)docs\databinding.md" />
+    <Content Include="$(MSBuildThisFileDirectory)docs\notes.md" />
+    <Content Include="$(MSBuildThisFileDirectory)docs\quickstart.md" />
+    <Content Include="$(MSBuildThisFileDirectory)docs\README.md" />
+    <Content Include="$(MSBuildThisFileDirectory)docs\style.md" />
+    <Content Include="$(MSBuildThisFileDirectory)GitVersion.yml" />
+    <Content Include="$(MSBuildThisFileDirectory)LICENSE.txt" />
+    <Content Include="$(MSBuildThisFileDirectory)licenseheader.txt" />
+    <Content Include="$(MSBuildThisFileDirectory)publish.ps1" />
+    <Content Include="$(MSBuildThisFileDirectory)README.md" />
+    <Content Include="$(MSBuildThisFileDirectory)release.cake" />
+    <Content Include="$(MSBuildThisFileDirectory)release.ps1" />
+    <Content Include="$(MSBuildThisFileDirectory)release.sh" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)tools\packages.config" />
+  </ItemGroup>
+</Project>
