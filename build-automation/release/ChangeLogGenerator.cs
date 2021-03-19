@@ -9,6 +9,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 public static class ChangeLogGenerator
 {
@@ -83,8 +84,11 @@ public static class ChangeLogGenerator
 
     static bool ParseBody(IEnumerator<string> r, out List<string> body)
     {
+        var versionIncrementComment = new Regex("\\+semver:\\s?(breaking|major|feature|minor|fix|patch)");
+        
         var lines = new List<string>();
         bool eol = false;
+        bool skip = false;
         while (true)
         {
             if (!r.MoveNext())
@@ -105,6 +109,22 @@ public static class ChangeLogGenerator
                 break;
             }
 
+            if ("--".Equals(l.Trim()))
+            {
+                skip = true;
+                continue;
+            }
+
+            if (versionIncrementComment.IsMatch(l))
+            {
+                continue;
+            }
+
+            if (skip)
+            {
+                continue;
+            }
+            
             if (lines.Count == 0 && string.IsNullOrWhiteSpace(l))
             {
                 continue;
