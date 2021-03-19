@@ -4,6 +4,8 @@ Test
 
 ## 2021-03-19 - v2.2.0
 
+## 2021-03-19 - v2.2.0
+
     [???]   Updating version info for development branch 2.1.1-unstable.0
 
     [???]   Porting project to a cleaner project standard.
