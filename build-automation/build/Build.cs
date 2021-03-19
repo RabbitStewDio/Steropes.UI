@@ -158,10 +158,20 @@ class Build : NukeBuild
          .Executes(() =>
          {
              string releaseNotes = null;
+             // Seriously, I have no clue what the format of those release notes should
+             // be and how NuGet.org actually formats that stuff. It seems either broken
+             // or random and most packages do not ship release notes or provide
+             // a single link to an external website (aka its broken and I work around
+             // it
+             //
+             // So uncomment the line below at your own risk.
+             
+             /*
              if (!string.IsNullOrEmpty(PackageReleaseNotesFile) && File.Exists(PackageReleaseNotesFile))
              {
                  releaseNotes = TextTasks.ReadAllText(PackageReleaseNotesFile);
              }
+             */
 
              DotNetPack(s => s.SetProject(Solution)
                               .SetConfiguration(Configuration)
