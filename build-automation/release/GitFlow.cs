@@ -1,5 +1,6 @@
 using JetBrains.Annotations;
 using Nuke.Common;
+using Nuke.Common.IO;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.Git;
 using Nuke.Common.Tools.GitVersion;
@@ -14,14 +15,14 @@ public class GitFlow
         this.build = build ?? throw new ArgumentNullException(nameof(build));
     }
 
-    public event EventHandler<string> UpdateVersionNumbers;
+    public event EventHandler<BuildType> UpdateVersionNumbers;
 
     public bool EnsureNoUncommittedChanges()
     {
         if (!GitTasks.GitHasCleanWorkingCopy())
             throw new Exception(
                 "There are uncommitted changes in the working tree. Please commit or remove these before proceeding.");
-        
+
         return true;
     }
 
@@ -51,7 +52,7 @@ Based on the current version information I expect to be on branch '{state.Develo
             {
                 Logger.Info($"Creating new staging branch from current branch {versionInfo.BranchName} as branch {stageBranchName}");
                 GitTools.Branch(stageBranchName);
-                UpdateVersionNumbers?.Invoke(this, "staging");
+                UpdateVersionNumbers?.Invoke(this, BuildType.Staging);
             }
         }
         else
@@ -64,16 +65,16 @@ Based on the current version information I expect to be on branch '{state.Releas
         }
     }
 
-    public void AttemptStagingBuild(BuildState state, Action<Build> action)
+    public void AttemptStagingBuild(BuildState state, Action<BuildType, string> action)
     {
         // We are now supposed to be on the release branch.
         EnsureOnReleaseStagingBranch(state);
 
         Logger.Info("Building current release as release candidate.");
-        ValidateBuild(action);
+        ValidateBuild(action, BuildType.Staging, null);
     }
 
-    public void ValidateBuild(Action<Build> runBuildTarget)
+    void ValidateBuild(Action<BuildType, string> runBuildTarget, BuildType t, string path)
     {
         if (runBuildTarget == null)
             throw new ArgumentException("RunBuildTarget action is not configured.");
@@ -81,7 +82,7 @@ Based on the current version information I expect to be on branch '{state.Releas
         EnsureNoUncommittedChanges();
 
         Logger.Info("Running target build script.");
-        runBuildTarget(this.build);
+        runBuildTarget(t, path);
 
         Logger.Info("Restoring original assembly version files.");
         GitTools.Reset(GitTools.ResetType.Hard);
@@ -112,6 +113,73 @@ Based on the current version information I expect to be on branch '{state.Releas
                 "Not on the release branch. Based on the current version information I expect to be on branch '" +
                 state.ReleaseStagingBranch + "', but detected branch '" + versionInfo.BranchName + "' instead");
         return true;
+    }
+
+    public void PerformRelease(BuildState state, AbsolutePath changeLogFile, Action<BuildType, string> buildAction)
+    {
+        var releaseId = Guid.NewGuid();
+        var releaseBranchTag = "_release-state-" + releaseId;
+        var stagingBranchTag = "_staging-state-" + releaseId;
+
+        EnsureOnReleaseStagingBranch(state);
+
+        GitTools.Tag(stagingBranchTag, state.ReleaseStagingBranch);
+
+        try
+        {
+            if (ChangeLogGenerator.TryPrepareChangeLogForRelease(state, changeLogFile, out var sectionFile))
+            {
+                GitTools.Commit($"Updated change log for release {state.Version.MajorMinorPatch}");
+            }
+
+
+            // record the current master branch state.
+            // We will use that later to potentially undo any changes we made during that build.
+            GitTools.Tag(releaseBranchTag, state.ReleaseTargetBranch);
+
+            try
+            {
+                // this takes the current staging branch state and merges it into
+                // the release branch (usually master). This changes the active 
+                // branch of the working copy.
+                GitTools.MergeRelease(state.ReleaseTargetBranch, state.ReleaseStagingBranch);
+
+                // attempt to build the release again.
+                ValidateBuild(buildAction, BuildType.Release, sectionFile);
+            }
+            catch
+            {
+                Logger.Error("Error: Unable to build the release on the release branch. Attempting to roll back changes on release branch.");
+                GitTools.Reset(GitTools.ResetType.Hard, releaseBranchTag);
+                throw;
+            }
+            finally
+            {
+                GitTools.DeleteTag(releaseBranchTag);
+            }
+        }
+        catch
+        {
+            // In case of errors, roll back all commits and restore the current state 
+            // to be back on the release-staging branch.
+            GitTools.Checkout(stagingBranchTag);
+            GitTools.ResetBranch(state.ReleaseStagingBranch, stagingBranchTag);
+            throw;
+        }
+        finally
+        {
+            GitTools.DeleteTag(stagingBranchTag);
+        }
+    }
+
+    public void ContinueOnDevelopmentBranch(BuildState state)
+    {
+        EnsureNoUncommittedChanges();
+
+        GitTools.Checkout(state.DevelopmentBranch);
+        GitTools.Merge(state.ReleaseStagingBranch);
+
+        UpdateVersionNumbers?.Invoke(this, BuildType.Development);
     }
 
     public BuildState RecordBuildState()

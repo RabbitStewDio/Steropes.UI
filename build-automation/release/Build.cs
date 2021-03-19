@@ -23,7 +23,7 @@ public partial class Build : NukeBuild
     ///   - JetBrains Rider            https://nuke.build/rider
     ///   - Microsoft VisualStudio     https://nuke.build/visualstudio
     ///   - Microsoft VSCode           https://nuke.build/vscode
-    public static int Main() => Execute<Build>(x => x.UpdateChangeLog);
+    public static int Main() => Execute<Build>(x => x.Release);
 
     public event Action BuildInitialized;
 
@@ -84,103 +84,46 @@ public partial class Build : NukeBuild
          });
 
 
-    Target PrepareReleaseStagingBranch => _ =>
+    Target PrepareRelease => _ =>
         _.Description("Switches the repository to the current release staging branch - or creates one if needed.")
-         .Requires(() => GitFlow.EnsureNoUncommittedChanges())
          .Executes(() =>
          {
+             GitFlow.EnsureNoUncommittedChanges();
+             
              var state = GetOrCreateBuildState();
              GitFlow.PrepareStagingBranch(state);
          });
 
     Target BuildStagingBuild => _ =>
         _.Description("Invokes the builds script for a staging build to validate that the build passes and all tests run without errors. This is a pre-requisite for a release.")
-         .DependsOn(PrepareReleaseStagingBranch)
-         .Requires(() => GitFlow.EnsureOnReleaseStagingBranch(GetOrCreateBuildState()))
+         .DependsOn(PrepareRelease)
          .Executes(() =>
          {
+             GitFlow.EnsureNoUncommittedChanges();
+             GitFlow.EnsureOnReleaseStagingBranch(GetOrCreateBuildState());
+             
              var state = GetOrCreateBuildState();
-             GitFlow.AttemptStagingBuild(state, x => PerformBuild(BuildType.Staging));
+             GitFlow.AttemptStagingBuild(state, PerformBuild);
          });
 
 
     Target Release => _ =>
         _.DependsOn(BuildStagingBuild)
-         .Executes(PerformRelease);
+         .Executes(() =>
+         {
+             GitFlow.PerformRelease(GetOrCreateBuildState(), ChangeLogFile, PerformBuild);
+         });
+
+    Target ContinueDevelopment => _ =>
+        _.Executes(() =>
+        {
+            GitFlow.EnsureNoUncommittedChanges();
+            
+            var state = GetOrCreateBuildState();
+            GitFlow.ContinueOnDevelopmentBranch(state);
+        });
     
-    void PerformRelease()
-    {
-        var state = GetOrCreateBuildState();
-        var releaseId = Guid.NewGuid();
-        var releaseBranchTag = "_release-state-" + releaseId;
-        var stagingBranchTag = "_staging-state-" + releaseId;
-        
-        GitFlow.EnsureOnReleaseStagingBranch(state);
-        
-        GitTools.Tag(stagingBranchTag, state.ReleaseStagingBranch);
 
-        try
-        {
-            if (TryPrepareChangeLogForRelease(state, out var sectionFile))
-            {
-                GitTools.Commit($"Updated change log for release {state.Version.MajorMinorPatch}");
-            }
-            
-            
-            // record the current master branch state.
-            // We will use that later to potentially undo any changes we made during that build.
-            GitTools.Tag(releaseBranchTag, state.ReleaseTargetBranch);
-
-            try
-            {
-                // this takes the current staging branch state and merges it into
-                // the release branch (usually master). This changes the active 
-                // branch of the working copy.
-                GitTools.MergeRelease(state.ReleaseTargetBranch, state.ReleaseStagingBranch);
-
-                // attempt to build the release again.
-                GitFlow.AttemptStagingBuild(state, x => PerformBuild(BuildType.Release, sectionFile));
-                BuildScript($"upload --configuration {Configuration} --package-release-notes-file {sectionFile} {BuildToolParameters}");
-            }
-            catch
-            {
-                Logger.Error("Error: Unable to build the release on the release branch. Attempting to roll back changes on release branch.");
-                GitTools.Reset(GitTools.ResetType.Hard, releaseBranchTag);
-
-            }
-            finally
-            {
-                GitTools.DeleteTag(releaseBranchTag);
-            }
-        }
-        catch
-        {
-            // In case of errors, roll back all commits and restore the current state 
-            // to be back on the release-staging branch.
-            GitTools.Checkout(stagingBranchTag);
-            GitTools.ResetBranch(state.ReleaseStagingBranch, stagingBranchTag);
-        }
-        finally
-        {
-            GitTools.DeleteTag(stagingBranchTag);
-        }
-        
-    }
-
-    bool TryPrepareChangeLogForRelease(BuildState state, out string sectionFile)
-    {
-        if (!File.Exists(ChangeLogFile))
-        {
-            sectionFile = default;
-            return false;
-        }
-
-        var (cl, section) = ChangeLogGenerator.UpdateChangeLogFile(ChangeLogFile, state.VersionTag, state.ReleaseTargetBranch);
-        File.WriteAllText(ChangeLogFile, cl);
-        sectionFile = Path.GetTempFileName();
-        File.WriteAllText(sectionFile, section);
-        return true;
-    }
 
     Target UpdateChangeLog => _ =>
         _.Executes(() =>
@@ -196,16 +139,14 @@ public partial class Build : NukeBuild
         if (changeLogSection != null)
         {
             BuildScript($"default --configuration {Configuration} --package-release-notes-file {changeLogSection.DoubleQuoteIfNeeded()} {BuildToolParameters}");
+            if (type == BuildType.Release)
+            {
+                BuildScript($"upload --configuration {Configuration} --package-release-notes-file {changeLogSection.DoubleQuoteIfNeeded()} {BuildToolParameters}");
+            }
         }
         else
         {
             BuildScript($"default --configuration {Configuration} {BuildToolParameters}");
         }
-    }
-
-    enum BuildType
-    {
-        Staging,
-        Release
     }
 }

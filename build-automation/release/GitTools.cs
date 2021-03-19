@@ -50,7 +50,7 @@ public static class GitTools
     public static void Checkout(string branchName, bool force = false)
     {
         var forceArg = force ? "-f" : ""; 
-        GitTasks.Git($"checkout {forceArg} {branchName.DoubleQuoteIfNeeded()}{forceArg}");
+        GitTasks.Git($"checkout {forceArg} {branchName.DoubleQuoteIfNeeded()}");
     }
 
     public static void Branch(string branchName, bool force = false)

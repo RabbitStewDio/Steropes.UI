@@ -216,4 +216,21 @@ public static class ChangeLogGenerator
 
         return sb.ToString();
     }
+    
+    public static bool TryPrepareChangeLogForRelease(BuildState state, AbsolutePath changeLogFile, out string sectionFile)
+    {
+        if (!File.Exists(changeLogFile))
+        {
+            sectionFile = default;
+            return false;
+        }
+
+        var (cl, section) = ChangeLogGenerator.UpdateChangeLogFile(changeLogFile, state.VersionTag, state.ReleaseTargetBranch);
+        File.WriteAllText(changeLogFile, cl);
+        sectionFile = Path.GetTempFileName();
+        File.WriteAllText(sectionFile, section);
+        return true;
+    }
+
+
 }
