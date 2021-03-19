@@ -1,6 +1,29 @@
-﻿# Changelog
+# Changelog
 
 Test
+
+## 2021-03-19 - v2.2.0
+
+## 2021-03-19 - v2.2.0
+
+    [???]   Updating version info for development branch 2.1.1-unstable.0
+
+    [???]   Porting project to a cleaner project standard.
+
+            Now using modern dotnet-core.
+            Fixed case of project files to be in line with common pascal-case standard used in dotnet.
+            Added new shared-items project as content project to be able to edit documentation in the IDE.
+            Changed all project types to be netstandard2.0 libraries, thanks to MonoGame supporting this build type now.
+            
+    [???]   Corrected case of project file
+
+    [Bug]   Setting a value on the progressbar played the lerp animation from value=0. [Bug] ProgressBar.SetValue() still had an int parameter type for values. Everything else was switched to float some time ago.
+
+    [Bug]   List synchronizer used wrong offset
+
+    [Build] Created NUKE-Build build and release scripts
+
+    [Build] Reworking release script.
 
 ## 2018-05-25 - 2.1.0
 
